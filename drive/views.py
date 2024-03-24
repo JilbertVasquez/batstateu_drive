@@ -9,7 +9,13 @@ from django.contrib.auth.hashers import make_password
 # Create your views here.
 
 def dashboard(request):
-    return render(request, 'dashboard.html')
+    username = request.session.get('username', None)
+    if username:
+        # Pass the username to the template
+        return render(request, 'dashboard.html', {'username': username})
+    else:
+        # Handle the case if user is not logged in
+        return redirect('login')
 
 def signupPage(request):
     if request.method == 'POST':
@@ -53,6 +59,7 @@ def loginPage(request):
             if check_password(pass1, user.password):
                 # Passwords match, user authenticated
                 print(email, pass1)
+                request.session['username'] = user.username  # Storing username in session
                 return redirect('dashboard')
             else:
                 print(email, pass1)
