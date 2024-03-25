@@ -1,14 +1,80 @@
 * {
-    height: 100vh;
+    margin: 0;
+    padding: 0;
 }
 
 body {
+    height: 100vh;
     display: flex;
+    flex-direction: column;
     justify-content: center;
     align-items: center;
     text-align: center;
 }
 
+header {
+    height: 10%;
+    width:  100%;
+}
+
 h1 {
-    color: red;
+    color: blue;
+}
+
+.section {
+    background-color: red;
+    width: 100%;
+    height: 90%;
+    display: flex;
+    position: relative;
+}
+
+.upload-section {
+    width: 50%;
+    background-color: yellow;
+    position: relative;
+}
+
+.toggle-upload-buttons {
+    width: 10%;
+    height: 8%;
+    background-color: red;
+    border-radius: 10px;
+    margin: 10px 0px 0px 10px;
+}
+
+.toggle-upload-buttons button {
+    height: 100%;
+    width: 100%;
+    border-radius: 10px;
+}
+
+.upload-buttons {
+    height: 20%;
+    width: 20%;
+    background-color: blue;
+    display: none;
+    
+    flex-direction: column;
+    position: absolute;
+    top: 10%;
+    left: 5%;
+    z-index: 2;
+}
+
+.upload-buttons button {
+    width: 100%;
+    height: 50%;
+    background-color: white;
+}
+
+
+
+.download-section {
+    width:  50%;
+    background-color: blue;
+}
+
+button {
+    background-color: red;
 }

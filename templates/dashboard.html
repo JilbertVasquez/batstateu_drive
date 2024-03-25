@@ -6,12 +6,63 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
     <link rel="stylesheet" href="{% static 'dashboard.css' %}">
     <title>BatStateU | Dashboard</title>
 </head>
 <body>
-    <h1>Welcome, {{ username }}</h1>
+    <header>
+        <h1>Welcome, {{ username }}</h1>
+    </header>
+    <!-- Upload Button -->
+    
+<div class="section">
+    <div class="upload-section">
+        <div class="toggle-upload-buttons">
+            <button onclick="toggleUploadButtons()">New</button>
+            <h1>HELLO WORLD</h1>
+        </div>
+        <div class="upload-buttons">
+            <form method="POST" enctype="multipart/form-data" id="upload-form" action="action="{% url 'handle_upload' %}>
+                {% csrf_token %}
+                <button type="button" onclick="createFolder()">Create Folder</button>
+                <input type="file" name="file" id="file" multiple style="display: none;">
+                <button type="button" onclick="uploadFile();">Upload Files</button>
+                <button type="button" onclick="uploadFolder()">Upload Folder</button>
+            </form>
+            
+            <script>
+                function uploadFolder() {
+                    document.getElementById('file').webkitdirectory = true;
+                    document.getElementById('file').directory = true;
+                    document.getElementById('file').click();
+                }
+
+                function uploadFile() {
+                    document.getElementById('file').webkitdirectory = false;
+                    document.getElementById('file').directory = false;
+                    document.getElementById('file').click();
+                }
+
+                function toggleUploadButtons() {
+                    var uploadButtons = document.querySelector('.upload-buttons');
+                    if (uploadButtons.style.display === "none") {
+                        uploadButtons.style.display = "block";
+                    } else {
+                        uploadButtons.style.display = "none";
+                    }
+                }
+            </script>
+        </div>
+    </div>
+    <div class="download-section">
+        <h2>Uploaded Files:</h2>
+        <ul>
+            {% for file in uploaded_files %}
+                <li>{{ file }}</li>
+            {% endfor %}
+        </ul>
+    </div>
+    </div>
 
 </body>
 </html>

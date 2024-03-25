@@ -5,17 +5,58 @@ from .models import Users
 from django.contrib.auth import authenticate, login
 from django.contrib.auth.hashers import check_password
 from django.contrib.auth.hashers import make_password
+import os
+from django.conf import settings
+
 
 # Create your views here.
 
 def dashboard(request):
     username = request.session.get('username', None)
+    uploaded_files = os.listdir('D:/uploadedfiles')
     if username:
         # Pass the username to the template
-        return render(request, 'dashboard.html', {'username': username})
+        return render(request, 'dashboard.html', {'username': username, 'uploaded_files': uploaded_files})
     else:
         # Handle the case if user is not logged in
         return redirect('login')
+    
+def handle_upload(request):
+    if request.method == 'POST' and request.FILES:
+        uploaded_files = request.FILES.getlist('file')
+        for uploaded_file in uploaded_files:
+            if hasattr(uploaded_file, 'chunks'):
+                handle_directory_upload(uploaded_file)
+            else:
+                handle_file_upload(uploaded_file)
+        return HttpResponse("Files uploaded successfully!")
+    else:
+        return HttpResponse("No files uploaded!")
+
+def handle_file_upload(uploaded_file):
+    destination_path = os.path.join('uploadedfiles', uploaded_file.name)
+    with open(destination_path, 'wb+') as destination:
+        for chunk in uploaded_file.chunks():
+            destination.write(chunk)
+
+def handle_directory_upload(uploaded_directory):
+    destination_path = os.path.join(settings.BASE_DIR, 'uploadedfiles', uploaded_directory.name)
+    os.makedirs(destination_path, exist_ok=True)
+    for file_name, file_content in uploaded_directory.items():
+        with open(os.path.join(destination_path, file_name), 'wb+') as destination:
+            for chunk in file_content.chunks():
+                destination.write(chunk)
+
+def create_folder(request):
+    folder_name = request.POST.get('folder_name')
+    if folder_name:
+        folder_path = os.path.join(settings.BASE_DIR, 'uploadedfiles', folder_name)
+        os.makedirs(folder_path, exist_ok=True)
+        return HttpResponse("Folder created successfully!")
+    else:
+        return HttpResponse("Folder name not provided!")
+    
+
 
 def signupPage(request):
     if request.method == 'POST':
