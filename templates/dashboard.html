@@ -19,29 +19,37 @@
     <div class="upload-section">
         <div class="toggle-upload-buttons">
             <button onclick="toggleUploadButtons()">New</button>
-            <h1>HELLO WORLD</h1>
+            {% comment %} <h1>HELLO WORLD</h1> {% endcomment %}
         </div>
         <div class="upload-buttons">
-            <form method="POST" enctype="multipart/form-data" id="upload-form" action="action="{% url 'handle_upload' %}>
+            <form method="POST" enctype="multipart/form-data" id="upload-form" action="{% url 'handle_upload' %}">
                 {% csrf_token %}
-                <button type="button" onclick="createFolder()">Create Folder</button>
+                <button class="buttonClass" type="button" onclick="createFolder()">Create Folder</button>
                 <input type="file" name="file" id="file" multiple style="display: none;">
-                <button type="button" onclick="uploadFile();">Upload Files</button>
-                <button type="button" onclick="uploadFolder()">Upload Folder</button>
+                {% comment %} <label for="file" id="file-label">Choose File(s)</label> {% endcomment %}
+                <button class="buttonClass" type="button" onclick="uploadFile();">Upload Files</button>
+                <button class="buttonClass" type="button" onclick="uploadFolder()">Upload Folder</button>
             </form>
-            
+            {% comment %} document.getElementById('file').click(); {% endcomment %}
+            {% comment %} document.getElementById('upload-form').submit(); {% endcomment %}
             <script>
                 function uploadFolder() {
                     document.getElementById('file').webkitdirectory = true;
                     document.getElementById('file').directory = true;
-                    document.getElementById('file').click();
+                   
                 }
 
                 function uploadFile() {
                     document.getElementById('file').webkitdirectory = false;
                     document.getElementById('file').directory = false;
                     document.getElementById('file').click();
+                    
+                    
                 }
+
+                document.getElementById('file').addEventListener('change', function() {
+                    document.getElementById('upload-form').submit();
+                });
 
                 function toggleUploadButtons() {
                     var uploadButtons = document.querySelector('.upload-buttons');
@@ -57,10 +65,19 @@
     <div class="download-section">
         <h2>Uploaded Files:</h2>
         <ul>
-            {% for file in uploaded_files %}
-                <li>{{ file }}</li>
-            {% endfor %}
-        </ul>
+            {% comment %} {% for file in uploaded_files %}
+                <li><a href="{{ file.url }}" download>{{ file.name }}</a></li>
+            {% endfor %} {% endcomment %}
+            {% comment %} {% for file_name in uploaded_files %}
+                {% with file_path="D:/uploadedfiles/"|add:file_name %}
+                    <li><a href="{{ file_path }}" download>{{ file_name }}</a></li>
+                {% endwith %}
+        {% endfor %} {% endcomment %}
+
+        {% for file_name in uploaded_files %}
+            <li><a href="{% url 'download_file' file_name=file_name %}" download>{{ file_name }}</a></li>
+        {% endfor %}
+
     </div>
     </div>
 

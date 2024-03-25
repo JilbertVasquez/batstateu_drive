@@ -18,7 +18,7 @@ header {
 }
 
 h1 {
-    color: blue;
+    color: red;
 }
 
 .section {
@@ -31,7 +31,7 @@ h1 {
 
 .upload-section {
     width: 50%;
-    background-color: yellow;
+    background-color: rgb(154, 154, 154);
     position: relative;
 }
 
@@ -52,7 +52,7 @@ h1 {
 .upload-buttons {
     height: 20%;
     width: 20%;
-    background-color: blue;
+    background-color: white;
     display: none;
     
     flex-direction: column;
@@ -60,21 +60,31 @@ h1 {
     top: 10%;
     left: 5%;
     z-index: 2;
+    padding: 0.5%;
 }
 
 .upload-buttons button {
-    width: 100%;
+    width: 98%;
     height: 50%;
     background-color: white;
+}
+
+.upload-buttons .buttonClass {
+    height: 25px;
 }
 
 
 
 .download-section {
     width:  50%;
-    background-color: blue;
+    background-color: rgb(154, 154, 154);;
 }
 
 button {
-    background-color: red;
+    background-color: white;
+}
+
+ul li a {
+    color: white;
+    text-decoration: none;
 }

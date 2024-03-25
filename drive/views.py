@@ -6,7 +6,7 @@ from django.contrib.auth import authenticate, login
 from django.contrib.auth.hashers import check_password
 from django.contrib.auth.hashers import make_password
 import os
-from django.conf import settings
+from django.core.files.storage import FileSystemStorage
 
 
 # Create your views here.
@@ -14,6 +14,8 @@ from django.conf import settings
 def dashboard(request):
     username = request.session.get('username', None)
     uploaded_files = os.listdir('D:/uploadedfiles')
+    # uploaded_files = os.path
+    # print(os.path())
     if username:
         # Pass the username to the template
         return render(request, 'dashboard.html', {'username': username, 'uploaded_files': uploaded_files})
@@ -21,40 +23,62 @@ def dashboard(request):
         # Handle the case if user is not logged in
         return redirect('login')
     
+def download_file(request, file_name):
+    file_path = os.path.join('D:/uploadedfiles/', file_name)
+    if os.path.exists(file_path):
+        with open(file_path, 'rb') as file:
+            response = HttpResponse(file.read(), content_type='application/force-download')
+            response['Content-Disposition'] = f'attachment; filename="{file_name}"'
+            return response
+    else:
+        return HttpResponse("File not found", status=404)
+    
+# def handle_upload(request):
+#     if request.method == 'POST' and request.FILES['file']:
+#         uploaded_file = request.FILES['file']
+#         print(uploaded_file)
+#         fs = FileSystemStorage()
+#         fs.save(uploaded_file.name, uploaded_file)
+#         return redirect('dashboard')  # Assuming you have a URL named 'dashboard'
+#     return render(request, 'dashboard.html')  # Render the same page if no file is uploaded or request method is not POST
+    
 def handle_upload(request):
-    if request.method == 'POST' and request.FILES:
-        uploaded_files = request.FILES.getlist('file')
-        for uploaded_file in uploaded_files:
-            if hasattr(uploaded_file, 'chunks'):
-                handle_directory_upload(uploaded_file)
-            else:
-                handle_file_upload(uploaded_file)
-        return HttpResponse("Files uploaded successfully!")
-    else:
-        return HttpResponse("No files uploaded!")
-
-def handle_file_upload(uploaded_file):
-    destination_path = os.path.join('uploadedfiles', uploaded_file.name)
-    with open(destination_path, 'wb+') as destination:
-        for chunk in uploaded_file.chunks():
-            destination.write(chunk)
-
-def handle_directory_upload(uploaded_directory):
-    destination_path = os.path.join(settings.BASE_DIR, 'uploadedfiles', uploaded_directory.name)
-    os.makedirs(destination_path, exist_ok=True)
-    for file_name, file_content in uploaded_directory.items():
-        with open(os.path.join(destination_path, file_name), 'wb+') as destination:
-            for chunk in file_content.chunks():
+    if request.method == 'POST' and request.FILES.get('file'):
+        uploaded_file = request.FILES['file']
+        # Do something with the uploaded file, e.g., save it
+        with open('D:/uploadedfiles/' + uploaded_file.name, 'wb+') as destination:
+            for chunk in uploaded_file.chunks():
                 destination.write(chunk)
-
-def create_folder(request):
-    folder_name = request.POST.get('folder_name')
-    if folder_name:
-        folder_path = os.path.join(settings.BASE_DIR, 'uploadedfiles', folder_name)
-        os.makedirs(folder_path, exist_ok=True)
-        return HttpResponse("Folder created successfully!")
+        return redirect('dashboard')  # Redirect after successful upload
     else:
-        return HttpResponse("Folder name not provided!")
+        # Handle the case if no file is uploaded or request method is not POST
+        return render(request, 'dashboard.html')
+    
+# def handle_upload(request):
+#     if request.method == 'POST' and request.FILES:
+#         uploaded_files = request.FILES.getlist('file')
+#         for uploaded_file in uploaded_files:
+#             if hasattr(uploaded_file, 'chunks'):
+#                 handle_directory_upload(uploaded_file)
+#             else:
+#                 handle_file_upload(uploaded_file)
+#         return HttpResponse("Files uploaded successfully!")
+#     else:
+#         return HttpResponse("No files uploaded!")
+
+# def handle_file_upload(uploaded_file):
+#     destination_path = os.path.join('D:/uploadedfiles', uploaded_file.name)
+#     with open(destination_path, 'wb+') as destination:
+#         for chunk in uploaded_file.chunks():
+#             destination.write(chunk)
+
+# def handle_directory_upload(uploaded_directory):
+#     destination_path = os.path.join(settings.BASE_DIR, 'uploadedfiles', uploaded_directory.name)
+#     os.makedirs(destination_path, exist_ok=True)
+#     for file_name, file_content in uploaded_directory.items():
+#         with open(os.path.join(destination_path, file_name), 'wb+') as destination:
+#             for chunk in file_content.chunks():
+#                 destination.write(chunk)
     
 
 

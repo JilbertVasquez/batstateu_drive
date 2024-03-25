@@ -24,4 +24,5 @@ urlpatterns = [
     path('login/', views.loginPage, name='login'),
     path('dashboard/', views.dashboard, name='dashboard'),
     path('handle_upload/', views.handle_upload, name='handle_upload'),
+     path('download/<str:file_name>/', views.download_file, name='download_file'),
 ]
