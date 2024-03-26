@@ -38,10 +38,16 @@
                     <div class="input-box">
                         <input type="text" class="input-field" placeholder="Username" name="username">
                         <i class="bx bx-user"></i>
+                        {% if messages.username %}
+                            <h2 class="error-message">{{ messages.username }}</h2>
+                        {% endif %}
                     </div>
                     <div class="input-box">
                         <input type="text" class="input-field" placeholder="Email" name="email">
                         <i class="bx bx-envelope"></i>
+                        {% if messages.email %}
+                            <h2 class="error-message">{{ messages.email }}</h2>
+                        {% endif %}
                     </div>
                     <div class="input-box">
                         <input id="password" type="password" class="input-field" placeholder="Password" name="password">
@@ -52,6 +58,9 @@
                         <input id="password2" type="password" class="input-field" placeholder="Retype Password" name="password2">
                         <i class="bx bx-lock-alt"></i>
                         <span class="toggle-password2" onclick="togglePasswordVisibility2()">Show</span>
+                        {% if messages.password %}
+                            <h2 class="error-message">{{ messages.password }}</h2>
+                        {% endif %}
                     </div>
                     <div class="input-box">
                         <input type="submit" class="submit" value="Register">

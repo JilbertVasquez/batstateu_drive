@@ -7,13 +7,14 @@ from django.contrib.auth.hashers import check_password
 from django.contrib.auth.hashers import make_password
 import os
 from django.core.files.storage import FileSystemStorage
+from django.contrib import messages
 
 
 # Create your views here.
 
 def dashboard(request):
     username = request.session.get('username', None)
-    uploaded_files = os.listdir('D:/uploadedfiles')
+    uploaded_files = os.listdir('D:/uploadedfiles/' + username)
     # uploaded_files = os.path
     # print(os.path())
     if username:
@@ -24,7 +25,8 @@ def dashboard(request):
         return redirect('login')
     
 def download_file(request, file_name):
-    file_path = os.path.join('D:/uploadedfiles/', file_name)
+    username = request.session.get('username', None)
+    file_path = os.path.join('D:/uploadedfiles/' + username + "/", file_name)
     if os.path.exists(file_path):
         with open(file_path, 'rb') as file:
             response = HttpResponse(file.read(), content_type='application/force-download')
@@ -43,10 +45,11 @@ def download_file(request, file_name):
 #     return render(request, 'dashboard.html')  # Render the same page if no file is uploaded or request method is not POST
     
 def handle_upload(request):
+    username = request.session.get('username', None)
     if request.method == 'POST' and request.FILES.get('file'):
         uploaded_file = request.FILES['file']
         # Do something with the uploaded file, e.g., save it
-        with open('D:/uploadedfiles/' + uploaded_file.name, 'wb+') as destination:
+        with open('D:/uploadedfiles/' + username + "/" + uploaded_file.name, 'wb+') as destination:
             for chunk in uploaded_file.chunks():
                 destination.write(chunk)
         return redirect('dashboard')  # Redirect after successful upload
@@ -93,14 +96,29 @@ def signupPage(request):
         
         print(fname, lname, uname, email, pass1, pass2)
         
+        # Check if username already exists
+        if Users.objects.filter(username=uname).exists():
+            messages.error(request, "Username already exists.")
+            return render(request, 'signup.html', {'messages': messages})
+        
+        # Check if email already exists
+        if Users.objects.filter(email=email).exists():
+            messages.error(request, "Email already exists.")
+            return render(request, 'signup.html', {'messages': messages})
+        
         if pass1 != pass2:
-            return HttpResponse("Your password is not the same !!")
+            messages.error(request, "Your password is not the same !!")
+            return render(request, 'signup.html', {'messages': messages})
         else:
             hashed_password = make_password(pass1)
             my_user = Users(firstname=fname, lastname=lname, username=uname, email=email, password=hashed_password)
             my_user.save()
             # return render(request, 'signup.html')
             # return HttpResponse("User has been created successfully!!")
+            
+            user_directory = os.path.join('D:/uploadedfiles', uname)
+            os.makedirs(user_directory, exist_ok=True)
+            
             return redirect('login')
         
     else:
