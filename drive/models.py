@@ -61,3 +61,15 @@ class Users(models.Model):
 
     class Meta:
         db_table = 'Users'  # Specify the name of the table in the database
+
+
+from django.db import models
+from django.contrib.auth.models import User
+
+class Folder(models.Model):
+    name = models.CharField(max_length=255)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    parent_folder = models.ForeignKey('self', on_delete=models.CASCADE, null=True, blank=True)
+
+    def __str__(self):
+        return self.name
