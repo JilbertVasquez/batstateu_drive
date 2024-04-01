@@ -29,16 +29,45 @@ def dashboard(request):
         return redirect('login')
 
     
+# def download_file(request, file_name):
+#     username = request.session.get('username', None)
+#     file_path = os.path.join(settings.MEDIA_ROOT, username, file_name)
+#     if os.path.exists(file_path):
+#         with open(file_path, 'rb') as file:
+#             response = HttpResponse(file.read(), content_type='application/force-download')
+#             response['Content-Disposition'] = f'attachment; filename="{file_name}"'
+#             return response
+#     else:
+#         return HttpResponse("File not found", status=404)
+
+
+# def download_file(request, file_name):
+#     username = request.session.get('username', None)
+#     current_directory = request.POST.get('current_directory')
+#     file_path = os.path.join(settings.MEDIA_ROOT, username, current_directory, file_name)
+#     if os.path.exists(file_path):
+#         with open(file_path, 'rb') as file:
+#             response = HttpResponse(file.read(), content_type='application/force-download')
+#             response['Content-Disposition'] = f'attachment; filename="{file_name}"'
+#             return response
+#     else:
+#         return HttpResponse("File not found", status=404)
+
+
 def download_file(request, file_name):
     username = request.session.get('username', None)
-    file_path = os.path.join(settings.MEDIA_ROOT, username, file_name)
-    if os.path.exists(file_path):
-        with open(file_path, 'rb') as file:
-            response = HttpResponse(file.read(), content_type='application/force-download')
-            response['Content-Disposition'] = f'attachment; filename="{file_name}"'
-            return response
+    current_directory = request.GET.get('current_directory', '')  # Use request.GET to get query parameters
+    if username:
+        file_path = os.path.join(settings.MEDIA_ROOT, username, current_directory, file_name)
+        if os.path.exists(file_path):
+            with open(file_path, 'rb') as file:
+                response = HttpResponse(file.read(), content_type='application/force-download')
+                response['Content-Disposition'] = f'attachment; filename="{file_name}"'
+                return response
+        else:
+            return HttpResponse("File not found", status=404)
     else:
-        return HttpResponse("File not found", status=404)
+        return HttpResponse("User not authenticated", status=401)
     
 
 import os

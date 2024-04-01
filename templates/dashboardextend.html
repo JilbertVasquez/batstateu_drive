@@ -18,7 +18,24 @@
                 {% else %}
                     <span>{{ file_info.name }}</span>
                     <!-- Add download link -->
-                    <a href="{% url 'download_file' file_name=file_info.name %}">Download</a>
+                    {% comment %} <a href="{% url 'download_file' file_name=file_info.name  %}">Download</a> {% endcomment %}
+                    {% comment %} <input type="hidden" name="current_directory" value="{{ file_info.full_path }}">
+                    <a href="{% url 'download_file' file_name=file_info.name %}">Download</a> {% endcomment %}
+                    <span>{{ file_info.name }}</span>
+                    <!-- Add download link -->
+                    <input type="hidden" name="current_directory" value="{{ current_directory }}">
+                    <a href="#" class="download-link" data-file="{{ file_info.name }}">Download</a>
+                    <script>
+                        document.querySelectorAll('.download-link').forEach(link => {
+                            link.addEventListener('click', function(event) {
+                                event.preventDefault();
+                                const fileName = this.dataset.file;
+                                const currentDirectory = this.previousElementSibling.value;
+                                const downloadUrl = `/download/${fileName}/?current_directory=${currentDirectory}`;
+                                window.location.href = downloadUrl;
+                            });
+                        });
+                    </script>
                 {% endif %}
                 <!-- Add delete button -->
                 <form method="post" action="{% url 'delete_item' %}">

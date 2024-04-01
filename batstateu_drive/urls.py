@@ -26,6 +26,7 @@ urlpatterns = [
     path('handle_file_upload/', views.handle_file_upload, name='handle_file_upload'),
     path('handle_folder_upload/', views.handle_folder_upload, name='handle_folder_upload'),
     path('download/<str:file_name>/', views.download_file, name='download_file'),
+    # path('download/<str:file_name>/<str:current_directory>/', views.download_file, name='download_file'),
     path('delete_item/', views.delete_item, name='delete_item'),
     # path('view_folder/<str:folder_name>/', views.view_folder, name='view_folder'),
     path('view_folder/<path:folder_path>/', views.view_folder, name='view_folder'),
