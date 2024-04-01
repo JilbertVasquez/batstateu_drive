@@ -66,10 +66,36 @@ class Users(models.Model):
 from django.db import models
 from django.contrib.auth.models import User
 
-class Folder(models.Model):
-    name = models.CharField(max_length=255)
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
-    parent_folder = models.ForeignKey('self', on_delete=models.CASCADE, null=True, blank=True)
+# class FileDetails(models.Model):
+#     file_id = models.AutoField(primary_key=True)
+#     filename = models.CharField(max_length=255)
+#     size = models.CharField(max_length=50)
+#     extension = models.CharField(max_length=50)
+#     upload_date = models.DateField()
+#     path = models.CharField(max_length=255)
+#     username = models.ForeignKey(User, on_delete=models.CASCADE)
+
+#     def __str__(self):
+#         return self.filename
+
+class FileDetails(models.Model):
+    user = models.ForeignKey(Users, on_delete=models.CASCADE)
+    filename = models.CharField(max_length=255)
+    size = models.CharField(max_length=50)
+    extension = models.CharField(max_length=50)
+    upload_date = models.DateField()
+    path = models.CharField(max_length=255)
+
+    class Meta:
+        db_table = 'file_details'  # Specify the name of your custom table in the database
 
     def __str__(self):
-        return self.name
+        return self.filename
+
+# class Folder(models.Model):
+#     name = models.CharField(max_length=255)
+#     user = models.ForeignKey(User, on_delete=models.CASCADE)
+#     parent_folder = models.ForeignKey('self', on_delete=models.CASCADE, null=True, blank=True)
+
+#     def __str__(self):
+#         return self.name

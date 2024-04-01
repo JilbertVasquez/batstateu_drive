@@ -1,6 +1,6 @@
 from django.shortcuts import render, HttpResponse, HttpResponseRedirect
 from django.shortcuts import redirect
-# from django.contrib.auth.models import User
+from django.contrib.auth.models import User
 from .models import Users
 from django.contrib.auth import authenticate, login
 from django.contrib.auth.hashers import check_password
@@ -265,16 +265,22 @@ def handle_file_upload(request):
         # Check if files were uploaded
         if 'file' in request.FILES:
             uploaded_files = request.FILES.getlist('file')  # Get list of uploaded files
+            
             username = request.session.get('username')
             current_directory = request.POST.get('current_directory', '')
             if username:
+                # Get the User object for the logged-in user
+                user = Users.objects.get(username=username)
+                print(user)
                 user_upload_dir = os.path.join(settings.MEDIA_ROOT, username, current_directory)
                 if not os.path.exists(user_upload_dir):
                     os.makedirs(user_upload_dir)
                 fs = FileSystemStorage(location=user_upload_dir)
                 for uploaded_file in uploaded_files:
                     try:
+                        file_details = get_file_details(uploaded_file, user_upload_dir)
                         fs.save(uploaded_file.name, uploaded_file)  # Save each uploaded file
+                        save_file_details(user, file_details)
                     
                         if current_directory:
                             # Redirect back to the view_folder with the current directory path included
@@ -284,13 +290,75 @@ def handle_file_upload(request):
                             return redirect('dashboard')
                     
                     except Exception as e:
+                        print(str(e))
                         # Handle file upload error
-                        return render(request, 'upload_error.html', {'error': str(e)})
+                        return render(request, 'dashboard.html', {'error': str(e)})
+                    
                 # Redirect to the current page to update file list
                 return redirect('dashboard')
             else:
                 return redirect('dashboard')   # Redirect to login if user is not authenticated
     return redirect('dashboard')
+
+
+from django.utils import timezone
+
+def get_file_details(uploaded_file, file_path):
+    """
+    Function to extract details of an uploaded file.
+    Returns a dictionary containing the file's name, size, extension, and upload date.
+    """
+    file_name = uploaded_file.name
+    file_name1 = os.path.splitext(file_name)[0]
+    file_size = uploaded_file.size
+    file_extension = os.path.splitext(file_name)[-1]
+    
+    # Convert file size to KB, MB, or GB based on magnitude
+    if file_size < 1024:
+        size_unit = 'B'
+        size_value = file_size
+    elif file_size < 1024 ** 2:
+        size_unit = 'KB'
+        size_value = file_size / 1024
+    elif file_size < 1024 ** 3:
+        size_unit = 'MB'
+        size_value = file_size / (1024 ** 2)
+    else:
+        size_unit = 'GB'
+        size_value = file_size / (1024 ** 3)
+        
+    size_value = round(size_value, 2)
+    upload_date = timezone.now().strftime('%Y-%d-%m')
+    
+    file_details = {
+        'name': file_name1,
+        'extension': file_extension,
+        'size': size_value,
+        'size_unit': size_unit,
+        'upload_date': upload_date,
+        'file_path': file_path,
+    }
+    
+    print(file_details)
+    
+    return file_details
+
+
+from .models import Users, FileDetails  # Import your custom Users and FileDetails models
+
+def save_file_details(user, file_details):
+    """
+    Function to save file details into the database.
+    """
+    file_details_object = FileDetails.objects.create(
+        user=user,  # Ensure you're passing an instance of your custom Users model here
+        filename=file_details['name'],
+        extension=file_details['extension'],
+        size=file_details['size'],
+        upload_date=file_details['upload_date'],
+        path=file_details['file_path']
+    )
+    return file_details_object
 
 
 def handle_folder_upload(request):
@@ -455,8 +523,6 @@ def handle_create_folder(request):
 
 
     
-
-
 
 
 def signupPage(request):
