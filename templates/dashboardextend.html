@@ -51,7 +51,8 @@
     </ul>
 
     <!-- Back button to return to the previous display -->
-    <form method="get" action="{% url 'dashboard' %}">
+    <form method="get" action="{% if parent_directory %}{% url 'view_folder' folder_path=parent_directory %}{% else %}{% url 'dashboard' %}{% endif %}">
+    
         <button type="submit">Back</button>
     </form>
     

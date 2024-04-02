@@ -152,9 +152,12 @@ def view_folder(request, folder_path):
     # Update full_path attribute for each item
     for item in uploaded_items:
         item['full_path'] = os.path.join(folder_path, item['name'])
-
-    return render(request, 'dashboardextend.html', {'uploaded_files': uploaded_items, 'current_directory': folder_path})
-
+        
+    parent_directory = os.path.dirname(folder_path)
+    if parent_directory == settings.MEDIA_ROOT:
+        return redirect('dashboard')
+    else:
+        return render(request, 'dashboardextend.html', {'uploaded_files': uploaded_items, 'current_directory': folder_path, 'parent_directory': parent_directory})
 
 
 
