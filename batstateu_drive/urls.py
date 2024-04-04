@@ -31,5 +31,8 @@ urlpatterns = [
     # path('view_folder/<str:folder_name>/', views.view_folder, name='view_folder'),
     path('view_folder/<path:folder_path>/', views.view_folder, name='view_folder'),
     path('handle_create_folder/', views.handle_create_folder, name='handle_create_folder'),
+    # path('rename/', views.rename_item, name='rename_item'),
+    path('rename/file/', views.rename_file, name='rename_file'),
+    path('rename/folder/', views.rename_folder, name='rename_folder'),
     
 ]

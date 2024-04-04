@@ -24,6 +24,9 @@
                     <button onclick="toggleUploadButtons()">New</button>
                     {% comment %} <h1>HELLO WORLD</h1> {% endcomment %}
                 </div>
+                <div class = "foldercreation">
+                    <h1>HELLO WORLD</h1>
+                </div>
                 <div class="upload-buttons">
                     <form method="POST" enctype="multipart/form-data" id="upload-form" action="{% url 'handle_create_folder' %}">
                         {% csrf_token %}
@@ -93,10 +96,13 @@
 
                         function toggleUploadButtons() {
                             var uploadButtons = document.querySelector('.upload-buttons');
-                            if (uploadButtons.style.display === "none") {
+                            var foldercreationbutton = document.querySelector('.foldercreation');
+                            if (uploadButtons.style.display === "none" || foldercreationbutton.style.display === "none") {
                                 uploadButtons.style.display = "block";
+                                foldercreationbutton.style.display = "block";
                             } else {
                                 uploadButtons.style.display = "none";
+                                foldercreationbutton.style.display = "none";
                             }
                         }
                         
@@ -110,6 +116,7 @@
             {% endblock %}
         </div>
 
+        
         
     </body>
     </html>

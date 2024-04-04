@@ -160,6 +160,95 @@ def view_folder(request, folder_path):
         return render(request, 'dashboardextend.html', {'uploaded_files': uploaded_items, 'current_directory': folder_path, 'parent_directory': parent_directory})
 
 
+# def rename_item(request):
+#     if request.method == 'POST':
+#         item_name = request.POST.get('item_name')
+#         new_name = request.POST.get('new_name')
+#         print(item_name, new_name)
+#         # Add your renaming logic here, e.g., using filesystem operations
+#         # After renaming, you may redirect to the current directory or any other appropriate page
+#         return JsonResponse({'success': True})  # You can return any JSON response as needed
+#     else:
+#         return redirect('dashboard')  # Redirect to dashboard if accessed via GET request
+
+# def rename_item(request):
+#     if request.method == 'POST':
+#         item_path = request.POST.get('item_path')
+#         new_name = request.POST.get('new_name')
+#         print(item_path, new_name)
+
+#         # Perform renaming operation (replace this with your logic)
+#         # For demonstration, we'll just return a success response
+#         return JsonResponse({'success': True})
+#     else:
+#         # Handle GET request or invalid method
+#         return JsonResponse({'success': False, 'error': 'Method not allowed'})
+
+
+# def rename_item(request):
+#     if request.method == 'POST':
+#         item_path = request.POST.get('item_path')
+#         new_name = request.POST.get('new_name')
+
+#         # Perform renaming operation
+#         try:
+#             # Example renaming logic (replace this with your actual renaming code)
+#             # For demonstration, we'll assume 'os.rename' function for renaming
+#             import os
+#             os.rename(item_path, os.path.join(os.path.dirname(item_path), new_name))
+#             # Render the same page again (you can pass any necessary context)
+#             return render(request, 'basedashboard.html', context={})
+#         except Exception as e:
+#             # Handle renaming errors
+#             return JsonResponse({'success': False, 'error': str(e)})
+#     else:
+#         # Handle GET request or invalid method
+#         return JsonResponse({'success': False, 'error': 'Method not allowed'})
+
+def rename_file(request):
+    if request.method == 'POST':
+        item_path = request.POST.get('item_path')
+        new_name = request.POST.get('new_name')
+        current_dir = request.POST.get("current_directory")
+        # print("HELLO WORLD", current_dir)
+
+        try:
+            # Rename the file
+            os.rename(item_path, os.path.join(os.path.dirname(item_path), new_name))
+            # Return success response
+            # return JsonResponse({'success': True})
+            if current_dir == "":
+                return redirect("dashboard")
+            else:
+                return redirect('view_folder', folder_path=current_dir)
+        except Exception as e:
+            # Handle renaming errors
+            return JsonResponse({'success': False, 'error': str(e)})
+    else:
+        # Handle GET request or invalid method
+        return JsonResponse({'success': False, 'error': 'Method not allowed'})
+
+def rename_folder(request):
+    if request.method == 'POST':
+        item_path = request.POST.get('item_path')
+        new_name = request.POST.get('new_name')
+        current_dir = request.POST.get("current_directory")
+
+        try:
+            # Rename the folder
+            os.rename(item_path, os.path.join(os.path.dirname(item_path), new_name))
+            # Return success response
+            # return JsonResponse({'success': True})
+            if current_dir == "":
+                return redirect("dashboard")
+            else:
+                return redirect('view_folder', folder_path=current_dir)
+        except Exception as e:
+            # Handle renaming errors
+            return JsonResponse({'success': False, 'error': str(e)})
+    else:
+        # Handle GET request or invalid method
+        return JsonResponse({'success': False, 'error': 'Method not allowed'})
 
 
     
