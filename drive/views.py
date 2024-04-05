@@ -157,7 +157,7 @@ def view_folder(request, folder_path):
     if parent_directory == settings.MEDIA_ROOT:
         return redirect('dashboard')
     else:
-        return render(request, 'dashboardextend.html', {'uploaded_files': uploaded_items, 'current_directory': folder_path, 'parent_directory': parent_directory})
+        return render(request, 'dashboardextend.html', {'uploaded_files': uploaded_items, 'current_directory': folder_path, 'parent_directory': parent_directory, 'username': username})
 
 
 # def rename_item(request):
