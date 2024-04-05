@@ -124,14 +124,15 @@
     </script>
 
     {% if search_results %}
-    <h2>Search Results:</h2>
-    <ul>
-        {% for result in search_results %}
-            <li>{{ result }}</li>
-        {% endfor %}
-    </ul>
-{% else %}
-    <p>No results found.</p>
-{% endif %}
+        <h2>Search Results:</h2>
+        <ul>
+            <!-- Display search results -->
+            {% for result in search_results %}
+                <li>{{ result.filename }}</li> <!-- Modify this according to your model fields -->
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>No results found.</p>
+    {% endif %}
     
 {% endblock %}

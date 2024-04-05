@@ -1,7 +1,7 @@
 from django.shortcuts import render, HttpResponse, HttpResponseRedirect
 from django.shortcuts import redirect
 from django.contrib.auth.models import User
-from .models import Users
+from .models import Users, FileDetails
 from django.contrib.auth import authenticate, login
 from django.contrib.auth.hashers import check_password
 from django.contrib.auth.hashers import make_password
@@ -173,31 +173,32 @@ def search(request):
     if current_directory == "":
         current_directory = os.path.join(settings.MEDIA_ROOT, username)
     
-    if not query or not username:
-        return HttpResponse("Invalid query or user not authenticated", status=400)
-
-    user_upload_dir = current_directory
-    search_results = []
-
-    # Function to search for items recursively
-    def search_items(directory, query):
-        results = []
-        for root, dirs, files in os.walk(directory):
-            for item in dirs + files:
-                if query in item:
-                    results.append(os.path.relpath(os.path.join(root, item), user_upload_dir))
-        return results
-
-    # Search for items in user's upload directory
-    search_results = search_items(user_upload_dir, query)
-
-    if current_directory == "":
-        redirect("dashboard", {'search_results': search_results})
-    else:
-        redirect_url = reverse('view_folder', kwargs={'folder_path': current_directory})
-        redirect_url += f'?search_results={",".join(search_results)}'
-
-        return redirect(redirect_url)
+    retrieved_files = {}    
+        
+    # user_filenames = FileDetails.objects.filter(filename__icontains=query)
+    search_results = FileDetails.objects.filter(filename__icontains=query)
+    # if search_results:
+    #     print("HELLO")
+    # else:
+    #     print("ADASDAS")
+    
+    print(search_results)
+    
+    for filenames_details in search_results:
+        print(filenames_details.filename)
+        print(filenames_details.size)
+        print(filenames_details.extension)
+    
+    # if current_directory == "":
+    #     return redirect('dashboard')
+    # else:
+    #     return redirect()
+    
+    return render(request, 'dashboardextend.html', {
+        'search_results': search_results,
+        'current_directory': current_directory,
+        'query': query  # Pass the query back to the template for displaying in the search input field
+    })
 
 
 

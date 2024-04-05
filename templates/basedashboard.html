@@ -17,7 +17,7 @@
             {% endif %}
             <form method="GET" action="{% url 'search' %}">
                 <input type="hidden" name="current_directory" value="{{ current_directory }}">
-                <input type="text" name="query" placeholder="Search in TNEU Drive...">
+                <input type="text" name="query" placeholder="Search in TNEU Drive..." value="{{ query }}">
                 <button type="submit">Search</button>
             </form>
         </header>
