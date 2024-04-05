@@ -28,6 +28,7 @@ urlpatterns = [
     path('download/<str:file_name>/', views.download_file, name='download_file'),
     # path('download/<str:file_name>/<str:current_directory>/', views.download_file, name='download_file'),
     path('delete_item/', views.delete_item, name='delete_item'),
+    path('delete_item_search/', views.delete_item_search, name='delete_item_search'),
     # path('view_folder/<str:folder_name>/', views.view_folder, name='view_folder'),
     path('view_folder/<path:folder_path>/', views.view_folder, name='view_folder'),
     path('handle_create_folder/', views.handle_create_folder, name='handle_create_folder'),

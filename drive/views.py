@@ -69,10 +69,35 @@ def delete_item(request):
             else:
                 return HttpResponse("Item not found", status=404)
         else:
+            print(item_path)
             return HttpResponse("Invalid request", status=400)
     else:
         return HttpResponse("Method not allowed", status=405)
 
+def delete_item_search(request):
+    if request.method == 'POST':
+        username = request.session.get('username', None)
+        item_path = request.POST.get('item_path')  # Get the full item path
+        item_name = request.POST.get('item_name')
+        if username and item_path:
+            if os.path.exists(item_path):
+                try:
+                    print(os.path.join(item_path, item_name))
+                    print(os.path.dirname(item_path))
+                    # os.remove(item_path + "\\" + item_name)  # Delete file
+                    os.remove(os.path.join(item_path, item_name))
+                    # return JsonResponse({'success': True, 'message': 'Item deleted successfully'})
+                    # deleted_item_directory = os.path.dirname(item_path)
+                    return redirect('view_folder', folder_path=os.path.dirname(item_path))
+                except Exception as e:
+                    return JsonResponse({'success': False, 'message': f'Error deleting item: {str(e)}'})
+            else:
+                return HttpResponse("Item not found", status=404)
+        else:
+            print(item_path)
+            return HttpResponse("Invalid request", status=400)
+    else:
+        return HttpResponse("Method not allowed", status=405)
 
 def get_folder_contents(folder_path):
     """
@@ -129,11 +154,6 @@ def search(request):
     # user_filenames = FileDetails.objects.filter(filename__icontains=query)
     search_results = FileDetails.objects.filter(filename__icontains=query)
     
-    # if search_results:
-    #     print("HELLO")
-    # else:
-    #     print("ADASDAS")
-    
     print(search_results)
     
     for filenames_details in search_results:
@@ -141,15 +161,11 @@ def search(request):
         print(filenames_details.size)
         print(filenames_details.extension)
     
-    # if current_directory == "":
-    #     return redirect('dashboard')
-    # else:
-    #     return redirect()
-    
-    return render(request, 'dashboardextend.html', {
+    return render(request, 'search_form.html', {
         'search_results': search_results,
         'current_directory': current_directory,
-        'query': query  # Pass the query back to the template for displaying in the search input field
+        'query': query,  # Pass the query back to the template for displaying in the search input field
+        'username': username
     })
 
 
