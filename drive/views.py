@@ -174,9 +174,12 @@ def search(request):
         current_directory = os.path.join(settings.MEDIA_ROOT, username)
     
     retrieved_files = {}    
-        
+
+    if query == "":
+        return render(request, 'dashboardextend.html')
     # user_filenames = FileDetails.objects.filter(filename__icontains=query)
     search_results = FileDetails.objects.filter(filename__icontains=query)
+    
     # if search_results:
     #     print("HELLO")
     # else:
