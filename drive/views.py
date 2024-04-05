@@ -160,6 +160,47 @@ def view_folder(request, folder_path):
         return render(request, 'dashboardextend.html', {'uploaded_files': uploaded_items, 'current_directory': folder_path, 'parent_directory': parent_directory, 'username': username})
 
 
+import os
+from django.conf import settings
+from django.http import HttpResponse
+from django.shortcuts import render
+
+def search(request):
+    query = request.GET.get('query')
+    username = request.session.get('username')
+    current_directory = request.GET.get('current_directory')
+    
+    if current_directory == "":
+        current_directory = os.path.join(settings.MEDIA_ROOT, username)
+    
+    if not query or not username:
+        return HttpResponse("Invalid query or user not authenticated", status=400)
+
+    user_upload_dir = current_directory
+    search_results = []
+
+    # Function to search for items recursively
+    def search_items(directory, query):
+        results = []
+        for root, dirs, files in os.walk(directory):
+            for item in dirs + files:
+                if query in item:
+                    results.append(os.path.relpath(os.path.join(root, item), user_upload_dir))
+        return results
+
+    # Search for items in user's upload directory
+    search_results = search_items(user_upload_dir, query)
+
+    if current_directory == "":
+        redirect("dashboard", {'search_results': search_results})
+    else:
+        redirect_url = reverse('view_folder', kwargs={'folder_path': current_directory})
+        redirect_url += f'?search_results={",".join(search_results)}'
+
+        return redirect(redirect_url)
+
+
+
 # def rename_item(request):
 #     if request.method == 'POST':
 #         item_name = request.POST.get('item_name')

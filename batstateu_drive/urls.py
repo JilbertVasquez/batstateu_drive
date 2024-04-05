@@ -34,5 +34,6 @@ urlpatterns = [
     # path('rename/', views.rename_item, name='rename_item'),
     path('rename/file/', views.rename_file, name='rename_file'),
     path('rename/folder/', views.rename_folder, name='rename_folder'),
+    path('search/', views.search, name='search'),
     
 ]
