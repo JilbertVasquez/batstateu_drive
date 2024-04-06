@@ -50,8 +50,6 @@
                 </form>
             </li>
         {% endfor %}
-
-
     </ul>
 
     <!-- Back button to return to the previous display -->
@@ -66,7 +64,7 @@
             <input type="hidden" name="current_directory" value="{{ current_directory }}">
             <input type="hidden" id="rename-item-name-folder" name="item_path">
             <input type="text" id="new-name-folder" name="new_name" placeholder="Enter new folder name">
-            <button type="submit">Rename Folder</button>
+            <button class="buttonClassrename" type="submit">Rename Folder</button>
         </form>
     </div>
 
@@ -98,7 +96,7 @@
             <input type="hidden" name="current_directory" value="{{ current_directory }}">
             <input type="hidden" id="rename-item-name-file" name="item_path">
             <input type="text" id="new-name-file" name="new_name" placeholder="Enter new file name">
-            <button type="submit">Rename File</button>
+            <button class="buttonClassrename" type="submit">Rename File</button>
         </form>
     </div>
 
