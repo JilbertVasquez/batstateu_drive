@@ -6,13 +6,13 @@
     
     <h2>Uploaded Files:</h2>
     {% if current_directory %}
-        <p style="color: red;">Current Directory: {{ current_directory }}</p>
+        {% comment %} <p style="color: red;">Current Directory: {{ current_directory }}</p> {% endcomment %}
     {% endif %}
 
     <ul>
         <!-- Inside the block content -->
         {% for file_info in uploaded_files %}
-            <li>
+            <li class="listdirxfile">
                 {% if file_info.is_dir %}
                     <span>{{ file_info.name }}</span>
                     <!-- Add view folder link with current directory path -->

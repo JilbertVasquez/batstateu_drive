@@ -1,0 +1,211 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap');
+
+
+* {
+    margin: 0;
+    padding: 0;
+    font-family: 'Poppins', sans-serif;
+}
+
+/* body {
+    display: flex;
+    flex-direction: row;
+} */
+
+.foldercreationsection {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: #fff;
+    padding: 1.5%;
+    border: 0px solid #000000;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.8);
+    width: 15%;
+    height: 10%;
+    z-index: 1;
+    display: none;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    background-color: blue;
+}
+
+#folder-field {
+    padding: 1%;
+    width: 100%;
+    margin-bottom: 5%;
+    box-sizing: border-box;
+    display: flex;
+    text-align: center;
+}
+
+.foldercreationsection .buttonClass {
+    width: 100%;
+    padding: 1%;
+    box-sizing: border-box;
+    
+}
+
+.container {
+    height: 100vh;
+    width: 100%;
+    position: relative;
+    display: flex;
+    flex-direction: row;
+}
+
+.leftsection {
+    height: 100vh;
+    width: 15%;
+    background-color: red;
+}
+
+.leftsectionupper {
+    display: flex;
+    height: 10%;
+    background-color: white;
+    justify-content: center;
+    text-align: center;
+    align-items: center;
+}
+
+.leftsectionupper img {
+    width: 25%;
+    height: auto;
+    object-fit: contain;
+    margin-right: 3%;
+    margin-left: -5%;
+}
+
+.leftsection .options {
+    display: flex;
+    flex-direction: column;
+    height: 90%;
+    background-color: aquamarine;
+}
+
+.options button {
+    border: 0px solid black;
+}
+
+.options .add {
+    background-color: blue;
+    height: 10%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.add button {
+    background-color: rgb(252, 40, 40);
+    color:white;
+    border-radius: 10px;
+    width: 60%;
+    height: 40%;
+}
+
+.upload-buttons {
+    height: 15%;
+    width: 10%;
+    background-color: white;
+    display: none;
+    flex-direction: column;
+    position: absolute;
+    top: 15.5%;
+    left:8%;
+    z-index: 2;
+    padding: 0.5%;
+    border-radius: 10px;
+}
+
+
+.buttonClass {
+    width: 98%;
+    height: 50%;
+    background-color: white;
+    border: 0px solid black;
+}
+
+.buttonClass:hover {
+    color: red;
+}
+
+.buttonClass {
+    height: 25px;
+}
+
+.options .optionfolders {
+    /* background-color: yellow; */
+    height: 55%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.optionfolders button {
+    background-color: rgba(255, 255, 255, 0);
+    width: 60%;
+    height: 10%;
+}
+
+.optionfolders button:hover, .optionaccount button:hover{
+    color: red;
+}
+
+.options .optionaccount {
+    /* background-color: aliceblue; */
+    height: 20%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.optionaccount button {
+    background-color: rgba(255, 255, 255, 0);
+    width: 60%;
+    height: 25%;
+}
+
+.leftsectionupper h2 {
+    font-size: 20px;
+    color: red;
+    margin-left: 3%;
+}
+
+.rightsection {
+    height: 100vh;
+    width: 85%;
+    background-color: blue;
+    display: flex;
+    flex-direction: column;
+}
+
+.upperrightsection {
+    height: 10%;
+    background-color: yellow;
+}
+
+/* .drivesection {
+    height: 90%;
+    background-color: cyan;
+} */
+
+.download-section {
+    height: 90%;
+    background-color: cyan;
+}
+
+header {
+    height: 10%;
+    width:  100%;
+}
+
+.listdirxfile {
+    text-decoration: none;
+    list-style: none;
+    color: red;
+}
