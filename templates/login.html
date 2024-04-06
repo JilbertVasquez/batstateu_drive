@@ -23,7 +23,7 @@
                 <div class="top">
                     <header>Login</header>
                 </div>
-                <form action="" method="POST">
+                <form action="{% url 'login' %}" method="POST">
                     {% csrf_token %}
                     <div class="input-box">
                         <input type="text" class="input-field" placeholder="Email" name="email">
