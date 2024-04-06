@@ -77,13 +77,12 @@
             btn.addEventListener('click', function() {
                 const itemName = this.dataset.item;
                 const itemPath = this.parentElement.querySelector('[name="item_path"]').value;
-                const renameSectionFolder = document.querySelector('.rename-section-folder');
+                console.log(itemPath);
                 const renameSectionFile = document.querySelector('.rename-section-file');
                 if (renameSectionFile.style.display === 'none' || renameSectionFile.querySelector('#rename-item-name-file').value !== itemPath) {
                     renameSectionFile.style.display = 'block';
                     renameSectionFile.querySelector('#rename-item-name-file').value = itemPath;
                     renameSectionFile.querySelector('#new-name-file').value = itemName;
-                    renameSectionFolder.style.display = 'none';
                 } else {
                     renameSectionFile.style.display = 'none';
                 }
