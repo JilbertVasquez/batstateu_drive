@@ -14,6 +14,7 @@ from django.utils import timezone
 from django.shortcuts import render
 from django.shortcuts import redirect
 from django.urls import reverse
+import time
 
 
 # Create your views here.
@@ -27,10 +28,40 @@ def dashboard(request):
         for file_name in os.listdir(user_upload_dir):
             file_path = os.path.join(user_upload_dir, file_name)
             is_dir = os.path.isdir(file_path)
-            uploaded_files.append({'name': file_name, 'is_dir': is_dir, 'full_path': file_path})  # Add full_path
+            
+            # Get file size and last modified date
+            file_size = os.path.getsize(file_path)
+            size_label = str(convert_size(file_size))
+            last_modified = os.path.getmtime(file_path)
+            last_modified_date = time.strftime('%m-%d-%Y', time.localtime(last_modified))
+
+            uploaded_files.append({
+                'name': file_name,
+                'size': size_label,
+                'date': last_modified_date,
+                'is_dir': is_dir,
+                'full_path': file_path
+            })
+            print(uploaded_files[0])
+            
+            # uploaded_files.append({'name': file_name, 'size': file_size, 'last_modified': last_modified_date, 'is_dir': is_dir, 'full_path': file_path})  # Add full_path
+            # print(uploaded_files[0])
         return render(request, 'dashboardextend.html', {'username': username, 'uploaded_files': uploaded_files})
     else:
         return redirect('login')
+    
+def convert_size(size_bytes):
+    # Define suffixes and corresponding divisor
+    suffixes = ['B', 'KB', 'MB', 'GB', 'TB']
+    divisor = 1024
+
+    # Determine appropriate suffix and value
+    for suffix in suffixes:
+        if size_bytes < divisor:
+            return f"{size_bytes:.2f} {suffix}"
+        size_bytes /= divisor
+
+    return f"{size_bytes:.2f} {suffixes[-1]}"  # Fallback to largest suffix
 
 
 def download_file(request, file_name):
@@ -52,6 +83,7 @@ def download_file(request, file_name):
 def delete_item(request):
     if request.method == 'POST':
         username = request.session.get('username', None)
+        item_name = request.POST.get('item_name')
         item_path = request.POST.get('item_path')  # Get the full item path
         if username and item_path:
             if os.path.exists(item_path):
@@ -61,6 +93,11 @@ def delete_item(request):
                         shutil.rmtree(item_path)
                     else:
                         os.remove(item_path)  # Delete file
+                        
+                    # file_detail = FileDetails.objects.get(path=item_path)
+                    # file_detail.delete()
+                    # print(file_detail)
+                    
                     # return JsonResponse({'success': True, 'message': 'Item deleted successfully'})
                     deleted_item_directory = os.path.dirname(item_path)
                     return redirect('view_folder', folder_path=deleted_item_directory)
@@ -69,7 +106,7 @@ def delete_item(request):
             else:
                 return HttpResponse("Item not found", status=404)
         else:
-            print(item_path)
+            # print(item_path)
             return HttpResponse("Invalid request", status=400)
     else:
         return HttpResponse("Method not allowed", status=405)
@@ -82,8 +119,8 @@ def delete_item_search(request):
         if username and item_path:
             if os.path.exists(item_path):
                 try:
-                    print(os.path.join(item_path, item_name))
-                    print(os.path.dirname(item_path))
+                    # print(os.path.join(item_path, item_name))
+                    # print(os.path.dirname(item_path))
                     # os.remove(item_path + "\\" + item_name)  # Delete file
                     os.remove(os.path.join(item_path, item_name))
                     # return JsonResponse({'success': True, 'message': 'Item deleted successfully'})
@@ -154,12 +191,13 @@ def search(request):
     # user_filenames = FileDetails.objects.filter(filename__icontains=query)
     search_results = FileDetails.objects.filter(filename__icontains=query)
     
-    print(search_results)
+    # print(search_results)
     
     for filenames_details in search_results:
-        print(filenames_details.filename)
-        print(filenames_details.size)
-        print(filenames_details.extension)
+        # print(filenames_details.filename)
+        # print(filenames_details.size)
+        # print(filenames_details.extension)
+        pass
     
     return render(request, 'search_form.html', {
         'search_results': search_results,
@@ -226,7 +264,7 @@ def handle_file_upload(request):
             if username:
                 # Get the User object for the logged-in user
                 user = Users.objects.get(username=username)
-                print(user)
+                # print(user)
                 user_upload_dir = os.path.join(settings.MEDIA_ROOT, username, current_directory)
                 if not os.path.exists(user_upload_dir):
                     os.makedirs(user_upload_dir)
@@ -245,7 +283,7 @@ def handle_file_upload(request):
                             return redirect('dashboard')
                     
                     except Exception as e:
-                        print(str(e))
+                        # print(str(e))
                         # Handle file upload error
                         return render(request, 'dashboard.html', {'error': str(e)})
                     
@@ -292,7 +330,7 @@ def get_file_details(uploaded_file, file_path):
         'file_path': file_path,
     }
     
-    print(file_details)
+    # print(file_details)
     
     return file_details
 
@@ -386,7 +424,7 @@ def signupPage(request):
         pass1 = request.POST.get('password')
         pass2 = request.POST.get('password2')
         
-        print(fname, lname, uname, email, pass1, pass2)
+        # print(fname, lname, uname, email, pass1, pass2)
         
         # Check if username already exists
         if Users.objects.filter(username=uname).exists():
@@ -425,11 +463,11 @@ def loginPage(request):
             
             if check_password(pass1, user.password):
                 # Passwords match, user authenticated
-                print(email, pass1)
+                # print(email, pass1)
                 request.session['username'] = user.username  # Storing username in session
                 return redirect('dashboard')
             else:
-                print(email, pass1)
+                # print(email, pass1)
                 return HttpResponse("Username or Password is incorrect")
             
         except Users.DoesNotExist:

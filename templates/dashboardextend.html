@@ -3,59 +3,100 @@
 {% block content %}
 
 
-    
-    <h2>Uploaded Files:</h2>
-    {% if current_directory %}
-        {% comment %} <p style="color: red;">Current Directory: {{ current_directory }}</p> {% endcomment %}
-    {% endif %}
+    <div class="filefolderheader">
+        <h2>My Drive</h2>
+        {% if current_directory %}
+            {% comment %} <p style="color: red;">Current Directory: {{ current_directory }}</p> {% endcomment %}
+        {% endif %}
+        <!-- Back button to return to the previous display -->
+        <form method="get" action="{% if parent_directory %}{% url 'view_folder' folder_path=parent_directory %}{% else %}{% url 'dashboard' %}{% endif %}">
+            <button type="submit"><i class='bx bx-left-arrow-alt'></i>Back</button>
+        </form>
+    </div>
 
     <ul>
         <!-- Inside the block content -->
         {% for file_info in uploaded_files %}
             <li class="listdirxfile">
-                {% if file_info.is_dir %}
-                    <span>{{ file_info.name }}</span>
-                    <!-- Add view folder link with current directory path -->
-                    <a href="{% url 'view_folder' folder_path=file_info.full_path %}">View Folder</a>
-                    <button class="rename-btn-folder" data-item="{{ file_info.name }}" data-is-dir="true">Rename</button>
-                {% else %}
-                    <span>{{ file_info.name }}</span>
-                    <!-- Add download link -->
-                    {% comment %} <a href="{% url 'download_file' file_name=file_info.name  %}">Download</a> {% endcomment %}
-                    {% comment %} <input type="hidden" name="current_directory"  value="{{ file_info.full_path }}">
-                    <a href="{% url 'download_file' file_name=file_info.name %}">Download</a> {% endcomment %}
-                    {% comment %} <span>{{ file_info.name }}</span> {% endcomment %}
-                    <!-- Add download link -->
-                    <input type="hidden" name="current_directory" value="{{ current_directory }}">
-                    <a href="#" class="download-link" data-file="{{ file_info.name }}">Download</a> 
-                    <button class="rename-btn-file" data-item="{{ file_info.name }}" data-is-dir="false">Rename</button>
-                    <script>
-                        document.querySelectorAll('.download-link').forEach(link => {
-                            link.addEventListener('click', function(event) {
-                                event.preventDefault();
-                                const fileName = this.dataset.file;
-                                const currentDirectory = this.previousElementSibling.value;
-                                const downloadUrl = `/download/${fileName}/?current_directory=${currentDirectory}`;
-                                window.location.href = downloadUrl;
-                            });
-                        });
-                    </script>
-                {% endif %}
-                <!-- Add delete button -->
-                <form method="post" action="{% url 'delete_item' %}">
-                    {% csrf_token %}
-                    <input type="hidden" name="item_name" value="{{ file_info.name }}">
-                    <input type="hidden" name="item_path" value="{{ file_info.full_path }}">
-                    <button type="submit">Delete</button>
-                </form>
+                <div class="filesfolders">
+                    {% if file_info.is_dir %}
+                        <div class="files-folders-folders">
+                            <div class="listfilename">
+                                <span>{{ file_info.name }}</span>
+                            </div>
+                            <div class="listfilefunctions">
+                                <span>{{ file_info.date }}</span>
+                            </div>
+                            <div class="listfilefunctions">
+                                <span></span>
+                            </div>
+                            <div class="listfilefunctions">
+                                <!-- Add view folder link with current directory path -->
+                                <a href="{% url 'view_folder' folder_path=file_info.full_path %}"><i class='bx bxs-folder-open' ></i>View Folder</a>
+                            </div>
+                            <div class="listfilefunctions">
+                                <button class="rename-btn-folder" data-item="{{ file_info.name }}" data-is-dir="true">Rename</button>
+                            </div>
+                            <div class="listfilefunctions">
+                                <form method="post" action="{% url 'delete_item' %}">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="item_name" value="{{ file_info.name }}">
+                                    <input type="hidden" name="item_path" value="{{ file_info.full_path }}">
+                                    <button type="submit">Delete</button>
+                                </form>
+                            </div>
+                        </div>
+                    {% else %}
+                        <div class="files-folders-folders">
+                            <div class="listfilename">
+                                <span>{{ file_info.name }}</span>
+                            </div>
+                            <div class="listfilefunctions">
+                                <span>{{ file_info.date }}</span>
+                            </div>
+                            <div class="listfilefunctions">
+                                <span>{{ file_info.size }}</span>
+                            </div>
+                            <div class="listfilefunctions">
+                                <!-- Add download link -->
+                                <input type="hidden" name="current_directory" value="{{ current_directory }}">
+                                <a href="#" class="download-link" data-file="{{ file_info.name }}"><i class='bx bxs-download'></i>Download</a> 
+                            </div>
+                            <div class="listfilefunctions">
+                                <button class="rename-btn-file" data-item="{{ file_info.name }}" data-is-dir="false">Rename</button>
+                                <script>
+                                    document.querySelectorAll('.download-link').forEach(link => {
+                                        link.addEventListener('click', function(event) {
+                                            event.preventDefault();
+                                            const fileName = this.dataset.file;
+                                            const currentDirectory = this.previousElementSibling.value;
+                                            const downloadUrl = `/download/${fileName}/?current_directory=${currentDirectory}`;
+                                            window.location.href = downloadUrl;
+                                        });
+                                    });
+                                </script>
+                            </div>
+                            <div class="listfilefunctions">
+                                <form method="post" action="{% url 'delete_item' %}">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="item_name" value="{{ file_info.name }}">
+                                    <input type="hidden" name="item_path" value="{{ file_info.full_path }}">
+                                    <button type="submit">Delete</button>
+                                </form>
+                            </div>
+                        </div>
+                    {% endif %}
+                    <!-- Add delete button -->
+                    {% comment %} <form method="post" action="{% url 'delete_item' %}">
+                        {% csrf_token %}
+                        <input type="hidden" name="item_name" value="{{ file_info.name }}">
+                        <input type="hidden" name="item_path" value="{{ file_info.full_path }}">
+                        <button type="submit">Delete</button>
+                    </form> {% endcomment %}
+                </div>
             </li>
         {% endfor %}
     </ul>
-
-    <!-- Back button to return to the previous display -->
-    <form method="get" action="{% if parent_directory %}{% url 'view_folder' folder_path=parent_directory %}{% else %}{% url 'dashboard' %}{% endif %}">
-        <button type="submit">Back</button>
-    </form>
 
     <!-- Floating section for renaming folder -->
     <div class="rename-section-folder" style="display: none;">
