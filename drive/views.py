@@ -122,7 +122,7 @@ def delete_item_search(request):
                     # print(os.path.join(item_path, item_name))
                     # print(os.path.dirname(item_path))
                     # os.remove(item_path + "\\" + item_name)  # Delete file
-                    os.remove(os.path.join(item_path, item_name))
+                    os.remove(os.path.join(item_path))
                     # return JsonResponse({'success': True, 'message': 'Item deleted successfully'})
                     # deleted_item_directory = os.path.dirname(item_path)
                     return redirect('view_folder', folder_path=os.path.dirname(item_path))
@@ -175,7 +175,7 @@ def view_folder(request, folder_path):
     else:
         return render(request, 'dashboardextend.html', {'uploaded_files': uploaded_items, 'current_directory': folder_path, 'parent_directory': parent_directory, 'username': username})
 
-
+'''
 def search(request):
     query = request.GET.get('query')
     username = request.session.get('username')
@@ -205,6 +205,49 @@ def search(request):
         'query': query,  # Pass the query back to the template for displaying in the search input field
         'username': username
     })
+    
+'''
+
+def search(request):
+    query = request.GET.get('query')
+    username = request.session.get('username')
+    current_directory = request.GET.get('current_directory')
+    
+    if current_directory == "":
+        current_directory = os.path.join(settings.MEDIA_ROOT, username)
+    
+    retrieved_files = []
+
+    if query == "":
+        return render(request, 'dashboardextend.html')
+    
+    search_results = []
+
+    for root, dirs, files in os.walk(current_directory):
+        for file_name in files:
+            if query.lower() in file_name.lower():
+                if current_directory == "":
+                    file_path = current_directory
+                else:
+                    file_path = os.path.join(root, file_name)
+                print("ADSAD---------",file_path)
+                file_size = os.path.getsize(file_path)
+                file_size_formatted = get_formatted_file_size(file_size)
+                search_results.append({'filename': file_name, 'size': file_size_formatted, 'path': file_path})
+    
+    return render(request, 'search_form.html', {
+        'search_results': search_results,
+        'current_directory': current_directory,
+        'query': query,  # Pass the query back to the template for displaying in the search input field
+        'username': username
+    })
+
+def get_formatted_file_size(file_size):
+    # Convert bytes to appropriate unit (KB, MB, GB)
+    for unit in ['bytes', 'KB', 'MB', 'GB']:
+        if file_size < 1024.0:
+            return f"{file_size:.2f} {unit}"
+        file_size /= 1024.0
 
 
 def rename_file(request):
