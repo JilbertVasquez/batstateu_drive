@@ -1,0 +1,177 @@
+{% extends 'basedashboard.html' %}
+
+{% block content %}
+
+
+    <div class="filefolderheader">
+        <h2>My Drive</h2>
+        {% if current_directory %}
+            {% comment %} <p style="color: red;">Current Directory: {{ current_directory }}</p> {% endcomment %}
+        {% endif %}
+        <!-- Back button to return to the previous display -->
+        <form method="get" action="{% if parent_directory %}{% url 'view_folder' folder_path=parent_directory %}{% else %}{% url 'dashboard' %}{% endif %}">
+            <button type="submit"><i class='bx bx-left-arrow-alt'></i>Back</button>
+        </form>
+    </div>
+
+    <ul>
+        <!-- Inside the block content -->
+        {% for file_info in uploaded_files %}
+            <li class="listdirxfile">
+                <div class="filesfolders">
+                    {% if file_info.is_dir %}
+                        <div class="files-folders-folders">
+                            <div class="listfilename">
+                                <span>{{ file_info.name }}</span>
+                            </div>
+                            <div class="listfilefunctions">
+                                <span>{{ file_info.date }}</span>
+                            </div>
+                            <div class="listfilefunctions">
+                                <span></span>
+                            </div>
+                            <div class="listfilefunctions">
+                                <!-- Add view folder link with current directory path -->
+                                <a href="{% url 'view_folder' folder_path=file_info.full_path %}"><i class='bx bxs-folder-open' ></i>View Folder</a>
+                            </div>
+                            <div class="listfilefunctions">
+                                <button class="rename-btn-folder" data-item="{{ file_info.name }}" data-is-dir="true">Rename</button>
+                            </div>
+                            <div class="listfilefunctions">
+                                <form method="post" action="{% url 'delete_item' %}">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="item_name" value="{{ file_info.name }}">
+                                    <input type="hidden" name="item_path" value="{{ file_info.full_path }}">
+                                    <button type="submit">Delete</button>
+                                </form>
+                            </div>
+                        </div>
+                    {% else %}
+                        <div class="files-folders-folders">
+                            <div class="listfilename">
+                                <span>{{ file_info.name }}</span>
+                            </div>
+                            <div class="listfilefunctions">
+                                <span>{{ file_info.date }}</span>
+                            </div>
+                            <div class="listfilefunctions">
+                                <span>{{ file_info.size }}</span>
+                            </div>
+                            <div class="listfilefunctions">
+                                <!-- Add download link -->
+                                <input type="hidden" name="current_directory" value="{{ current_directory }}">
+                                <a href="#" class="download-link" data-file="{{ file_info.name }}"><i class='bx bxs-download'></i>Download</a> 
+                            </div>
+                            <div class="listfilefunctions">
+                                <button class="rename-btn-file" data-item="{{ file_info.name }}" data-is-dir="false">Rename</button>
+                                <script>
+                                    document.querySelectorAll('.download-link').forEach(link => {
+                                        link.addEventListener('click', function(event) {
+                                            event.preventDefault();
+                                            const fileName = this.dataset.file;
+                                            const currentDirectory = this.previousElementSibling.value;
+                                            const downloadUrl = `/download/${fileName}/?current_directory=${currentDirectory}`;
+                                            window.location.href = downloadUrl;
+                                        });
+                                    });
+                                </script>
+                            </div>
+                            <div class="listfilefunctions">
+                                <form method="post" action="{% url 'delete_item' %}">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="item_name" value="{{ file_info.name }}">
+                                    <input type="hidden" name="item_path" value="{{ file_info.full_path }}">
+                                    <button type="submit">Delete</button>
+                                </form>
+                            </div>
+                        </div>
+                    {% endif %}
+                    <!-- Add delete button -->
+                    {% comment %} <form method="post" action="{% url 'delete_item' %}">
+                        {% csrf_token %}
+                        <input type="hidden" name="item_name" value="{{ file_info.name }}">
+                        <input type="hidden" name="item_path" value="{{ file_info.full_path }}">
+                        <button type="submit">Delete</button>
+                    </form> {% endcomment %}
+                </div>
+            </li>
+        {% endfor %}
+    </ul>
+
+    <!-- Floating section for renaming folder -->
+    <div class="rename-section-folder" style="display: none;">
+        <form id="rename-form-folder" method="POST" action="{% url 'rename_folder' %}">
+            {% csrf_token %}
+            <input type="hidden" name="current_directory" value="{{ current_directory }}">
+            <input type="hidden" id="rename-item-name-folder" name="item_path">
+            <input type="text" id="new-name-folder" name="new_name" placeholder="Enter new folder name">
+            <button class="buttonClassrename" type="submit">Rename Folder</button>
+        </form>
+    </div>
+
+    <!-- JavaScript to handle renaming for folder -->
+    <script>
+        // Toggle rename form for folder
+        document.querySelectorAll('.rename-btn-folder').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const itemName = this.dataset.item;
+                const itemPath = this.parentElement.querySelector('[name="item_path"]').value;
+                const renameSectionFolder = document.querySelector('.rename-section-folder');
+                const renameSectionFile = document.querySelector('.rename-section-file');
+                if (renameSectionFolder.style.display === 'none' || renameSectionFolder.querySelector('#rename-item-name-folder').value !== itemPath) {
+                    renameSectionFolder.style.display = 'block';
+                    renameSectionFolder.querySelector('#rename-item-name-folder').value = itemPath;
+                    renameSectionFolder.querySelector('#new-name-folder').value = itemName;
+                    renameSectionFile.style.display = 'none';
+                } else {
+                    renameSectionFolder.style.display = 'none';
+                }
+            });
+        });
+    </script>
+
+    <!-- Floating section for renaming file -->
+    <div class="rename-section-file" style="display: none;">
+        <form id="rename-form-file" method="POST" action="{% url 'rename_file' %}">
+            {% csrf_token %}
+            <input type="hidden" name="current_directory" value="{{ current_directory }}">
+            <input type="hidden" id="rename-item-name-file" name="item_path">
+            <input type="text" id="new-name-file" name="new_name" placeholder="Enter new file name">
+            <button class="buttonClassrename" type="submit">Rename File</button>
+        </form>
+    </div>
+
+    <!-- JavaScript to handle renaming for file -->
+    <script>
+        // Toggle rename form for file
+        document.querySelectorAll('.rename-btn-file').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const itemName = this.dataset.item;
+                const itemPath = this.parentElement.querySelector('[name="item_path"]').value;
+                const renameSectionFolder = document.querySelector('.rename-section-folder');
+                const renameSectionFile = document.querySelector('.rename-section-file');
+                if (renameSectionFile.style.display === 'none' || renameSectionFile.querySelector('#rename-item-name-file').value !== itemPath) {
+                    renameSectionFile.style.display = 'block';
+                    renameSectionFile.querySelector('#rename-item-name-file').value = itemPath;
+                    renameSectionFile.querySelector('#new-name-file').value = itemName;
+                    renameSectionFolder.style.display = 'none';
+                } else {
+                    renameSectionFile.style.display = 'none';
+                }
+            });
+        });
+    </script>
+
+    {% comment %} {% if search_results %}
+        <h2>Search Results:</h2>
+        <ul>
+            <!-- Display search results -->
+            {% for result in search_results %}
+                <li>{{ result.filename }}</li> <!-- Modify this according to your model fields -->
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>No results found.</p>
+    {% endif %} {% endcomment %}
+    
+{% endblock %}
