@@ -13,50 +13,65 @@
     {% else %}
         <p>No results found.</p>
     {% endif %} {% endcomment %}
-
+<div class="filefolderheader">
     {% if search_results %}
         <h2>Search Results:</h2>
+        <!-- Back button to return to the previous display -->
+        <form method="get" action="{% if parent_directory %}{% url 'view_folder' folder_path=parent_directory %}{% else %}{% url 'dashboard' %}{% endif %}">
+            <button type="submit">Back</button>
+        </form>
+    </div>
         <ul>
             <!-- Display search results -->
             {% for result in search_results %}
-                <li>
-                    <span>{{ result.filename }}{{result.extension}}</span>
-                    <!-- Add download link -->
-                    {% csrf_token %}
-                    <input type="hidden" name="current_directory" value="{{ current_directory }}">
-                    <a href="#" class="download-link" data-file="{{ result.filename }}{{result.extension}}">Download</a>
+                <li class="listdirxfile">
+                    <div class="filesfolders">
+                        <div class="files-folders-folders">
+                            <div class="listfilename">
+                                <span>{{ result.filename }}{{result.extension}}</span>
+                            </div>
+                            <div class="listfilefunctions">
+                                <span>{{ result.date }}</span>
+                            </div>
+                            <div class="listfilefunctions">
+                                <span>{{ result.size }}</span>
+                            </div>
+                            <!-- Add download link -->
+                            <div class="listfilefunctions">
+                                {% csrf_token %}
+                                <input type="hidden" name="current_directory" value="{{ current_directory }}">
+                                <a href="#" class="download-link" data-file="{{ result.filename }}{{result.extension}}">Download</a>
+                            </div>
 
-                    <!-- Add rename button -->
-                    <button class="rename-btn-file" data-item="{{ result.filename }}{{result.extension}}" data-is-dir="false">Rename</button>
-                    <!-- Add delete button -->
-                    <form method="post" action="{% url 'delete_item_search' %}">
-                        {% csrf_token %}
-                        <input type="hidden" name="item_name" value="{{ result.filename }}{{result.extension}}">
-                        <input type="hidden" name="item_path" value="{{ result.path }}">
-                        <button type="submit">Delete</button>
-                    </form>
-                    <script>
-                        document.querySelectorAll('.download-link').forEach(link => {
-                            link.addEventListener('click', function(event) {
-                                event.preventDefault();
-                                const fileName = this.dataset.file;
-                                const currentDirectory = this.previousElementSibling.value;
-                                const downloadUrl = `/download/${fileName}/?current_directory=${currentDirectory}`;
-                                window.location.href = downloadUrl;
-                            });
-                        });
-                    </script>
+                            <div class="listfilefunctions">
+                                <!-- Add rename button -->
+                                <button class="rename-btn-file" data-item="{{ result.filename }}{{result.extension}}" data-is-dir="false">Rename</button>
+                            </div>
+                                <!-- Add delete button -->
+                            <div class="listfilefunctions">
+                                <form method="post" action="{% url 'delete_item_search' %}">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="item_name" value="{{ result.filename }}{{result.extension}}">
+                                    <input type="hidden" name="item_path" value="{{ result.path }}">
+                                    <button type="submit">Delete</button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
                 </li>
             {% endfor %}
         </ul>
     {% else %}
-        <p>No results found.</p>
+        {% comment %} <p>No results found.</p> {% endcomment %}
+        <div class="listfilename">
+            <span>No results found.</span>
+        </div>
+        <form method="get" action="{% if parent_directory %}{% url 'view_folder' folder_path=parent_directory %}{% else %}{% url 'dashboard' %}{% endif %}">
+            <button type="submit">Back</button>
+        </form>
     {% endif %}
-
-    <!-- Back button to return to the previous display -->
-    <form method="get" action="{% if parent_directory %}{% url 'view_folder' folder_path=parent_directory %}{% else %}{% url 'dashboard' %}{% endif %}">
-        <button type="submit">Back</button>
-    </form>
+        
+    
 
 
     <!-- Floating section for renaming file -->
@@ -71,6 +86,17 @@
     </div>
 
     <!-- JavaScript to handle renaming for file -->
+    <script>
+        document.querySelectorAll('.download-link').forEach(link => {
+            link.addEventListener('click', function(event) {
+                event.preventDefault();
+                const fileName = this.dataset.file;
+                const currentDirectory = this.previousElementSibling.value;
+                const downloadUrl = `/download/${fileName}/?current_directory=${currentDirectory}`;
+                window.location.href = downloadUrl;
+            });
+        });
+    </script>
     <script>
         // Toggle rename form for file
         document.querySelectorAll('.rename-btn-file').forEach(btn => {

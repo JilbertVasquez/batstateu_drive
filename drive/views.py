@@ -21,6 +21,7 @@ import time
 
 def dashboard(request):
     username = request.session.get('username', None)
+    userid = request.session.get('userid', None)
     user_upload_dir = os.path.join(settings.MEDIA_ROOT, username)
     uploaded_files = []
 
@@ -42,10 +43,10 @@ def dashboard(request):
                 'is_dir': is_dir,
                 'full_path': file_path
             })
-            print(uploaded_files[0])
+            # print(uploaded_files[0])
             
             # uploaded_files.append({'name': file_name, 'size': file_size, 'last_modified': last_modified_date, 'is_dir': is_dir, 'full_path': file_path})  # Add full_path
-            # print(uploaded_files[0])
+
         return render(request, 'dashboardextend.html', {'username': username, 'uploaded_files': uploaded_files})
     else:
         return redirect('login')
@@ -66,6 +67,7 @@ def convert_size(size_bytes):
 
 def download_file(request, file_name):
     username = request.session.get('username', None)
+    userid = request.session.get('userid', None)
     current_directory = request.GET.get('current_directory', '')  # Use request.GET to get query parameters
     if username:
         file_path = os.path.join(settings.MEDIA_ROOT, username, current_directory, file_name)
@@ -83,9 +85,23 @@ def download_file(request, file_name):
 def delete_item(request):
     if request.method == 'POST':
         username = request.session.get('username', None)
+        userid = request.session.get('userid', None)
         item_name = request.POST.get('item_name')
         item_path = request.POST.get('item_path')  # Get the full item path
+
         if username and item_path:
+            print(item_name.split(".")[0])
+            print(item_path)
+            try:
+                file = FileDetails.objects.get(filename=item_name.split(".")[0])
+                if os.path.join(file.path, (file.filename + file.extension)) == item_path:
+                    file.delete()  # Delete the file from the database
+                else:
+                    print(os.path.join(file.path, (file.filename + file.extension)))
+                    print(item_path)
+            except FileDetails.DoesNotExist:
+                return HttpResponse("Item not found", status=404)
+            
             if os.path.exists(item_path):
                 try:
                     if os.path.isdir(item_path):
@@ -93,12 +109,7 @@ def delete_item(request):
                         shutil.rmtree(item_path)
                     else:
                         os.remove(item_path)  # Delete file
-                        
-                    # file_detail = FileDetails.objects.get(path=item_path)
-                    # file_detail.delete()
-                    # print(file_detail)
-                    
-                    # return JsonResponse({'success': True, 'message': 'Item deleted successfully'})
+
                     deleted_item_directory = os.path.dirname(item_path)
                     return redirect('view_folder', folder_path=deleted_item_directory)
                 except Exception as e:
@@ -106,7 +117,6 @@ def delete_item(request):
             else:
                 return HttpResponse("Item not found", status=404)
         else:
-            # print(item_path)
             return HttpResponse("Invalid request", status=400)
     else:
         return HttpResponse("Method not allowed", status=405)
@@ -114,13 +124,12 @@ def delete_item(request):
 def delete_item_search(request):
     if request.method == 'POST':
         username = request.session.get('username', None)
+        userid = request.session.get('userid', None)
         item_path = request.POST.get('item_path')  # Get the full item path
         item_name = request.POST.get('item_name')
         if username and item_path:
             if os.path.exists(item_path):
                 try:
-                    # print(os.path.join(item_path, item_name))
-                    # print(os.path.dirname(item_path))
                     # os.remove(item_path + "\\" + item_name)  # Delete file
                     os.remove(os.path.join(item_path))
                     # return JsonResponse({'success': True, 'message': 'Item deleted successfully'})
@@ -131,7 +140,6 @@ def delete_item_search(request):
             else:
                 return HttpResponse("Item not found", status=404)
         else:
-            print(item_path)
             return HttpResponse("Invalid request", status=400)
     else:
         return HttpResponse("Method not allowed", status=405)
@@ -156,6 +164,7 @@ def get_folder_contents(folder_path):
 
 def view_folder(request, folder_path):
     username = request.session.get('username', None)
+    userid = request.session.get('userid', None)
     folder_path = os.path.join(settings.MEDIA_ROOT, username, folder_path)
     uploaded_items = []
 
@@ -191,13 +200,7 @@ def search(request):
     # user_filenames = FileDetails.objects.filter(filename__icontains=query)
     search_results = FileDetails.objects.filter(filename__icontains=query)
     
-    # print(search_results)
-    
-    for filenames_details in search_results:
-        # print(filenames_details.filename)
-        # print(filenames_details.size)
-        # print(filenames_details.extension)
-        pass
+
     
     return render(request, 'search_form.html', {
         'search_results': search_results,
@@ -211,6 +214,7 @@ def search(request):
 def search(request):
     query = request.GET.get('query')
     username = request.session.get('username')
+    userid = request.session.get('userid', None)
     current_directory = request.GET.get('current_directory')
     
     if current_directory == "":
@@ -230,10 +234,11 @@ def search(request):
                     file_path = current_directory
                 else:
                     file_path = os.path.join(root, file_name)
-                print("ADSAD---------",file_path)
                 file_size = os.path.getsize(file_path)
                 file_size_formatted = get_formatted_file_size(file_size)
-                search_results.append({'filename': file_name, 'size': file_size_formatted, 'path': file_path})
+                last_modified = os.path.getmtime(file_path)
+                last_modified_date = time.strftime('%m-%d-%Y', time.localtime(last_modified))
+                search_results.append({'filename': file_name, 'date': last_modified_date, 'size': file_size_formatted, 'path': file_path})
     
     return render(request, 'search_form.html', {
         'search_results': search_results,
@@ -255,7 +260,6 @@ def rename_file(request):
         item_path = request.POST.get('item_path')
         new_name = request.POST.get('new_name')
         current_dir = request.POST.get("current_directory")
-        # print("HELLO WORLD", current_dir)
 
         try:
             # Rename the file
@@ -303,11 +307,11 @@ def handle_file_upload(request):
             uploaded_files = request.FILES.getlist('file')  # Get list of uploaded files
             
             username = request.session.get('username')
+            userid = request.session.get('userid', None)
             current_directory = request.POST.get('current_directory', '')
             if username:
                 # Get the User object for the logged-in user
                 user = Users.objects.get(username=username)
-                # print(user)
                 user_upload_dir = os.path.join(settings.MEDIA_ROOT, username, current_directory)
                 if not os.path.exists(user_upload_dir):
                     os.makedirs(user_upload_dir)
@@ -326,7 +330,6 @@ def handle_file_upload(request):
                             return redirect('dashboard')
                     
                     except Exception as e:
-                        # print(str(e))
                         # Handle file upload error
                         return render(request, 'dashboard.html', {'error': str(e)})
                     
@@ -373,7 +376,6 @@ def get_file_details(uploaded_file, file_path):
         'file_path': file_path,
     }
     
-    # print(file_details)
     
     return file_details
 
@@ -398,6 +400,7 @@ def handle_folder_upload(request):
         if 'file' in request.FILES:
             uploaded_folder = request.FILES['file']
             username = request.session.get('username', None)
+            userid = request.session.get('userid', None)
             if username:
                 user_upload_dir = os.path.join(settings.MEDIA_ROOT, username)
                 if not os.path.exists(user_upload_dir):
@@ -426,6 +429,7 @@ def handle_create_folder(request):
     if request.method == 'POST':
         # Get the current username from session
         username = request.session.get('username', None)
+        userid = request.session.get('userid', None)
         
         # Get the folder name and current directory from the POST request
         folder_name = request.POST.get('folder_name')
@@ -467,7 +471,6 @@ def signupPage(request):
         pass1 = request.POST.get('password')
         pass2 = request.POST.get('password2')
         
-        # print(fname, lname, uname, email, pass1, pass2)
         
         # Check if username already exists
         if Users.objects.filter(username=uname).exists():
@@ -506,11 +509,10 @@ def loginPage(request):
             
             if check_password(pass1, user.password):
                 # Passwords match, user authenticated
-                # print(email, pass1)
                 request.session['username'] = user.username  # Storing username in session
+                request.session['userid'] = user.userid
                 return redirect('dashboard')
             else:
-                # print(email, pass1)
                 return HttpResponse("Username or Password is incorrect")
             
         except Users.DoesNotExist:
