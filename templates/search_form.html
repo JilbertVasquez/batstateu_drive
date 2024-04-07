@@ -56,6 +56,9 @@
                                     <button type="submit">Delete</button>
                                 </form>
                             </div>
+                            <div class="listfilefunctions">
+                                <button class="share-btn-file" data-item="{{ file_info.name }}" data-is-dir="false">Share</button>
+                            </div>
                         </div>
                     </div>
                 </li>
@@ -85,6 +88,16 @@
         </form>
     </div>
 
+    <div class="share-file-section" style="display: none;">
+        <form id="share-file-form" method="POST" action="{% url 'rename_file' %}">
+            {% csrf_token %}
+            <input type="hidden" name="current_directory" value="{{ current_directory }}">
+            <input type="hidden" id="share-item-name" name="item_path">
+            <input type="text" id="share-email" name="email" placeholder="Enter Email...">
+            <button class="buttonClassShare" type="submit">Share</button>
+        </form>
+    </div>
+
     <!-- JavaScript to handle renaming for file -->
     <script>
         document.querySelectorAll('.download-link').forEach(link => {
@@ -111,6 +124,24 @@
                     renameSectionFile.querySelector('#new-name-file').value = itemName;
                 } else {
                     renameSectionFile.style.display = 'none';
+                }
+            });
+        });
+
+        document.querySelectorAll('.share-btn-file').forEach(btn => {
+            btn.addEventListener('click', function() {
+                //const itemName = this.dataset.item;
+                //const itemPath = this.parentElement.querySelector('[name="item_path"]').value;
+                //const itemPathElement = this.parentElement.querySelector('[name="item_path"]');
+                const itemName = this.dataset.item;
+                const itemPathElement = this.closest('.filesfolders').querySelector('[name="item_path"]');
+                const itemPath = itemPathElement ? itemPathElement.value : null;
+                console.log(itemPath);
+                const shareSectionFile = document.querySelector('.share-file-section');
+                if (shareSectionFile.style.display === 'none') {
+                    shareSectionFile.style.display = 'block';
+                } else {
+                    shareSectionFile.style.display = 'none';
                 }
             });
         });

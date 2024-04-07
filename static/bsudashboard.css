@@ -253,11 +253,10 @@ header {
 }
 
 .rename-section-folder .buttonClassrename, .rename-section-file .buttonClassrename {
-    width: 50%;
+    width: 80%;
     padding: 1%;
     box-sizing: border-box;
     margin-left: 50%;
-    
 }
 
 
@@ -281,7 +280,7 @@ header {
 
 .listfilefunctions {
     background-color: beige;
-    width: 12%;
+    width: 10%;
 }
 
 
@@ -289,3 +288,45 @@ header {
     border: black;
     background-color: rgba(255, 255, 255, 0);
 } */
+
+
+
+.share-file-section {
+    position: absolute;
+    top: 42.8%;
+    left: 39.7%;
+    transform: translate(-42.83%, -39.7%);
+    background-color: #fff;
+    padding: 1.5%;
+    border: 0px solid #000000;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.8);
+    width: 18%;
+    height: 12%;
+    z-index: 1;
+    display: none;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    background-color: rgba(184, 0, 0, 0.75);
+    background-color: blue;
+}
+
+#share-email {
+    padding: 1%;
+    width: 100%;
+    margin-bottom: 5%;
+    box-sizing: border-box;
+    display: flex;
+    border-radius: 5px;
+    border: 0px solid black;
+}
+
+.buttonClassShare {
+    width: 80%;
+    padding: 1%;
+    box-sizing: border-box;
+    margin-left: 50%;
+    color: blue;
+    background-color: yellow;
+}

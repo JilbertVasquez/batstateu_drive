@@ -61,9 +61,6 @@
                                 <!-- Add download link -->
                                 <input type="hidden" name="current_directory" value="{{ current_directory }}">
                                 <a href="#" class="download-link" data-file="{{ file_info.name }}"><i class='bx bxs-download'></i>Download</a> 
-                            </div>
-                            <div class="listfilefunctions">
-                                <button class="rename-btn-file" data-item="{{ file_info.name }}" data-is-dir="false">Rename</button>
                                 <script>
                                     document.querySelectorAll('.download-link').forEach(link => {
                                         link.addEventListener('click', function(event) {
@@ -77,12 +74,18 @@
                                 </script>
                             </div>
                             <div class="listfilefunctions">
+                                <button class="rename-btn-file" data-item="{{ file_info.name }}" data-is-dir="false">Rename</button>
+                            </div>
+                            <div class="listfilefunctions">
                                 <form method="post" action="{% url 'delete_item' %}">
                                     {% csrf_token %}
                                     <input type="hidden" name="item_name" value="{{ file_info.name }}">
                                     <input type="hidden" name="item_path" value="{{ file_info.full_path }}">
                                     <button type="submit">Delete</button>
                                 </form>
+                            </div>
+                            <div class="listfilefunctions">
+                                <button class="share-btn-file" data-item="{{ file_info.name }}" data-is-dir="false">Share</button>
                             </div>
                         </div>
                     {% endif %}
@@ -147,7 +150,18 @@
             <input type="hidden" name="current_directory" value="{{ current_directory }}">
             <input type="hidden" id="rename-item-name-folder" name="item_path">
             <input type="text" id="new-name-folder" name="new_name" placeholder="Enter new file name">
-            <button class="buttonClassrename" type="submit">Rename File</button>
+            <button class="buttonClassrename" type="submit">Rename Folder</button>
+        </form>
+    </div>
+
+    <!-- Floating section for sharing file -->
+    <div class="share-file-section" style="display: none;">
+        <form id="share-file-form" method="POST" action="{% url 'rename_file' %}">
+            {% csrf_token %}
+            <input type="hidden" name="current_directory" value="{{ current_directory }}">
+            <input type="hidden" id="share-item-name" name="item_path">
+            <input type="text" id="share-email" name="email" placeholder="Enter Email...">
+            <button class="buttonClassShare" type="submit">Share</button>
         </form>
     </div>
 
@@ -196,6 +210,24 @@
                     renameSectionFile.style.display = 'none';
                 } else {
                     renameSectionFolder.style.display = 'none';
+                }
+            });
+        });
+
+        document.querySelectorAll('.share-btn-file').forEach(btn => {
+            btn.addEventListener('click', function() {
+                //const itemName = this.dataset.item;
+                //const itemPath = this.parentElement.querySelector('[name="item_path"]').value;
+                //const itemPathElement = this.parentElement.querySelector('[name="item_path"]');
+                const itemName = this.dataset.item;
+                const itemPathElement = this.closest('.filesfolders').querySelector('[name="item_path"]');
+                const itemPath = itemPathElement ? itemPathElement.value : null;
+                console.log(itemPath);
+                const shareSectionFile = document.querySelector('.share-file-section');
+                if (shareSectionFile.style.display === 'none') {
+                    shareSectionFile.style.display = 'block';
+                } else {
+                    shareSectionFile.style.display = 'none';
                 }
             });
         });
