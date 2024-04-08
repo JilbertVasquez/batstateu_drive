@@ -54,11 +54,11 @@
                     </form>
                 </div>
                 <div class="optionfolders">
-                    <button><i class='bx bxs-folder-open'></i>My Files</button>
+                    <button><i class='bx bxs-folder-open'></i>My Drive</button>
                     <button><i class='bx bx-history' ></i>Recent</button>
-                    <button><i class='bx bx-download' ></i>Downloads</button>
+                    {% comment %} <button><i class='bx bx-download' ></i>Downloads</button> {% endcomment %}
                     <button><i class='bx bxs-user-plus'></i>Shared Files</button>
-                    <button><i class='bx bxs-trash' ></i>Recycle Bin</button>
+                    {% comment %} <button><i class='bx bxs-trash' ></i>Recycle Bin</button> {% endcomment %}
                 </div>
                 <div class="optionaccount">
                     <button><i class='bx bxs-user-circle' ></i>My Profile</button>
@@ -77,8 +77,10 @@
                     <form method="GET" action="{% url 'search' %}">
                         <input type="hidden" name="current_directory" value="{{ current_directory }}">
                         <input class="searchinput" type="text" name="query" placeholder="Search in TNEU Drive..." value="{{ query }}">
-                        <button type="submit">Search</button>
+                        <button type="submit"><i class='bx bx-search'></i></button>
                     </form>
+                    <div class="searchsection-profile">
+                    </div>
                 </div>
             </header>
             {% comment %} <div class="drivesection">

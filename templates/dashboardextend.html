@@ -14,6 +14,30 @@
         </form>
     </div>
 
+    <div class="files-folders-folders">
+        <div class="listfilename">
+            <span>Name</span>
+        </div>
+        <div class="listfilefunctions">
+            <span>Date</span>
+        </div>
+        <div class="listfilefunctions">
+            <span>Size</span>
+        </div>
+        <div class="listfilefunctions">
+            <span></span>
+        </div>
+        <div class="listfilefunctions">
+            <span></span>
+        </div>
+        <div class="listfilefunctions">
+            <span></span>
+        </div>
+        <div class="listfilefunctions">
+            <span></span>
+        </div>
+    </div>
+
     <ul>
         <!-- Inside the block content -->
         {% for file_info in uploaded_files %}
@@ -22,7 +46,7 @@
                     {% if file_info.is_dir %}
                         <div class="files-folders-folders">
                             <div class="listfilename">
-                                <span>{{ file_info.name }}</span>
+                                <span><i class='bx bxs-folder' ></i>{{ file_info.name }}</span>
                             </div>
                             <div class="listfilefunctions">
                                 <span>{{ file_info.date }}</span>
@@ -35,14 +59,14 @@
                                 <a href="{% url 'view_folder' folder_path=file_info.full_path %}"><i class='bx bxs-folder-open' ></i>View Folder</a>
                             </div>
                             <div class="listfilefunctions">
-                                <button class="rename-btn-folder" data-item="{{ file_info.name }}" data-is-dir="true">Rename</button>
+                                <button class="rename-btn-folder" data-item="{{ file_info.name }}" data-is-dir="true"><i class='bx bxs-edit'></i>Rename</button>
                             </div>
                             <div class="listfilefunctions">
                                 <form method="post" action="{% url 'delete_item' %}">
                                     {% csrf_token %}
                                     <input type="hidden" name="item_name" value="{{ file_info.name }}">
                                     <input type="hidden" name="item_path" value="{{ file_info.full_path }}">
-                                    <button type="submit">Delete</button>
+                                    <button type="submit"><i class='bx bxs-trash-alt' ></i>Delete</button>
                                 </form>
                             </div>
                             <div class="listfilefunctions">
@@ -52,7 +76,7 @@
                     {% else %}
                         <div class="files-folders-folders">
                             <div class="listfilename">
-                                <span>{{ file_info.name }}</span>
+                                <span><i class='bx bxs-file-blank' ></i>{{ file_info.name }}</span>
                             </div>
                             <div class="listfilefunctions">
                                 <span>{{ file_info.date }}</span>
@@ -77,18 +101,18 @@
                                 </script>
                             </div>
                             <div class="listfilefunctions">
-                                <button class="rename-btn-file" data-item="{{ file_info.name }}" data-is-dir="false">Rename</button>
+                                <button class="rename-btn-file" data-item="{{ file_info.name }}" data-is-dir="false"><i class='bx bxs-edit'></i>Rename</button>
                             </div>
                             <div class="listfilefunctions">
                                 <form method="post" action="{% url 'delete_item' %}">
                                     {% csrf_token %}
                                     <input type="hidden" name="item_name" value="{{ file_info.name }}">
                                     <input type="hidden" name="item_path" value="{{ file_info.full_path }}">
-                                    <button type="submit">Delete</button>
+                                    <button type="submit"><i class='bx bxs-trash-alt' ></i>Delete</button>
                                 </form>
                             </div>
                             <div class="listfilefunctions">
-                                <button class="share-btn-file" data-item="{{ file_info.name }}" data-is-dir="false">Share</button>
+                                <button class="share-btn-file" data-item="{{ file_info.name }}" data-is-dir="false"><i class='bx bx-share-alt' ></i>Share</button>
                             </div>
                         </div>
                     {% endif %}

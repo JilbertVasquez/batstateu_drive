@@ -92,15 +92,7 @@ def delete_item(request):
         if username and item_path:
             print(item_name.split(".")[0])
             print(item_path)
-            try:
-                file = FileDetails.objects.get(filename=item_name.split(".")[0])
-                if os.path.join(file.path, (file.filename + file.extension)) == item_path:
-                    file.delete()  # Delete the file from the database
-                else:
-                    print(os.path.join(file.path, (file.filename + file.extension)))
-                    print(item_path)
-            except FileDetails.DoesNotExist:
-                return HttpResponse("Item not found", status=404)
+            
             
             if os.path.exists(item_path):
                 try:
@@ -108,6 +100,15 @@ def delete_item(request):
                         # Use shutil.rmtree for recursive deletion of folders and files
                         shutil.rmtree(item_path)
                     else:
+                        try:
+                            file = FileDetails.objects.get(filename=item_name.split(".")[0])
+                            if os.path.join(file.path, (file.filename + file.extension)) == item_path:
+                                file.delete()  # Delete the file from the database
+                            else:
+                                print(os.path.join(file.path, (file.filename + file.extension)))
+                                print(item_path)
+                        except FileDetails.DoesNotExist:
+                            return HttpResponse("Item not found", status=404)
                         os.remove(item_path)  # Delete file
 
                     deleted_item_directory = os.path.dirname(item_path)
