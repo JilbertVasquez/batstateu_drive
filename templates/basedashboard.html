@@ -72,12 +72,14 @@
                 <h1>upper</h1>
             </div> -->
             <header>
-                <!-- <h1>Welcome, {{ username }}</h1> -->
-                <form method="GET" action="{% url 'search' %}">
-                    <input type="hidden" name="current_directory" value="{{ current_directory }}">
-                    <input type="text" name="query" placeholder="Search in TNEU Drive..." value="{{ query }}">
-                    <button type="submit">Search</button>
-                </form>
+                <div class="searchsection">
+                    <!-- <h1>Welcome, {{ username }}</h1> -->
+                    <form method="GET" action="{% url 'search' %}">
+                        <input type="hidden" name="current_directory" value="{{ current_directory }}">
+                        <input class="searchinput" type="text" name="query" placeholder="Search in TNEU Drive..." value="{{ query }}">
+                        <button type="submit">Search</button>
+                    </form>
+                </div>
             </header>
             {% comment %} <div class="drivesection">
                 <h1>lower</h1>
