@@ -82,10 +82,10 @@ class FileDetails(models.Model):
         return self.filename
     
 class SharingFiles(models.Model):
-    sharing_id = models.AutoField(primary_key=True)
+    sharing_id = models.AutoField(primary_key=True)  # This line is fine, as it sets the primary key and enables auto-incrementing
     filename = models.CharField(max_length=255)
-    file_id = models.ForeignKey(FileDetails, on_delete=models.CASCADE)
-    user_id = models.ForeignKey(Users, on_delete=models.CASCADE, db_column='user_id')  # Corrected field name
+    file_id = models.ForeignKey(FileDetails, on_delete=models.CASCADE, db_column='file_id')
+    user_id = models.ForeignKey(Users, on_delete=models.CASCADE, db_column='user_id')
     share_by = models.CharField(max_length=255)
     share_to = models.CharField(max_length=255)
     path = models.CharField(max_length=255)

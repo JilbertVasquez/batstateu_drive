@@ -220,36 +220,69 @@ def search(request):
 # from .models import SharingFiles, FileDetails
 # from django.contrib import messages
 
+# def share_file(request):
+#     if request.method == 'POST':
+#         username = request.session.get('username', None)
+#         current_directory = request.POST.get('current_directory', '')
+#         # if current_directory == "":
+#         #     current_directory = os.path.join(settings.MEDIA_ROOT, username)
+#         curr_dir = os.path.join(settings.MEDIA_ROOT, username, current_directory)
+#         item_name = request.POST.get('itemname', '')
+#         item_name2 = item_name.split(".")[0]
+#         print(item_name2)
+#         print(curr_dir)
+#         item_path = request.POST.get('item_path', None)
+#         email = request.POST.get('email', None)
+
+#         try:
+#             recipient = Users.objects.get(email=email)
+#             print(recipient.email, recipient.userid, curr_dir, item_name2)
+#             # Check if the file exists in the file_details table
+#             file_entry = FileDetails.objects.get(filename=item_name2, path=curr_dir)
+#             print(file_entry.id)
+#             print(recipient.email, recipient.userid, curr_dir, item_name2)
+#             SharingFiles.objects.create(filename=item_name, file_id=file_entry, user_id=recipient, path=curr_dir, share_by=username, share_to=email)
+#             print("SUCCESS")
+#             messages.success(request, f'File shared with {email} successfully!')
+#         except FileDetails.DoesNotExist:
+#             messages.error(request, f'File with name {item_name2} does not exist in the specified path!')
+#         except Users.DoesNotExist:
+#             messages.error(request, f'User with email {email} does not exist!')
+
+#         return redirect('dashboard')  # Redirect to the dashboard or appropriate URL after sharing
+#     else:
+#         # Handle GET request if needed
+#         pass
+
+
 def share_file(request):
     if request.method == 'POST':
         username = request.session.get('username', None)
         current_directory = request.POST.get('current_directory', '')
-        # if current_directory == "":
-        #     current_directory = os.path.join(settings.MEDIA_ROOT, username)
         curr_dir = os.path.join(settings.MEDIA_ROOT, username, current_directory)
         item_name = request.POST.get('itemname', '')
         item_name2 = item_name.split(".")[0]
-        print(item_name2)
-        print(curr_dir)
         item_path = request.POST.get('item_path', None)
         email = request.POST.get('email', None)
 
         try:
             recipient = Users.objects.get(email=email)
-            print(recipient.email, recipient.userid, curr_dir, item_name2)
-            # Check if the file exists in the file_details table
             file_entry = FileDetails.objects.get(filename=item_name2, path=curr_dir)
-            print(file_entry.id)
-            print(recipient.email, recipient.userid, curr_dir, item_name2)
-            SharingFiles.objects.create(filename=item_name, file_id=file_entry, user_id=recipient, path=curr_dir, share_by=username, share_to=email)
-            print("SUCCESS")
+            SharingFiles.objects.create(
+                filename=item_name,
+                file_id=file_entry,
+                user_id=recipient,
+                path=curr_dir,
+                share_by=username,
+                share_to=email
+            )
             messages.success(request, f'File shared with {email} successfully!')
         except FileDetails.DoesNotExist:
             messages.error(request, f'File with name {item_name2} does not exist in the specified path!')
         except Users.DoesNotExist:
             messages.error(request, f'User with email {email} does not exist!')
 
-        return redirect('dashboard')  # Redirect to the dashboard or appropriate URL after sharing
+        return redirect('dashboard')
     else:
         # Handle GET request if needed
         pass
