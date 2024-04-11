@@ -67,6 +67,7 @@ from django.db import models
 from django.contrib.auth.models import User
 
 class FileDetails(models.Model):
+    id = models.AutoField(primary_key=True)
     user = models.ForeignKey(Users, on_delete=models.CASCADE)
     filename = models.CharField(max_length=255)
     size = models.CharField(max_length=50)
@@ -79,3 +80,19 @@ class FileDetails(models.Model):
 
     def __str__(self):
         return self.filename
+    
+class SharingFiles(models.Model):
+    sharing_id = models.AutoField(primary_key=True)
+    filename = models.CharField(max_length=255)
+    file_id = models.ForeignKey(FileDetails, on_delete=models.CASCADE)
+    user_id = models.ForeignKey(Users, on_delete=models.CASCADE, db_column='user_id')  # Corrected field name
+    share_by = models.CharField(max_length=255)
+    share_to = models.CharField(max_length=255)
+    path = models.CharField(max_length=255)
+
+    class Meta:
+        db_table = 'sharing_files'
+
+
+
+
