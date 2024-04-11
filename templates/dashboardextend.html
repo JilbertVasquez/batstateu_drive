@@ -164,6 +164,7 @@
     <div class="rename-section-file" style="display: none;">
         <form id="rename-form-file" method="POST" action="{% url 'rename_file' %}">
             {% csrf_token %}
+            <input type="hidden" id="item-file-name" name="itemname">
             <input type="hidden" name="current_directory" value="{{ current_directory }}">
             <input type="hidden" id="rename-item-name-file" name="item_path">
             <input type="text" id="new-name-file" name="new_name" placeholder="Enter new file name">
@@ -174,17 +175,19 @@
     <div class="rename-section-folder" style="display: none;">
         <form id="rename-form-folder" method="POST" action="{% url 'rename_file' %}">
             {% csrf_token %}
+            <input type="hidden" id="item-folder-name" name="itemname">
             <input type="hidden" name="current_directory" value="{{ current_directory }}">
             <input type="hidden" id="rename-item-name-folder" name="item_path">
-            <input type="text" id="new-name-folder" name="new_name" placeholder="Enter new file name">
+            <input type="text" id="new-name-folder" name="new_name" placeholder="Enter new folder name">
             <button class="buttonClassrename" type="submit">Rename Folder</button>
         </form>
     </div>
 
     <!-- Floating section for sharing file -->
     <div class="share-file-section" style="display: none;">
-        <form id="share-file-form" method="POST" action="{% url 'rename_file' %}">
+        <form id="share-file-form" method="POST" action="{% url 'share_file' %}">
             {% csrf_token %}
+            <input type="hidden" id="item-share-name" name="itemname">
             <input type="hidden" name="current_directory" value="{{ current_directory }}">
             <input type="hidden" id="share-item-name" name="item_path">
             <input type="text" id="share-email" name="email" placeholder="Enter Email...">
@@ -197,68 +200,75 @@
         // Toggle rename form for file
         document.querySelectorAll('.rename-btn-file').forEach(btn => {
             btn.addEventListener('click', function() {
-                //const itemName = this.dataset.item;
-                //const itemPath = this.parentElement.querySelector('[name="item_path"]').value;
-                //const itemPathElement = this.parentElement.querySelector('[name="item_path"]');
                 const itemName = this.dataset.item;
                 const itemPathElement = this.closest('.filesfolders').querySelector('[name="item_path"]');
                 const itemPath = itemPathElement ? itemPathElement.value : null;
-                //const itemPath = itemPathElement ? itemPathElement.value : null;
-                console.log(itemPath);
+    
                 const renameSectionFolder = document.querySelector('.rename-section-folder');
                 const renameSectionFile = document.querySelector('.rename-section-file');
+    
                 if (renameSectionFile.style.display === 'none' || renameSectionFile.querySelector('#rename-item-name-file').value !== itemPath) {
                     renameSectionFile.style.display = 'block';
                     renameSectionFile.querySelector('#rename-item-name-file').value = itemPath;
+                    renameSectionFile.querySelector('#item-file-name').value = itemName;
                     renameSectionFile.querySelector('#new-name-file').value = itemName;
                     renameSectionFolder.style.display = 'none';
                 } else {
                     renameSectionFile.style.display = 'none';
                 }
+                // Hide share section if visible
+                document.querySelector('.share-file-section').style.display = 'none';
             });
         });
-
+    
+        // Toggle rename form for folder
         document.querySelectorAll('.rename-btn-folder').forEach(btn => {
             btn.addEventListener('click', function() {
-                //const itemName = this.dataset.item;
-                //const itemPath = this.parentElement.querySelector('[name="item_path"]').value;
-                //const itemPathElement = this.parentElement.querySelector('[name="item_path"]');
                 const itemName = this.dataset.item;
                 const itemPathElement = this.closest('.filesfolders').querySelector('[name="item_path"]');
                 const itemPath = itemPathElement ? itemPathElement.value : null;
-                //const itemPath = itemPathElement ? itemPathElement.value : null;
-                console.log(itemPath);
+    
                 const renameSectionFolder = document.querySelector('.rename-section-folder');
                 const renameSectionFile = document.querySelector('.rename-section-file');
-                if (renameSectionFolder.style.display === 'none' || renameSectionFile.querySelector('#rename-item-name-folder').value !== itemPath) {
+    
+                if (renameSectionFolder.style.display === 'none' || renameSectionFolder.querySelector('#rename-item-name-folder').value !== itemPath) {
                     renameSectionFolder.style.display = 'block';
                     renameSectionFolder.querySelector('#rename-item-name-folder').value = itemPath;
+                    renameSectionFolder.querySelector('#item-folder-name').value = itemName;
                     renameSectionFolder.querySelector('#new-name-folder').value = itemName;
                     renameSectionFile.style.display = 'none';
                 } else {
                     renameSectionFolder.style.display = 'none';
                 }
+                // Hide share section if visible
+                document.querySelector('.share-file-section').style.display = 'none';
             });
         });
-
+    
+        // Toggle share section for file
         document.querySelectorAll('.share-btn-file').forEach(btn => {
             btn.addEventListener('click', function() {
-                //const itemName = this.dataset.item;
-                //const itemPath = this.parentElement.querySelector('[name="item_path"]').value;
-                //const itemPathElement = this.parentElement.querySelector('[name="item_path"]');
-                const itemName = this.dataset.item;
                 const itemPathElement = this.closest('.filesfolders').querySelector('[name="item_path"]');
                 const itemPath = itemPathElement ? itemPathElement.value : null;
-                console.log(itemPath);
+                const itemName = this.dataset.item;
+    
                 const shareSectionFile = document.querySelector('.share-file-section');
-                if (shareSectionFile.style.display === 'none') {
+                if (shareSectionFile.style.display === 'none' || shareSectionFile.querySelector('#share-item-name').value !== itemPath) {
                     shareSectionFile.style.display = 'block';
+                    shareSectionFile.querySelector('#share-item-name').value = itemPath;
+                    shareSectionFile.querySelector('#item-share-name').value = itemName;
                 } else {
                     shareSectionFile.style.display = 'none';
                 }
+                // Hide rename sections if visible
+                document.querySelector('.rename-section-file').style.display = 'none';
+                document.querySelector('.rename-section-folder').style.display = 'none';
             });
         });
     </script>
+    
+    
+    
 
     {% comment %} {% if search_results %}
         <h2>Search Results:</h2>

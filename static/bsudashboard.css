@@ -407,6 +407,10 @@ header {
 .searchsection-profile {
     width: 30%;
 }
+.searchsection-profile form {
+    height: 65%;
+    width: 100% ;
+}
 
 .searchsection .searchinput {
     padding: 1%;
@@ -428,4 +432,8 @@ header {
     border-radius: 50px;
     font-size: 22px;
     border: 0px solid black;
+}
+
+.searchsection-profile button {
+    width: 100%;
 }

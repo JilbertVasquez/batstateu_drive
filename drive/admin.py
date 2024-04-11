@@ -14,6 +14,8 @@ from django.contrib import admin
 from django.contrib import admin
 from .models import Users
 from .models import FileDetails
+from .models import SharingFiles
 
 admin.site.register(Users)
 admin.site.register(FileDetails)
+admin.site.register(SharingFiles)
