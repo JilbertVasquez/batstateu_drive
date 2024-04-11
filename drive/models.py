@@ -51,6 +51,53 @@ class CustomUser(AbstractBaseUser):
 
 from django.db import models
 
+# class Users(models.Model):
+#     userid = models.AutoField(primary_key=True)
+#     firstname = models.CharField(max_length=255)
+#     lastname = models.CharField(max_length=255)
+#     username = models.CharField(max_length=255)
+#     email = models.EmailField(max_length=255)
+#     password = models.CharField(max_length=255)
+
+#     class Meta:
+#         db_table = 'Users'  # Specify the name of the table in the database
+
+
+# from django.db import models
+# from django.contrib.auth.models import User
+
+# class FileDetails(models.Model):
+#     id = models.AutoField(primary_key=True)
+#     user = models.ForeignKey(Users, on_delete=models.CASCADE)
+#     filename = models.CharField(max_length=255)
+#     size = models.CharField(max_length=50)
+#     extension = models.CharField(max_length=50)
+#     upload_date = models.DateField()
+#     path = models.CharField(max_length=255)
+
+#     class Meta:
+#         db_table = 'file_details'  # Specify the name of your custom table in the database
+
+#     def __str__(self):
+#         return self.filename
+    
+# class SharingFiles(models.Model):
+#     sharing_id = models.AutoField(primary_key=True)  # This line is fine, as it sets the primary key and enables auto-incrementing
+#     filename = models.CharField(max_length=255)
+#     file_id = models.ForeignKey(FileDetails, on_delete=models.CASCADE, db_column='file_id')
+#     user_id = models.ForeignKey(Users, on_delete=models.CASCADE, db_column='user_id')
+#     share_by = models.CharField(max_length=255)
+#     share_to = models.CharField(max_length=255)
+#     path = models.CharField(max_length=255)
+
+#     class Meta:
+#         db_table = 'sharing_files'
+
+
+
+
+
+
 class Users(models.Model):
     userid = models.AutoField(primary_key=True)
     firstname = models.CharField(max_length=255)
@@ -60,11 +107,7 @@ class Users(models.Model):
     password = models.CharField(max_length=255)
 
     class Meta:
-        db_table = 'Users'  # Specify the name of the table in the database
-
-
-from django.db import models
-from django.contrib.auth.models import User
+        db_table = 'Users'
 
 class FileDetails(models.Model):
     id = models.AutoField(primary_key=True)
@@ -76,23 +119,15 @@ class FileDetails(models.Model):
     path = models.CharField(max_length=255)
 
     class Meta:
-        db_table = 'file_details'  # Specify the name of your custom table in the database
+        db_table = 'file_details'
 
-    def __str__(self):
-        return self.filename
-    
 class SharingFiles(models.Model):
-    sharing_id = models.AutoField(primary_key=True)  # This line is fine, as it sets the primary key and enables auto-incrementing
+    sharing_id = models.AutoField(primary_key=True)
     filename = models.CharField(max_length=255)
-    file_id = models.ForeignKey(FileDetails, on_delete=models.CASCADE, db_column='file_id')
-    user_id = models.ForeignKey(Users, on_delete=models.CASCADE, db_column='user_id')
+    extension = models.CharField(max_length=10)
+    file_id = models.ForeignKey(FileDetails, on_delete=models.CASCADE)
     share_by = models.CharField(max_length=255)
     share_to = models.CharField(max_length=255)
-    path = models.CharField(max_length=255)
 
     class Meta:
-        db_table = 'sharing_files'
-
-
-
-
+        db_table = 'share_files'

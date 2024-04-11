@@ -185,7 +185,7 @@
 
     <!-- Floating section for sharing file -->
     <div class="share-file-section" style="display: none;">
-        <form id="share-file-form" method="POST" action="{% url 'share_file' %}">
+        <form id="share-file-form" method="POST" action="{% url 'dashboard' %}">
             {% csrf_token %}
             <input type="hidden" id="item-share-name" name="itemname">
             <input type="hidden" name="current_directory" value="{{ current_directory }}">

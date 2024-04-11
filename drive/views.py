@@ -1,6 +1,7 @@
 from django.shortcuts import render, HttpResponse
 # from django.contrib.auth.models import User
-from .models import Users, FileDetails, SharingFiles
+from .models import Users, FileDetails
+# from .models import SharingFiles
 from django.contrib.auth import authenticate, login
 from django.contrib.auth.hashers import check_password
 from django.contrib.auth.hashers import make_password
@@ -255,37 +256,37 @@ def search(request):
 #         pass
 
 
-def share_file(request):
-    if request.method == 'POST':
-        username = request.session.get('username', None)
-        current_directory = request.POST.get('current_directory', '')
-        curr_dir = os.path.join(settings.MEDIA_ROOT, username, current_directory)
-        item_name = request.POST.get('itemname', '')
-        item_name2 = item_name.split(".")[0]
-        item_path = request.POST.get('item_path', None)
-        email = request.POST.get('email', None)
+# def share_file(request):
+#     if request.method == 'POST':
+#         username = request.session.get('username', None)
+#         current_directory = request.POST.get('current_directory', '')
+#         curr_dir = os.path.join(settings.MEDIA_ROOT, username, current_directory)
+#         item_name = request.POST.get('itemname', '')
+#         item_name2 = item_name.split(".")[0]
+#         item_path = request.POST.get('item_path', None)
+#         email = request.POST.get('email', None)
 
-        try:
-            recipient = Users.objects.get(email=email)
-            file_entry = FileDetails.objects.get(filename=item_name2, path=curr_dir)
-            SharingFiles.objects.create(
-                filename=item_name,
-                file_id=file_entry,
-                user_id=recipient,
-                path=curr_dir,
-                share_by=username,
-                share_to=email
-            )
-            messages.success(request, f'File shared with {email} successfully!')
-        except FileDetails.DoesNotExist:
-            messages.error(request, f'File with name {item_name2} does not exist in the specified path!')
-        except Users.DoesNotExist:
-            messages.error(request, f'User with email {email} does not exist!')
+#         try:
+#             recipient = Users.objects.get(email=email)
+#             file_entry = FileDetails.objects.get(filename=item_name2, path=curr_dir)
+#             SharingFiles.objects.create(
+#                 filename=item_name,
+#                 file_id=file_entry,
+#                 user_id=recipient,
+#                 path=curr_dir,
+#                 share_by=username,
+#                 share_to=email
+#             )
+#             messages.success(request, f'File shared with {email} successfully!')
+#         except FileDetails.DoesNotExist:
+#             messages.error(request, f'File with name {item_name2} does not exist in the specified path!')
+#         except Users.DoesNotExist:
+#             messages.error(request, f'User with email {email} does not exist!')
 
-        return redirect('dashboard')
-    else:
-        # Handle GET request if needed
-        pass
+#         return redirect('dashboard')
+#     else:
+#         # Handle GET request if needed
+#         pass
 
 
 

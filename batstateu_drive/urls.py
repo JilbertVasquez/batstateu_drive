@@ -37,6 +37,6 @@ urlpatterns = [
     path('rename/folder/', views.rename_folder, name='rename_folder'),
     path('search/', views.search, name='search'),
     path('logout/', views.logout, name='logout'),
-    path('share_file/', views.share_file, name='share_file'),
+    # path('share_file/', views.share_file, name='share_file'),
     
 ]
