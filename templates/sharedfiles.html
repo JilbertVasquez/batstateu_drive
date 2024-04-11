@@ -1,0 +1,75 @@
+{% extends 'basedashboard.html' %}
+
+{% block content %}
+
+    <div class="filefolderheader">
+        <h2>Hello</h2>
+    </div>
+    <div class="files-folders-folders">
+        <div class="listfilename">
+            <span>Name</span>
+        </div>
+        <div class="listfilefunctions">
+            <span>Date</span>
+        </div>
+        <div class="listfilefunctions">
+            <span>Size</span>
+        </div>
+        <div class="listfilefunctions">
+            <span></span>
+        </div>
+        <div class="listfilefunctions">
+            <span></span>
+        </div>
+        <div class="listfilefunctions">
+            <span></span>
+        </div>
+        <div class="listfilefunctions">
+            <span></span>
+        </div>
+    </div>
+    <ul>
+        <!-- Display search results -->
+        {% for files in shared_files %}
+            <li class="listdirxfile">
+                <div class="filesfolders">
+                    <div class="files-folders-folders">
+                        <div class="listfilename">
+                            <span>{{ files.filename }}{{files.extension}}</span>
+                        </div>
+                        <div class="listfilefunctions">
+                            <span></span>
+                        </div>
+                        <div class="listfilefunctions">
+                            <span></span>
+                        </div>
+                        <!-- Add download link -->
+                        <div class="listfilefunctions">
+                            {% csrf_token %}
+                            <input type="hidden" name="current_directory" value="{{ files.path }}">
+                            <a href="#" class="download-link" data-file="{{ files.filename }}{{files.extension}}">Download</a>
+                        </div>
+
+                        <div class="listfilefunctions">
+                            <!-- Add rename button -->
+                            <button class="rename-btn-file" data-item="{{ files.filename }}{{files.extension}}" data-is-dir="false">Rename</button>
+                        </div>
+                            <!-- Add delete button -->
+                        <div class="listfilefunctions">
+                            <form method="post" action="{% url 'delete_item_search' %}">
+                                {% csrf_token %}
+                                <input type="hidden" name="item_name" value="{{ files.filename }}{{files.extension}}">
+                                <input type="hidden" name="item_path" value="{{ files.path }}">
+                                <button type="submit">Delete</button>
+                            </form>
+                        </div>
+                        <div class="listfilefunctions">
+                            <button class="share-btn-file" data-item="{{ file_info.name }}" data-is-dir="false">Share</button>
+                        </div>
+                    </div>
+                </div>
+            </li>
+        {% endfor %}
+    </ul>
+
+{% endblock content %}

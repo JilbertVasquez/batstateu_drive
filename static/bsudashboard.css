@@ -147,15 +147,18 @@
     flex-direction: column;
     justify-content: center;
     align-items: center;
+    text-align: center;
 }
 
-.optionfolders button {
+.optionfolders a {
     background-color: rgba(255, 255, 255, 0);
     width: 60%;
     height: 10%;
+    text-decoration: none;
+    color: #000000;
 }
 
-.optionfolders button:hover, .optionaccount button:hover{
+.optionfolders a:hover, .optionaccount a:hover{
     color: red;
 }
 
@@ -166,12 +169,15 @@
     flex-direction: column;
     justify-content: center;
     align-items: center;
+    text-align: center;
 }
 
-.optionaccount button {
+.optionaccount a {
     background-color: rgba(255, 255, 255, 0);
     width: 60%;
     height: 25%;
+    text-decoration: none;
+    color: #000000;
 }
 
 .leftsectionupper h2 {
@@ -409,7 +415,7 @@ header {
 }
 .searchsection-profile form {
     height: 65%;
-    width: 100% ;
+    width: 50% ;
 }
 
 .searchsection .searchinput {
@@ -435,5 +441,5 @@ header {
 }
 
 .searchsection-profile button {
-    width: 100%;
+    width: 50%;
 }

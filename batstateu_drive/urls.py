@@ -38,5 +38,6 @@ urlpatterns = [
     path('search/', views.search, name='search'),
     path('logout/', views.logout, name='logout'),
     path('share_file/', views.share_file, name='share_file'),
+    path('share_files_section', views.share_files_section, name='share_files_section'),
     
 ]

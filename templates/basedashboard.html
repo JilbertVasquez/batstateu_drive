@@ -54,15 +54,15 @@
                     </form>
                 </div>
                 <div class="optionfolders">
-                    <button><i class='bx bxs-folder-open'></i>My Drive</button>
-                    <button><i class='bx bx-history' ></i>Recent</button>
-                    {% comment %} <button><i class='bx bx-download' ></i>Downloads</button> {% endcomment %}
-                    <button><i class='bx bxs-user-plus'></i>Shared Files</button>
-                    {% comment %} <button><i class='bx bxs-trash' ></i>Recycle Bin</button> {% endcomment %}
+                    <a href=" {% url 'dashboard' %} "><i class='bx bxs-folder-open'></i>My Drive</a>
+                    <a href="#"><i class='bx bx-history' ></i>Recent</a>
+                    <!-- <a href="#"><i class='bx bx-download' ></i>Downloads</a> -->
+                    <a href=" {% url 'share_files_section' %}"><i class='bx bxs-user-plus'></i>Shared Files</a>
+                    <!-- <a href="#"><i class='bx bxs-trash' ></i>Recycle Bin</a> -->
                 </div>
                 <div class="optionaccount">
-                    <button><i class='bx bxs-user-circle' ></i>My Profile</button>
-                    <button><i class='bx bxs-cog' ></i>Settings</button>
+                    <a href="#"><i class='bx bxs-user-circle'></i>My Profile</a>
+                    <a href="#"><i class='bx bxs-cog'></i>Settings</a>
                 </div>
             </div>
             

@@ -289,6 +289,21 @@ def share_file(request):
         pass
 
 
+def share_files_section(request):
+    # Retrieve the username from the session
+    username = request.session.get('username', None)
+    fileuser = Users.objects.get(username=username)
+    if username:
+        # Filter shared files where the username matches the 'shared_to' field
+        shared_files = SharingFiles.objects.filter(share_to=fileuser.email)
+        return render(request, 'sharedfiles.html', {'shared_files': shared_files})
+    else:
+        # Handle case where username is not found in the session
+        # Redirect or render an error message as needed
+        return render(request, 'error.html', {'message': 'Username not found in session'})
+
+
+
 
 def search(request):
     query = request.GET.get('query')
