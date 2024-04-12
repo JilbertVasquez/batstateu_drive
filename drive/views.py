@@ -81,7 +81,13 @@ def download_file(request, file_name):
             return HttpResponse("File not found", status=404)
     else:
         return HttpResponse("User not authenticated", status=401)
+    
+def download_share_file (request):
+    pass
 
+
+def delete_share_files(request):
+    pass
 
 def delete_item(request):
     if request.method == 'POST':
@@ -263,6 +269,7 @@ def share_file(request):
         curr_dir = os.path.join(settings.MEDIA_ROOT, username, current_directory)
         item_name = request.POST.get('itemname', '')
         item_name2 = item_name.split(".")[0]
+        item_name3 = item_name.split(".")[-1]
         item_path = request.POST.get('item_path', None)
         email = request.POST.get('email', None)
 
@@ -271,7 +278,8 @@ def share_file(request):
             fileuser = Users.objects.get(username=username)
             file_entry = FileDetails.objects.get(filename=item_name2, path=curr_dir)
             SharingFiles.objects.create(
-                filename=item_name,
+                filename=item_name2,
+                extension=item_name3,
                 file_id=file_entry.id,
                 path=curr_dir,
                 share_by=fileuser.email,
@@ -293,10 +301,14 @@ def share_files_section(request):
     # Retrieve the username from the session
     username = request.session.get('username', None)
     fileuser = Users.objects.get(username=username)
+    current_directory = request.POST.get('current_directory', '')
+    
     if username:
         # Filter shared files where the username matches the 'shared_to' field
         shared_files = SharingFiles.objects.filter(share_to=fileuser.email)
-        return render(request, 'sharedfiles.html', {'shared_files': shared_files})
+        if current_directory == "":
+            current_directory = os.path.join(settings.MEDIA_ROOT, 'vasquezjilbert')
+        return render(request, 'sharedfiles.html', {'shared_files': shared_files, 'current_directory': current_directory})
     else:
         # Handle case where username is not found in the session
         # Redirect or render an error message as needed

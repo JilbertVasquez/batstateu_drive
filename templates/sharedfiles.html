@@ -35,20 +35,33 @@
                 <div class="filesfolders">
                     <div class="files-folders-folders">
                         <div class="listfilename">
-                            <span>{{ files.filename }}{{files.extension}}</span>
+                            <span>{{ files.filename }}.{{files.extension}}</span>
                         </div>
                         <div class="listfilefunctions">
-                            <span></span>
+                            <span>{{ files.path }}</span>
                         </div>
                         <div class="listfilefunctions">
-                            <span></span>
+                            <span>{{files.share_by}}</span>
                         </div>
                         <!-- Add download link -->
                         <div class="listfilefunctions">
                             {% csrf_token %}
-                            <input type="hidden" name="current_directory" value="{{ files.path }}">
-                            <a href="#" class="download-link" data-file="{{ files.filename }}{{files.extension}}">Download</a>
+                            <input type="hidden" name="current_directory" value="{{ current_directory }}">
+                            <a href="#" class="download-link" data-file="{{ files.filename }}.{{files.extension}}">Download</a>
+                            <script>
+                                document.querySelectorAll('.download-link').forEach(link => {
+                                    link.addEventListener('click', function(event) {
+                                        event.preventDefault();
+                                        const fileName = this.dataset.file; // Correctly retrieve the file name
+                                        const currentDirectory = this.previousElementSibling.value;
+                                        console.log(currentDirectory);
+                                        const downloadUrl = `/download/${fileName}/?current_directory=${currentDirectory}`;
+                                        window.location.href = downloadUrl;
+                                    });
+                                });
+                            </script>
                         </div>
+                        
 
                         <div class="listfilefunctions">
                             <!-- Add rename button -->

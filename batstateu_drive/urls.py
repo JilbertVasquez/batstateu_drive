@@ -39,5 +39,6 @@ urlpatterns = [
     path('logout/', views.logout, name='logout'),
     path('share_file/', views.share_file, name='share_file'),
     path('share_files_section', views.share_files_section, name='share_files_section'),
+    path('download_share_file', views.download_share_file, name='download_share_file'),
     
 ]

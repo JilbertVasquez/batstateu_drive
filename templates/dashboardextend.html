@@ -94,6 +94,8 @@
                                             event.preventDefault();
                                             const fileName = this.dataset.file;
                                             const currentDirectory = this.previousElementSibling.value;
+                                            console.log(fileName);
+                                            console.log(currentDirectory);
                                             const downloadUrl = `/download/${fileName}/?current_directory=${currentDirectory}`;
                                             window.location.href = downloadUrl;
                                         });
