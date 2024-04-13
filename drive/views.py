@@ -451,7 +451,7 @@ def get_file_details(uploaded_file, file_path):
     Returns a dictionary containing the file's name, size, extension, and upload date.
     """
     file_name = uploaded_file.name
-    file_name1 = os.path.splitext(file_name)[0]
+    file_name_without_extension = os.path.splitext(file_name)[0]
     file_size = uploaded_file.size
     file_extension = os.path.splitext(file_name)[-1]
     
@@ -470,19 +470,18 @@ def get_file_details(uploaded_file, file_path):
         size_value = file_size / (1024 ** 3)
         
     size_value = round(size_value, 2)
-    upload_date = timezone.now().strftime('%Y-%d-%m')
+    upload_date = timezone.now().strftime('%Y-%m-%d')
     
     file_details = {
-        'name': file_name1,
+        'filename': file_name_without_extension,
         'extension': file_extension,
         'size': size_value,
-        'size_unit': size_unit,
         'upload_date': upload_date,
-        'file_path': file_path,
+        'path': file_path,
     }
     
-    
     return file_details
+
 
 
 def save_file_details(user, file_details):
@@ -490,12 +489,12 @@ def save_file_details(user, file_details):
     Function to save file details into the database.
     """
     file_details_object = FileDetails.objects.create(
-        user=user,  # Ensure you're passing an instance of your custom Users model here
-        filename=file_details['name'],
+        user=user,
+        filename=file_details['filename'],  # Use 'filename' instead of 'name'
         extension=file_details['extension'],
         size=file_details['size'],
         upload_date=file_details['upload_date'],
-        path=file_details['file_path']
+        path=file_details['path']  # Use 'path' instead of 'file_path'
     )
     return file_details_object
 
