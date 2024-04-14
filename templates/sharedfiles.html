@@ -38,7 +38,10 @@
                             <span>{{ files.filename }}.{{files.extension}}</span>
                         </div>
                         <div class="listfilefunctions">
-                            <span>{{ files.path }}</span>
+                            <span>{{ files.upload_date }}</span>
+                        </div>
+                        <div class="listfilefunctions">
+                            <span>{{ files.size }}</span>
                         </div>
                         <div class="listfilefunctions">
                             <span>{{files.share_by}}</span>
@@ -46,14 +49,18 @@
                         <!-- Add download link -->
                         <div class="listfilefunctions">
                             {% csrf_token %}
-                            <input type="hidden" name="current_directory" value="{{ current_directory }}">
+                            <input type="hidden" name="current_directory" value="{{ files.path }}">
                             <a href="#" class="download-link" data-file="{{ files.filename }}.{{files.extension}}">Download</a>
                             <script>
                                 document.querySelectorAll('.download-link').forEach(link => {
                                     link.addEventListener('click', function(event) {
                                         event.preventDefault();
                                         const fileName = this.dataset.file; // Correctly retrieve the file name
-                                        const currentDirectory = this.previousElementSibling.value;
+                                        let currentDirectory = this.previousElementSibling.value;
+                                        if (currentDirectory.endsWith('\\')) {
+                                            // Remove the last character
+                                            currentDirectory = currentDirectory.slice(0, -1);
+                                        }
                                         console.log(currentDirectory);
                                         const downloadUrl = `/download/${fileName}/?current_directory=${currentDirectory}`;
                                         window.location.href = downloadUrl;
@@ -61,13 +68,19 @@
                                 });
                             </script>
                         </div>
-                        
 
                         <div class="listfilefunctions">
-                            <!-- Add rename button -->
+                        </div>
+
+                        <div class="listfilefunctions">
+                        </div>
+                        
+
+                        {% comment %} <div class="listfilefunctions">
+                            
                             <button class="rename-btn-file" data-item="{{ files.filename }}{{files.extension}}" data-is-dir="false">Rename</button>
                         </div>
-                            <!-- Add delete button -->
+                            
                         <div class="listfilefunctions">
                             <form method="post" action="{% url 'delete_item_search' %}">
                                 {% csrf_token %}
@@ -78,7 +91,7 @@
                         </div>
                         <div class="listfilefunctions">
                             <button class="share-btn-file" data-item="{{ file_info.name }}" data-is-dir="false">Share</button>
-                        </div>
+                        </div> {% endcomment %}
                     </div>
                 </div>
             </li>

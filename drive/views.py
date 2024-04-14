@@ -296,7 +296,7 @@ def share_file(request):
         # Handle GET request if needed
         pass
 
-
+from django.db.models import Q
 def share_files_section(request):
     # Retrieve the username from the session
     username = request.session.get('username', None)
@@ -306,9 +306,14 @@ def share_files_section(request):
     if username:
         # Filter shared files where the username matches the 'shared_to' field
         shared_files = SharingFiles.objects.filter(share_to=fileuser.email)
-        if current_directory == "":
-            current_directory = os.path.join(settings.MEDIA_ROOT, 'vasquezjilbert')
-        return render(request, 'sharedfiles.html', {'shared_files': shared_files, 'current_directory': current_directory})
+        file_names = [shared_file.filename for shared_file in shared_files]
+        file_details = FileDetails.objects.filter(Q(filename__in=[shared_file.filename for shared_file in shared_files]))
+        share_details = SharingFiles.objects.filter(filename__in=file_names)
+        for i in share_details:
+            print(i.share_by)
+        # if current_directory == "":
+        #     current_directory = os.path.join(settings.MEDIA_ROOT, 'username')
+        return render(request, 'sharedfiles.html', {'shared_files': file_details})
     else:
         # Handle case where username is not found in the session
         # Redirect or render an error message as needed
@@ -469,7 +474,7 @@ def get_file_details(uploaded_file, file_path):
         size_unit = 'GB'
         size_value = file_size / (1024 ** 3)
         
-    size_value = round(size_value, 2)
+    size_value = str(round(size_value, 2)) + size_unit
     upload_date = timezone.now().strftime('%Y-%m-%d')
     
     file_details = {
