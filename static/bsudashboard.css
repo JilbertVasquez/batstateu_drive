@@ -411,11 +411,15 @@ header {
 }
 
 .searchsection-profile {
+    height: 100%;
     width: 30%;
 }
 .searchsection-profile form {
     height: 65%;
-    width: 50% ;
+    width: 100% ;
+    display: flex;
+    justify-content: flex-end;
+    padding-right: 8%;
 }
 
 .searchsection .searchinput {
@@ -428,6 +432,10 @@ header {
     margin: 0 1%;
 }
 
+.searchsection-profile button {
+    width: 25%;
+}
+
 .searchsection button {
     /* background-color: red; */
     padding: 0.5%;
@@ -436,7 +444,7 @@ header {
     /* background-color: blue; */
     margin-top: 0.5%;
     border-radius: 50px;
-    font-size: 22px;
+    font-size: 18px;
     border: 0px solid black;
 }
 
