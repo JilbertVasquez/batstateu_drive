@@ -94,7 +94,7 @@
             <input type="hidden" name="current_directory" value="{{ current_directory }}">
             <input type="hidden" id="share-item-name" name="item_path">
             <input type="text" id="share-email" name="email" placeholder="Enter Email...">
-            <button class="buttonClassShare" type="submit">Share</button>
+            <button class="buttonClassrename" type="submit">Share</button>
         </form>
     </div>
 
@@ -112,7 +112,7 @@
     </script>
     <script>
         // Toggle rename form for file
-        document.querySelectorAll('.rename-btn-file').forEach(btn => {
+        {% comment %} document.querySelectorAll('.rename-btn-file').forEach(btn => {
             btn.addEventListener('click', function() {
                 const itemName = this.dataset.item;
                 const itemPath = this.parentElement.querySelector('[name="item_path"]').value;
@@ -126,7 +126,28 @@
                     renameSectionFile.style.display = 'none';
                 }
             });
+        }); {% endcomment %}
+
+        // Toggle rename form for file
+    document.querySelectorAll('.rename-btn-file').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const itemName = this.dataset.item;
+            const itemPath = this.parentElement.parentElement.querySelector('[name="item_path"]').value;
+            console.log(itemPath);
+            const renameSectionFile = document.querySelector('.rename-section-file');
+            if (renameSectionFile.style.display === 'none' || renameSectionFile.querySelector('#rename-item-name-file').value !== itemPath) {
+                // Hide all other sections before showing the current one
+                document.querySelectorAll('.rename-section-file').forEach(section => {
+                    section.style.display = 'none';
+                });
+                renameSectionFile.style.display = 'block';
+                renameSectionFile.querySelector('#rename-item-name-file').value = itemPath;
+                renameSectionFile.querySelector('#new-name-file').value = itemName;
+            } else {
+                renameSectionFile.style.display = 'none';
+            }
         });
+    });
 
         document.querySelectorAll('.share-btn-file').forEach(btn => {
             btn.addEventListener('click', function() {

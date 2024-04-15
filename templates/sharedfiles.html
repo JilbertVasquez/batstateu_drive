@@ -50,6 +50,7 @@
                         <div class="listfilefunctions">
                             {% csrf_token %}
                             <input type="hidden" name="current_directory" value="{{ files.path }}">
+                            <input type="hidden" name="lastname" value="{{ files.filename }}">
                             <a href="#" class="download-link" data-file="{{ files.filename }}{{files.extension}}">Download</a>
                             <script>
                                 document.querySelectorAll('.download-link').forEach(link => {

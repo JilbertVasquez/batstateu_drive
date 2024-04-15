@@ -368,12 +368,25 @@ def get_formatted_file_size(file_size):
 
 def rename_file(request):
     if request.method == 'POST':
+        username = request.session.get('username')  
         item_path = request.POST.get('item_path')
+        # if item_path == "":
+        #     item_path = os.path.join(settings.MEDIA_ROOT)
+        last_name = request.POST.get('lastname')
+        
         new_name = request.POST.get('new_name')
         current_dir = request.POST.get("current_directory")
+        print(current_dir+"\\")
+        print(last_name)
         try:
             # Rename the file
             os.rename(item_path, os.path.join(os.path.dirname(item_path), new_name))
+            
+            # Update database record with new name
+            file_detail = FileDetails.objects.get(filename=last_name, path=current_dir)
+            file_detail.filename = new_name
+            file_detail.save()
+            
             # Return success response
             # return JsonResponse({'success': True})
             if current_dir == "":
