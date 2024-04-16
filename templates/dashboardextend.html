@@ -166,7 +166,7 @@
     <div class="rename-section-file" style="display: none;">
         <form id="rename-form-file" method="POST" action="{% url 'rename_file' %}">
             {% csrf_token %}
-            <input type="hidden" id="item-file-name" name="itemname">
+            <input type="hidden" id="item-file-name" name="lastname">
             <input type="hidden" name="current_directory" value="{{ current_directory }}">
             <input type="hidden" id="rename-item-name-file" name="item_path">
             <input type="text" id="new-name-file" name="new_name" placeholder="Enter new file name">
@@ -214,6 +214,7 @@
                     renameSectionFile.querySelector('#rename-item-name-file').value = itemPath;
                     renameSectionFile.querySelector('#item-file-name').value = itemName;
                     renameSectionFile.querySelector('#new-name-file').value = itemName;
+                    //renameSectionFile.querySelector('#new-name-file').value = itemName; // Set the initial value to the current filename
                     renameSectionFolder.style.display = 'none';
                 } else {
                     renameSectionFile.style.display = 'none';

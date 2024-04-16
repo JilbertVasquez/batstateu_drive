@@ -270,8 +270,10 @@ def share_file(request):
         item_name = request.POST.get('item_name', '')
         print("itemname", item_name)
         # print(curr_dir)
-        item_name2 = item_name.split(".")[0]
-        item_name3 = item_name.split(".")[-1]
+        # item_name2 = item_name.split(".")[0]
+        # item_name3 = item_name.split(".")[-1]
+        item_name2 = os.path.splitext(item_name)[0]
+        item_name3 = os.path.splitext(item_name)[-1]
         item_path = request.POST.get('item_path', None)
         print(curr_dir)
         email = request.POST.get('email', None)
@@ -380,20 +382,41 @@ def rename_file(request):
         item_path = request.POST.get('item_path')
         # if item_path == "":
         #     item_path = os.path.join(settings.MEDIA_ROOT)
-        last_name = request.POST.get('lastname')
-        
+        last_name = request.POST.get('lastname') # Retrieve the last filename from the hidden input
+        last_name1 = last_name.split(".")
+        last_name2 = last_name1[0]
+        last_name3 = "." + last_name1[-1]
         new_name = request.POST.get('new_name')
+        new_name1 = new_name.split(".")
+        new_name2 = new_name1[0]
+        new_name3 = "." + new_name1[-1]
         current_dir = request.POST.get("current_directory")
-        print(current_dir+"\\")
-        print(last_name)
+        if current_dir == "":
+            current_dir = os.path.join(settings.MEDIA_ROOT, username) + "\\"
+        print(new_name)
+        print(last_name2)
+        print(current_dir)
         try:
             # Rename the file
             os.rename(item_path, os.path.join(os.path.dirname(item_path), new_name))
             
+            user = Users.objects.get(username=username)
+            userid = user.userid
+            useremail = user.email
+            
             # Update database record with new name
-            file_detail = FileDetails.objects.get(filename=last_name, path=current_dir)
-            file_detail.filename = new_name
+            file_detail = FileDetails.objects.get(filename=last_name2, extension=last_name3 ,path=current_dir, user_id=userid)
+            file_detail.filename = new_name2
+            file_detail.extension = new_name3
             file_detail.save()
+            
+            # Check if the file is shared by the user and update the filename in share_files table
+            shared_files = SharingFiles.objects.filter(share_by=useremail, filename=last_name2, extension=last_name3, path=current_dir)
+            for shared_file in shared_files:
+                print(share_file)
+                shared_file.filename = new_name2
+                shared_file.extension = new_name3
+                shared_file.save()
             
             # Return success response
             # return JsonResponse({'success': True})

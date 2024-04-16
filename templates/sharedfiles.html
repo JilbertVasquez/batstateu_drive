@@ -36,7 +36,7 @@
                 <div class="filesfolders">
                     <div class="files-folders-folders">
                         <div class="listfilename">
-                            <span>{{ files.filename }}.{{files.extension}}</span>
+                            <span>{{ files.filename }}{{files.extension}}</span>
                         </div>
                         <div class="listfilefunctions">
                             <span>{{ files.upload_date }}</span>
@@ -52,7 +52,7 @@
                             {% csrf_token %}
                             <input type="hidden" name="current_directory" value="{{ files.path }}">
                             <input type="hidden" name="lastname" value="{{ files.filename }}">
-                            <a href="#" class="download-link" data-file="{{ files.filename }}.{{files.extension}}">Download</a>
+                            <a href="#" class="download-link" data-file="{{ files.filename }}{{files.extension}}">Download</a>
                             <script>
                                 document.querySelectorAll('.download-link').forEach(link => {
                                     link.addEventListener('click', function(event) {
