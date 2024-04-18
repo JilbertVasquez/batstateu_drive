@@ -454,6 +454,28 @@ def rename_folder(request):
         return JsonResponse({'success': False, 'error': 'Method not allowed'})
 
 
+from cryptography.fernet import Fernet
+
+def encrypt_file(input_file_path, output_file_path, key):
+    """
+    Encrypts a file using Fernet encryption.
+    
+    Args:
+    - input_file_path: Path to the input file to be encrypted.
+    - output_file_path: Path to save the encrypted output file.
+    - key: Fernet encryption key.
+    """
+    cipher_suite = Fernet(key)
+    
+    with open(input_file_path, 'rb') as file:
+        file_data = file.read()
+        
+    encrypted_data = cipher_suite.encrypt(file_data)
+
+    with open(output_file_path, 'wb') as encrypted_file:
+        encrypted_file.write(encrypted_data)
+
+
 def handle_file_upload(request):
     if request.method == 'POST':
         # Check if files were uploaded
@@ -472,8 +494,16 @@ def handle_file_upload(request):
                 fs = FileSystemStorage(location=user_upload_dir)
                 for uploaded_file in uploaded_files:
                     try:
-                        file_details = get_file_details(uploaded_file, user_upload_dir)
+                        # file_details = get_file_details(uploaded_file, user_upload_dir)
                         fs.save(uploaded_file.name, uploaded_file)  # Save each uploaded file
+                        
+                        key = Fernet.generate_key()
+                        
+                        input_file_path = os.path.join(settings.MEDIA_ROOT, username, uploaded_file.name)
+                        output_file_path = os.path.join(user_upload_dir, uploaded_file.name)
+                        encrypt_file(input_file_path, output_file_path, key)
+                        
+                        file_details = get_file_details(uploaded_file, user_upload_dir)
                         save_file_details(user, file_details)
                     
                         if current_directory:
