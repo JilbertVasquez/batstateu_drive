@@ -4,6 +4,7 @@
 
     <div class="filefolderheader">
         <h2>Hello</h2>
+        <h2>{{current_directory}}</h2>
     </div>
     <div class="files-folders-folders">
         <div class="listfilename">
@@ -57,7 +58,7 @@
                                     link.addEventListener('click', function(event) {
                                         event.preventDefault();
                                         const fileName = this.dataset.file; // Correctly retrieve the file name
-                                        let currentDirectory = this.previousElementSibling.value;
+                                        let currentDirectory = this.parentElement.querySelector('[name="current_directory"]').value; // Access the value of the hidden input
                                         if (currentDirectory.endsWith('\\')) {
                                             // Remove the last character
                                             currentDirectory = currentDirectory.slice(0, -1);

@@ -267,29 +267,38 @@ def share_file(request):
         username = request.session.get('username', None)
         current_directory = request.POST.get('current_directory', '')
         curr_dir = os.path.join(settings.MEDIA_ROOT, username, current_directory)
-        item_name = request.POST.get('itemname', '')
-        item_name2 = item_name.split(".")[0]
-        item_name3 = item_name.split(".")[-1]
+        item_name = request.POST.get('item_name', '')
+        print("itemname", item_name)
+        # print(curr_dir)
+        # item_name2 = item_name.split(".")[0]
+        # item_name3 = item_name.split(".")[-1]
+        item_name2 = os.path.splitext(item_name)[0]
+        item_name3 = os.path.splitext(item_name)[-1]
         item_path = request.POST.get('item_path', None)
+        print(curr_dir)
         email = request.POST.get('email', None)
-
         try:
-            recipient = Users.objects.get(email=email)
+            # recipient = Users.objects.get(email=email)
             fileuser = Users.objects.get(username=username)
-            file_entry = FileDetails.objects.get(filename=item_name2, path=curr_dir)
+            # file_entry = FileDetails.objects.get(filename=item_name2, path=current_directory)
+            
             SharingFiles.objects.create(
                 filename=item_name2,
                 extension=item_name3,
-                file_id=file_entry.id,
+                # file_id=file_entry.id,
                 path=curr_dir,
                 share_by=fileuser.email,
                 share_to=email
             )
             messages.success(request, f'File shared with {email} successfully!')
+            print("SSUSSSSS")
         except FileDetails.DoesNotExist:
             messages.error(request, f'File with name {item_name2} does not exist in the specified path!')
+            ("ASDADQWEQ")
         except Users.DoesNotExist:
             messages.error(request, f'User with email {email} does not exist!')
+            print("!@#!#")
+            
 
         return redirect('dashboard')
     else:
@@ -302,6 +311,7 @@ def share_files_section(request):
     username = request.session.get('username', None)
     fileuser = Users.objects.get(username=username)
     current_directory = request.POST.get('current_directory', '')
+    print(current_directory)
     
     if username:
         # Filter shared files where the username matches the 'shared_to' field
@@ -310,10 +320,10 @@ def share_files_section(request):
         file_details = FileDetails.objects.filter(Q(filename__in=[shared_file.filename for shared_file in shared_files]))
         share_details = SharingFiles.objects.filter(filename__in=file_names)
         for i in share_details:
-            print(i.share_by)
+            print(i.path)
         # if current_directory == "":
         #     current_directory = os.path.join(settings.MEDIA_ROOT, 'username')
-        return render(request, 'sharedfiles.html', {'shared_files': file_details})
+        return render(request, 'sharedfiles.html', {'shared_files': share_details})
     else:
         # Handle case where username is not found in the session
         # Redirect or render an error message as needed
@@ -372,20 +382,41 @@ def rename_file(request):
         item_path = request.POST.get('item_path')
         # if item_path == "":
         #     item_path = os.path.join(settings.MEDIA_ROOT)
-        last_name = request.POST.get('lastname')
-        
+        last_name = request.POST.get('lastname') # Retrieve the last filename from the hidden input
+        last_name1 = last_name.split(".")
+        last_name2 = last_name1[0]
+        last_name3 = "." + last_name1[-1]
         new_name = request.POST.get('new_name')
+        new_name1 = new_name.split(".")
+        new_name2 = new_name1[0]
+        new_name3 = "." + new_name1[-1]
         current_dir = request.POST.get("current_directory")
-        print(current_dir+"\\")
-        print(last_name)
+        if current_dir == "":
+            current_dir = os.path.join(settings.MEDIA_ROOT, username) + "\\"
+        print(new_name)
+        print(last_name2)
+        print(current_dir)
         try:
             # Rename the file
             os.rename(item_path, os.path.join(os.path.dirname(item_path), new_name))
             
+            user = Users.objects.get(username=username)
+            userid = user.userid
+            useremail = user.email
+            
             # Update database record with new name
-            file_detail = FileDetails.objects.get(filename=last_name, path=current_dir)
-            file_detail.filename = new_name
+            file_detail = FileDetails.objects.get(filename=last_name2, extension=last_name3 ,path=current_dir, user_id=userid)
+            file_detail.filename = new_name2
+            file_detail.extension = new_name3
             file_detail.save()
+            
+            # Check if the file is shared by the user and update the filename in share_files table
+            shared_files = SharingFiles.objects.filter(share_by=useremail, filename=last_name2, extension=last_name3, path=current_dir)
+            for shared_file in shared_files:
+                print(share_file)
+                shared_file.filename = new_name2
+                shared_file.extension = new_name3
+                shared_file.save()
             
             # Return success response
             # return JsonResponse({'success': True})

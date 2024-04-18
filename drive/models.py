@@ -125,7 +125,7 @@ class SharingFiles(models.Model):
     share_id = models.AutoField(primary_key=True)
     filename = models.CharField(max_length=255)
     extension = models.CharField(max_length=10)
-    file_id = models.IntegerField()
+    # file_id = models.IntegerField()
     share_by = models.CharField(max_length=255)
     share_to = models.CharField(max_length=255)
     path = models.CharField(max_length=255)
