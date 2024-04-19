@@ -40,6 +40,7 @@
 
     <ul>
         <!-- Inside the block content -->
+        {% if uploaded_files %}
         {% for file_info in uploaded_files %}
             <li class="listdirxfile">
                 <div class="filesfolders">
@@ -128,6 +129,8 @@
                 </div>
             </li>
         {% endfor %}
+        {%else%}
+        {% endif %}
     </ul>
 
     <!-- Floating section for renaming folder -->

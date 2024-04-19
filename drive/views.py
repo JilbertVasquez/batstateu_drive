@@ -17,6 +17,26 @@ from django.shortcuts import redirect
 from django.urls import reverse
 import time
 
+from cryptography.fernet import Fernet
+
+def encrypt_file(input_file_path, output_file_path, key):
+    """
+    Encrypts a file using Fernet encryption.
+    
+    Args:
+    - input_file_path: Path to the input file to be encrypted.
+    - output_file_path: Path to save the encrypted output file.
+    - key: Fernet encryption key.
+    """
+    cipher_suite = Fernet(key)
+    
+    with open(input_file_path, 'rb') as file:
+        file_data = file.read()
+        
+    encrypted_data = cipher_suite.encrypt(file_data)
+
+    with open(output_file_path, 'wb') as encrypted_file:
+        encrypted_file.write(encrypted_data)
 
 # Create your views here.
 
@@ -24,30 +44,51 @@ def dashboard(request):
     username = request.session.get('username', None)
     userid = request.session.get('userid', None)
     user_upload_dir = os.path.join(settings.MEDIA_ROOT, username)
+    
+    contents = os.listdir(settings.MEDIA_ROOT)
+
+    folders = [item for item in contents if os.path.isdir(os.path.join(settings.MEDIA_ROOT, item))]
+    
+    # user_directory = os.path.join(settings.MEDIA_ROOT, uname)
+    for folder in folders:
+        pass
     uploaded_files = []
 
     if username:
-        for file_name in os.listdir(user_upload_dir):
-            file_path = os.path.join(user_upload_dir, file_name)
-            is_dir = os.path.isdir(file_path)
+        
+        # for file_name in os.listdir(user_upload_dir):
+        #     file_path = os.path.join(user_upload_dir, file_name)
+        #     is_dir = os.path.isdir(file_path)
             
-            # Get file size and last modified date
-            file_size = os.path.getsize(file_path)
-            size_label = str(convert_size(file_size))
-            last_modified = os.path.getmtime(file_path)
-            last_modified_date = time.strftime('%m-%d-%Y', time.localtime(last_modified))
+        #     # Get file size and last modified date
+        #     file_size = os.path.getsize(file_path)
+        #     size_label = str(convert_size(file_size))
+        #     last_modified = os.path.getmtime(file_path)
+        #     last_modified_date = time.strftime('%m-%d-%Y', time.localtime(last_modified))
 
-            uploaded_files.append({
-                'name': file_name,
-                'size': size_label,
-                'date': last_modified_date,
-                'is_dir': is_dir,
-                'full_path': file_path
-            })
+        #     uploaded_files.append({
+        #         'name': file_name,
+        #         'size': size_label,
+        #         'date': last_modified_date,
+        #         'is_dir': is_dir,
+        #         'full_path': file_path
+        #     })
+        
+
+        
+        try:
+            user = Users.objects.get(username=username)
+            userfiles = FileDetails.objects.get(user_id = user.userid)
+            
+            print(userfiles)
+        
+        except Exception as e:
+            print(e)
+        
+        
             # print(uploaded_files[0])
             
             # uploaded_files.append({'name': file_name, 'size': file_size, 'last_modified': last_modified_date, 'is_dir': is_dir, 'full_path': file_path})  # Add full_path
-
         return render(request, 'dashboardextend.html', {'username': username, 'uploaded_files': uploaded_files})
     else:
         return redirect('login')
@@ -510,26 +551,6 @@ def rename_folder(request):
         return JsonResponse({'success': False, 'error': 'Method not allowed'})
 
 
-from cryptography.fernet import Fernet
-
-def encrypt_file(input_file_path, output_file_path, key):
-    """
-    Encrypts a file using Fernet encryption.
-    
-    Args:
-    - input_file_path: Path to the input file to be encrypted.
-    - output_file_path: Path to save the encrypted output file.
-    - key: Fernet encryption key.
-    """
-    cipher_suite = Fernet(key)
-    
-    with open(input_file_path, 'rb') as file:
-        file_data = file.read()
-        
-    encrypted_data = cipher_suite.encrypt(file_data)
-
-    with open(output_file_path, 'wb') as encrypted_file:
-        encrypted_file.write(encrypted_data)
 
 
 def handle_file_upload(request):
@@ -544,32 +565,63 @@ def handle_file_upload(request):
             
             if username:
                 # Get the User object for the logged-in user
-                user = Users.objects.get(username=username)
-                user_upload_dir = os.path.join(settings.MEDIA_ROOT, username, current_directory)
-                print("_____________________" + user_upload_dir)
-                if not os.path.exists(user_upload_dir):
-                    os.makedirs(user_upload_dir)
-                fs = FileSystemStorage(location=user_upload_dir)
+                user = Users.objects.get(userid=userid)
+                # user_upload_dir = os.path.join(settings.MEDIA_ROOT, username, current_directory)
+                # print("_____________________" + user_upload_dir)
+                # if not os.path.exists(user_upload_dir):
+                #     os.makedirs(user_upload_dir)
+                # fs = FileSystemStorage(location=user_upload_dir)
+                
+                
+                
                 for uploaded_file in uploaded_files:
                     try:
                         # file_details = get_file_details(uploaded_file, user_upload_dir)
-                        fs.save(uploaded_file.name, uploaded_file)  # Save each uploaded file
+                        # fs.save(uploaded_file.name, uploaded_file)  # Save each uploaded file
                         
-                        key = Fernet.generate_key()
                         
-                        input_file_path = os.path.join(user_upload_dir, uploaded_file.name)
-                        output_file_path = os.path.join(user_upload_dir, uploaded_file.name)
-                        encrypt_file(input_file_path, output_file_path, key)
                         
-                        file_details = get_file_details(uploaded_file, user_upload_dir)
+                        contents = os.listdir(settings.MEDIA_ROOT)
+
+                        folders = [item for item in contents if os.path.isdir(os.path.join(settings.MEDIA_ROOT, item))]
+                        
+                        # user_directory = os.path.join(settings.MEDIA_ROOT, uname)
+                        
+                        list_of_dir_copy = []
+                        
+                        for folder in folders:
+                            key = Fernet.generate_key()
+                            user_directory = os.path.join(settings.MEDIA_ROOT, folder, username)
+                            list_of_dir_copy.append(user_directory)
+                            print(list_of_dir_copy)
+                            fs = FileSystemStorage(location=user_directory)
+                            fs.save(uploaded_file.name, uploaded_file)
+                            
+                            input_file_path = os.path.join(user_directory, uploaded_file.name)
+                            output_file_path = os.path.join(user_directory, uploaded_file.name)
+                            print(input_file_path)
+                            print(output_file_path)
+                            encrypt_file(input_file_path, output_file_path, key)
+                            print("SS________________")
+                        
+                        file_details = get_file_details(uploaded_file, list_of_dir_copy)
                         save_file_details(user, file_details)
+                            
+                        # input_file_path = os.path.join(user_upload_dir, uploaded_file.name)
+                        # output_file_path = os.path.join(user_upload_dir, uploaded_file.name)
+                        # encrypt_file(input_file_path, output_file_path, key)
+                        
+                        # file_details = get_file_details(uploaded_file, user_upload_dir)
+                        # save_file_details(user, file_details)
+                        
+                        
                     
-                        if current_directory:
+                        # if current_directory:
                             # Redirect back to the view_folder with the current directory path included
-                            return redirect(reverse('view_folder', kwargs={'folder_path': current_directory}))
-                        else:
+                        return redirect(reverse('view_folder', kwargs={'folder_path': user_directory}))
+                        # else:
                             # Redirect to dashboard if current_directory is empty
-                            return redirect('dashboard')
+                            # return redirect('dashboard')
                     
                     except Exception as e:
                         # Handle file upload error
@@ -679,11 +731,20 @@ def handle_create_folder(request):
         # Check if the current username and folder name are valid
         if username and folder_name:
             # Construct the full path to the new folder
-            new_folder_path = os.path.join(settings.MEDIA_ROOT, username, current_directory, folder_name)
+            # new_folder_path = os.path.join(settings.MEDIA_ROOT, username, current_directory, folder_name)
             
             try:
                 # Create the new folder
-                os.makedirs(new_folder_path, exist_ok=True)
+                # os.makedirs(new_folder_path, exist_ok=True)
+                
+                contents = os.listdir(settings.MEDIA_ROOT)
+
+                folders = [item for item in contents if os.path.isdir(os.path.join(settings.MEDIA_ROOT, item))]
+                
+                # user_directory = os.path.join(settings.MEDIA_ROOT, uname)
+                for folder in folders:
+                    user_directory = os.path.join(settings.MEDIA_ROOT, folder, username, folder_name )
+                    os.makedirs(user_directory, exist_ok=True)
                 
                 # Check if current_directory is not empty
                 if current_directory:
@@ -731,8 +792,14 @@ def signupPage(request):
             my_user = Users(firstname=fname, lastname=lname, username=uname, email=email, password=hashed_password)
             my_user.save()
             
-            user_directory = os.path.join(settings.MEDIA_ROOT, uname)
-            os.makedirs(user_directory, exist_ok=True)
+            contents = os.listdir(settings.MEDIA_ROOT)
+
+            folders = [item for item in contents if os.path.isdir(os.path.join(settings.MEDIA_ROOT, item))]
+            
+            # user_directory = os.path.join(settings.MEDIA_ROOT, uname)
+            for folder in folders:
+                user_directory = os.path.join(settings.MEDIA_ROOT, folder, uname)
+                os.makedirs(user_directory, exist_ok=True)
             
             return redirect('login')
         

@@ -145,7 +145,8 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # AUTH_USER_MODEL = 'drive.CustomUser'
 
-MEDIA_ROOT = os.path.join(BASE_DIR, 'uploadedfiles')
+# MEDIA_ROOT = os.path.join(BASE_DIR, 'uploadedfiles')
+MEDIA_ROOT = r'D:\Thesis\batstateu_drive\uploadedfiles'
 # MEDIA_ROOT = "D:\\uploadedfiles"
 
 LOGIN_URL = '/login/'

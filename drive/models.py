@@ -107,28 +107,28 @@ class Users(models.Model):
     password = models.CharField(max_length=255)
 
     class Meta:
-        db_table = 'Users'
+        db_table = 'users'
 
 class FileDetails(models.Model):
-    id = models.AutoField(primary_key=True)
+    file_id = models.AutoField(primary_key=True)
     user = models.ForeignKey(Users, on_delete=models.CASCADE)
     filename = models.CharField(max_length=255)
     size = models.CharField(max_length=50)
     extension = models.CharField(max_length=50)
     upload_date = models.DateField()
-    path = models.CharField(max_length=255)
+    path = models.CharField(max_length=1000)
 
     class Meta:
         db_table = 'file_details'
 
 class SharingFiles(models.Model):
     share_id = models.AutoField(primary_key=True)
+    file = models.ForeignKey(FileDetails, on_delete=models.CASCADE, null=True)  # Allow null values temporarily
     filename = models.CharField(max_length=255)
     extension = models.CharField(max_length=10)
-    # file_id = models.IntegerField()
     share_by = models.CharField(max_length=255)
     share_to = models.CharField(max_length=255)
-    path = models.CharField(max_length=255)
+    path = models.CharField(max_length=1000)
 
     class Meta:
         db_table = 'share_files'
