@@ -460,11 +460,40 @@ def rename_file(request):
 
 def rename_folder(request):
     if request.method == 'POST':
+        username = request.session.get('username')
         item_path = request.POST.get('item_path')
+        last_name = request.POST.get('itemname')
         new_name = request.POST.get('new_name')
         current_dir = request.POST.get("current_directory")
+        current_dir2 = ""
+        
+        newpath = ""
+        if current_dir == "":
+            current_dir2 = os.path.join(settings.MEDIA_ROOT, username, last_name)
+            newpath = os.path.join(settings.MEDIA_ROOT, username, new_name)
+        else:
+            current_dir2 = current_dir
 
+        # print(current_dir2)
+        
         try:
+            user = Users.objects.get(username=username)
+            userid = user.userid
+            
+            file_details = FileDetails.objects.filter(path__contains=current_dir2, user_id=userid)
+            shared_files = SharingFiles.objects.filter(path__contains=current_dir2)
+            
+            for file_detail in file_details:
+                new_db_path = file_detail.path.replace(current_dir2, newpath)
+                file_detail.path = new_db_path
+                file_detail.save()
+                
+            for shared_file in shared_files:
+                new_db_path = shared_file.path.replace(current_dir2, newpath)
+                shared_file.path = new_db_path
+                shared_file.save()
+            
+            
             # Rename the folder
             os.rename(item_path, os.path.join(os.path.dirname(item_path), new_name))
             # Return success response
@@ -512,10 +541,12 @@ def handle_file_upload(request):
             username = request.session.get('username')
             userid = request.session.get('userid', None)
             current_directory = request.POST.get('current_directory', '')
+            
             if username:
                 # Get the User object for the logged-in user
                 user = Users.objects.get(username=username)
                 user_upload_dir = os.path.join(settings.MEDIA_ROOT, username, current_directory)
+                print("_____________________" + user_upload_dir)
                 if not os.path.exists(user_upload_dir):
                     os.makedirs(user_upload_dir)
                 fs = FileSystemStorage(location=user_upload_dir)
@@ -526,7 +557,7 @@ def handle_file_upload(request):
                         
                         key = Fernet.generate_key()
                         
-                        input_file_path = os.path.join(settings.MEDIA_ROOT, username, uploaded_file.name)
+                        input_file_path = os.path.join(user_upload_dir, uploaded_file.name)
                         output_file_path = os.path.join(user_upload_dir, uploaded_file.name)
                         encrypt_file(input_file_path, output_file_path, key)
                         

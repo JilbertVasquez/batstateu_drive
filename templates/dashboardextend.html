@@ -175,7 +175,7 @@
     </div>
 
     <div class="rename-section-folder" style="display: none;">
-        <form id="rename-form-folder" method="POST" action="{% url 'rename_file' %}">
+        <form id="rename-form-folder" method="POST" action="{% url 'rename_folder' %}">
             {% csrf_token %}
             <input type="hidden" id="item-folder-name" name="itemname">
             <input type="hidden" name="current_directory" value="{{ current_directory }}">
