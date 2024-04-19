@@ -309,21 +309,48 @@ from django.db.models import Q
 def share_files_section(request):
     # Retrieve the username from the session
     username = request.session.get('username', None)
-    fileuser = Users.objects.get(username=username)
+    
     current_directory = request.POST.get('current_directory', '')
     print(current_directory)
     
     if username:
+        fileuser = Users.objects.get(username=username)
         # Filter shared files where the username matches the 'shared_to' field
+        # shared_files = SharingFiles.objects.filter(share_to=fileuser.email)
+        # file_names = [shared_file.filename for shared_file in shared_files]
+        # file_details = FileDetails.objects.filter(Q(filename__in=[shared_file.filename for shared_file in shared_files]))
+        # share_details = SharingFiles.objects.filter(filename__in=file_names)
+        # for i in share_details:
+        
+        share_file_details = []
+
         shared_files = SharingFiles.objects.filter(share_to=fileuser.email)
         file_names = [shared_file.filename for shared_file in shared_files]
-        file_details = FileDetails.objects.filter(Q(filename__in=[shared_file.filename for shared_file in shared_files]))
-        share_details = SharingFiles.objects.filter(filename__in=file_names)
-        for i in share_details:
-            print(i.path)
+        file_details = FileDetails.objects.filter(filename__in=file_names)
+
+        for share in shared_files:
+            for details in file_details:
+                if details.filename == share.filename and details.extension == share.extension and details.path == share.path:
+                    share_file_details.append({
+                        'filename': share.filename,
+                        'extension': share.extension,
+                        'share_by': share.share_by,
+                        'share_to': share.share_to,
+                        'path': share.path,
+                        'size': details.size,
+                        'upload_date': details.upload_date
+                    })
+
+        # Now share_file_details contains combined details from both SharingFiles and FileDetails
+        for detail in share_file_details:
+            print(detail)
+            
+
+        
+        #     print(i.path)
         # if current_directory == "":
         #     current_directory = os.path.join(settings.MEDIA_ROOT, 'username')
-        return render(request, 'sharedfiles.html', {'shared_files': share_details})
+        return render(request, 'sharedfiles.html', {'shared_files': share_file_details})
     else:
         # Handle case where username is not found in the session
         # Redirect or render an error message as needed

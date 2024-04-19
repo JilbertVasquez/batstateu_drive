@@ -301,7 +301,30 @@ header {
     align-items: center;
 }
 
+.listfilefunctions1 {
+    background-color: beige;
+    /* background-color: blue; */
+    width: 13%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.listfilefunctions2 {
+    background-color: beige;
+    /* background-color: blue; */
+    width: 21%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
 .listfilefunctions button i {
+    margin-right: 8%;
+    margin-top: 5%;
+}
+
+.listfilefunctions1 button i, .listfilefunctions2 button i {
     margin-right: 8%;
     margin-top: 5%;
 }
@@ -317,11 +340,30 @@ header {
     justify-content: center;
 }
 
+.listfilefunctions1 a, .listfilefunctions2 a {
+    width: 100%;
+    font-size: 14px;
+    text-decoration: none;
+    color: black;
+    display: flex;
+    text-align: center;
+    justify-content: center;
+}
+
 .listfilefunctions a:hover, .listfilefunctions button:hover {
     color: red;
 }
 
+.listfilefunctions1 a:hover, .listfilefunctions1 button:hover, .listfilefunctions2 a:hover, .listfilefunctions2 button:hover {
+    color: red;
+}
+
 .listfilefunctions a i {
+    margin-right: 6%;
+    margin-top: 2.5%;
+}
+
+.listfilefunctions1 a i, .listfilefunctions2 a i {
     margin-right: 6%;
     margin-top: 2.5%;
 }
@@ -334,7 +376,21 @@ header {
     justify-content: center;
 }
 
+.listfilefunctions1 button, .listfilefunctions2 button {
+    width: 80%;
+    background-color: rgba(255, 255, 255, 0);
+    border: 0px solid black;
+    display: flex;
+    justify-content: center;
+}
+
 .listfilefunctions form {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+}
+
+.listfilefunctions1 form, .listfilefunctions2 form{
     width: 100%;
     display: flex;
     justify-content: center;
@@ -413,6 +469,9 @@ header {
 .searchsection-profile {
     height: 100%;
     width: 30%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 .searchsection-profile form {
     height: 65%;
@@ -420,6 +479,7 @@ header {
     display: flex;
     justify-content: flex-end;
     padding-right: 8%;
+    align-items: center;
 }
 
 .searchsection .searchinput {
@@ -433,7 +493,7 @@ header {
 }
 
 .searchsection-profile button {
-    width: 25%;
+    width: 20%;
 }
 
 .searchsection button {
@@ -448,6 +508,6 @@ header {
     border: 0px solid black;
 }
 
-.searchsection-profile button {
-    width: 50%;
-}
+/* .searchsection-profile button {
+    width: 20%;
+} */

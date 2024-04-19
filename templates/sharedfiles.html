@@ -10,22 +10,16 @@
         <div class="listfilename">
             <span>Name</span>
         </div>
-        <div class="listfilefunctions">
+        <div class="listfilefunctions1">
             <span>Date</span>
         </div>
-        <div class="listfilefunctions">
+        <div class="listfilefunctions1">
             <span>Size</span>
         </div>
-        <div class="listfilefunctions">
-            <span></span>
+        <div class="listfilefunctions2">
+            <span>Owner</span>
         </div>
-        <div class="listfilefunctions">
-            <span></span>
-        </div>
-        <div class="listfilefunctions">
-            <span></span>
-        </div>
-        <div class="listfilefunctions">
+        <div class="listfilefunctions1">
             <span></span>
         </div>
     </div>
@@ -38,17 +32,17 @@
                         <div class="listfilename">
                             <span>{{ files.filename }}{{files.extension}}</span>
                         </div>
-                        <div class="listfilefunctions">
+                        <div class="listfilefunctions1">
                             <span>{{ files.upload_date }}</span>
                         </div>
-                        <div class="listfilefunctions">
+                        <div class="listfilefunctions1">
                             <span>{{ files.size }}</span>
                         </div>
-                        <div class="listfilefunctions">
+                        <div class="listfilefunctions2">
                             <span>{{files.share_by}}</span>
                         </div>
                         <!-- Add download link -->
-                        <div class="listfilefunctions">
+                        <div class="listfilefunctions1">
                             {% csrf_token %}
                             <input type="hidden" name="current_directory" value="{{ files.path }}">
                             <input type="hidden" name="lastname" value="{{ files.filename }}">
