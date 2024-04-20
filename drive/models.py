@@ -116,7 +116,13 @@ class FileDetails(models.Model):
     size = models.CharField(max_length=50)
     extension = models.CharField(max_length=50)
     upload_date = models.DateField()
-    path = models.CharField(max_length=1000)
+    path = models.TextField()  # Change to TextField to accommodate longer strings
+
+    def set_paths(self, paths_list):
+        self.path = '|'.join(paths_list)  # Use '|' as delimiter
+
+    def get_paths(self):
+        return self.path.split('|') if self.path else []  # Split by '|' to get list, empty list if path is empty
 
     class Meta:
         db_table = 'file_details'

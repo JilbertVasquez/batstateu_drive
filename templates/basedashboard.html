@@ -75,7 +75,6 @@
                 <div class="searchsection">
                     <!-- <h1>Welcome, {{ username }}</h1> -->
                     <form method="GET" action="{% url 'search' %}">
-                        <input type="hidden" name="current_directory" value="{{ current_directory }}">
                         <input class="searchinput" type="text" name="query" placeholder="Search in TNEU Drive..." value="{{ query }}">
                         <button type="submit"><i class='bx bx-search'></i></button>
                     </form>

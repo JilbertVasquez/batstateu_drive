@@ -21,6 +21,31 @@
             <button type="submit">Back</button>
         </form>
     </div>
+
+    <div class="files-folders-folders">
+        <div class="listfilename">
+            <span>Name</span>
+        </div>
+        <div class="listfilefunctions">
+            <span>Date</span>
+        </div>
+        <div class="listfilefunctions">
+            <span>Size</span>
+        </div>
+        <div class="listfilefunctions">
+            <span></span>
+        </div>
+        <div class="listfilefunctions">
+            <span></span>
+        </div>
+        <div class="listfilefunctions">
+            <span></span>
+        </div>
+        <div class="listfilefunctions">
+            <span></span>
+        </div>
+    </div>
+
         <ul>
             <!-- Display search results -->
             {% for result in search_results %}
@@ -31,16 +56,18 @@
                                 <span>{{ result.filename }}{{result.extension}}</span>
                             </div>
                             <div class="listfilefunctions">
-                                <span>{{ result.date }}</span>
+                                <span>{{ result.upload_date }}</span>
                             </div>
                             <div class="listfilefunctions">
                                 <span>{{ result.size }}</span>
                             </div>
                             <!-- Add download link -->
                             <div class="listfilefunctions">
-                                {% csrf_token %}
-                                <input type="hidden" name="current_directory" value="{{ current_directory }}">
-                                <a href="#" class="download-link" data-file="{{ result.filename }}{{result.extension}}">Download</a>
+                                <form id="download-file-form" method="POST" action="{% url 'download_file' %}">
+                                    {% csrf_token %}
+                                    <input type="hidden" id="item-download-name" name="itemid" value="{{ result.file_id }}">
+                                    <button class="buttonClassShare" type="submit">Download</button>
+                                </form>
                             </div>
 
                             <div class="listfilefunctions">

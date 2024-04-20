@@ -38,70 +38,59 @@
         </div>
     </div>
 
-    <ul>
+    {% comment %} <ul>
         <!-- Inside the block content -->
-        {% if uploaded_files %}
-        {% for file_info in uploaded_files %}
-            <li class="listdirxfile">
-                <div class="filesfolders">
-                    {% if file_info.is_dir %}
+        {% if folders %}
+            {% for folder in folders %}
+                <li class="listdirxfile">
+                    <div class="filesfolders">
                         <div class="files-folders-folders">
                             <div class="listfilename">
-                                <span><i class='bx bxs-folder' ></i>{{ file_info.name }}</span>
-                            </div>
-                            <div class="listfilefunctions">
-                                <span>{{ file_info.date }}</span>
+                                <span><i class='bx bxs-file-blank' ></i>{{ folder }}</span>
                             </div>
                             <div class="listfilefunctions">
                                 <span></span>
                             </div>
                             <div class="listfilefunctions">
-                                <!-- Add view folder link with current directory path -->
-                                <a href="{% url 'view_folder' folder_path=file_info.full_path %}"><i class='bx bxs-folder-open' ></i>View Folder</a>
+                                <span></span>
                             </div>
                             <div class="listfilefunctions">
-                                <button class="rename-btn-folder" data-item="{{ file_info.name }}" data-is-dir="true"><i class='bx bxs-edit'></i>Rename</button>
-                            </div>
-                            <div class="listfilefunctions">
-                                <form method="post" action="{% url 'delete_item' %}">
+                                <form id="view-folder-form" method="POST" action="{% url 'view_folder' %}">
                                     {% csrf_token %}
-                                    <input type="hidden" name="item_name" value="{{ file_info.name }}">
-                                    <input type="hidden" name="item_path" value="{{ file_info.full_path }}">
-                                    <button type="submit"><i class='bx bxs-trash-alt' ></i>Delete</button>
+                                    <input type="hidden" id="item-download-name" name="itemid" value="{{ file_info.fileid }}">
+                                    <button class="buttonClassShare" type="submit"><i class='bx bxs-folder-open'></i>View Folder</button>
                                 </form>
                             </div>
-                            <div class="listfilefunctions">
-                                {% comment %} <button class="share-btn-file" data-item="{{ file_info.name }}" data-is-dir="false">Share</button> {% endcomment %}
-                            </div>
                         </div>
-                    {% else %}
+                    </div>
+                </li>
+            {% endfor %}
+        {% endif %}
+    </ul> {% endcomment %}
+
+    <ul>
+        <!-- Inside the block content -->
+        {% if uploaded_files %}
+            {% for file_info in uploaded_files %}
+                <li class="listdirxfile">
+                    <div class="filesfolders">
                         <div class="files-folders-folders">
                             <div class="listfilename">
-                                <span><i class='bx bxs-file-blank' ></i>{{ file_info.name }}</span>
+                                <span><i class='bx bxs-file-blank' ></i>{{ file_info.filename }}{{ file_info.extension }}</span>
                             </div>
                             <div class="listfilefunctions">
-                                <span>{{ file_info.date }}</span>
+                                <span>{{ file_info.upload_date }}</span>
                             </div>
                             <div class="listfilefunctions">
                                 <span>{{ file_info.size }}</span>
                             </div>
                             <div class="listfilefunctions">
                                 <!-- Add download link -->
-                                <input type="hidden" name="current_directory" value="{{ current_directory }}">
-                                <a href="#" class="download-link" data-file="{{ file_info.name }}"><i class='bx bxs-download'></i>Download</a> 
-                                <script>
-                                    document.querySelectorAll('.download-link').forEach(link => {
-                                        link.addEventListener('click', function(event) {
-                                            event.preventDefault();
-                                            const fileName = this.dataset.file;
-                                            const currentDirectory = this.previousElementSibling.value;
-                                            console.log(fileName);
-                                            console.log(currentDirectory);
-                                            const downloadUrl = `/download/${fileName}/?current_directory=${currentDirectory}`;
-                                            window.location.href = downloadUrl;
-                                        });
-                                    });
-                                </script>
+                                <form id="download-file-form" method="POST" action="{% url 'download_file' %}">
+                                    {% csrf_token %}
+                                    <input type="hidden" id="item-download-name" name="itemid" value="{{ file_info.fileid }}">
+                                    <button class="buttonClassShare" type="submit">Download</button>
+                                </form>
                             </div>
                             <div class="listfilefunctions">
                                 <button class="rename-btn-file" data-item="{{ file_info.name }}" data-is-dir="false"><i class='bx bxs-edit'></i>Rename</button>
@@ -109,27 +98,18 @@
                             <div class="listfilefunctions">
                                 <form method="post" action="{% url 'delete_item' %}">
                                     {% csrf_token %}
-                                    <input type="hidden" name="item_name" value="{{ file_info.name }}">
-                                    <input type="hidden" name="item_path" value="{{ file_info.full_path }}">
+                                    <input type="hidden" id="item-delete-name" name="itemid" value="{{ file_info.fileid }}">
                                     <button type="submit"><i class='bx bxs-trash-alt' ></i>Delete</button>
                                 </form>
                             </div>
                             <div class="listfilefunctions">
+                                <input type="hidden" id="item-share-name" name="itemid" value="{{ file_info.fileid }}">
                                 <button class="share-btn-file" data-item="{{ file_info.name }}" data-is-dir="false"><i class='bx bx-share-alt' ></i>Share</button>
                             </div>
                         </div>
-                    {% endif %}
-                    <!-- Add delete button -->
-                    {% comment %} <form method="post" action="{% url 'delete_item' %}">
-                        {% csrf_token %}
-                        <input type="hidden" name="item_name" value="{{ file_info.name }}">
-                        <input type="hidden" name="item_path" value="{{ file_info.full_path }}">
-                        <button type="submit">Delete</button>
-                    </form> {% endcomment %}
-                </div>
-            </li>
-        {% endfor %}
-        {%else%}
+                    </div>
+                </li>
+            {% endfor %}
         {% endif %}
     </ul>
 
@@ -192,6 +172,7 @@
     <div class="share-file-section" style="display: none;">
         <form id="share-file-form" method="POST" action="{% url 'share_file' %}">
             {% csrf_token %}
+            <input type="hidden" id="item-share-id" name="itemid">
             <input type="hidden" id="item-share-name" name="item_name">
             <input type="hidden" name="current_directory" value="{{ current_directory }}">
             <input type="hidden" id="share-item-name" name="item_path">
@@ -258,12 +239,14 @@
                 const itemPath = itemPathElement ? itemPathElement.value : null;
                 const itemName = this.dataset.item;
                 console.log("Item Name:", itemName);
+                const itemId = this.closest('.listfilefunctions').querySelector('[name="itemid"]').value;
     
                 const shareSectionFile = document.querySelector('.share-file-section');
                 if (shareSectionFile.style.display === 'none' || shareSectionFile.querySelector('#share-item-name').value !== itemPath) {
                     shareSectionFile.style.display = 'block';
                     shareSectionFile.querySelector('#share-item-name').value = itemPath;
                     shareSectionFile.querySelector('#item-share-name').value = itemName;
+                    shareSectionFile.querySelector('#item-share-id').value = itemId;
                 } else {
                     shareSectionFile.style.display = 'none';
                 }

@@ -49,47 +49,29 @@ def dashboard(request):
 
     folders = [item for item in contents if os.path.isdir(os.path.join(settings.MEDIA_ROOT, item))]
     
-    # user_directory = os.path.join(settings.MEDIA_ROOT, uname)
-    for folder in folders:
-        pass
+    folder1 = [item for item in os.listdir(os.path.join(settings.MEDIA_ROOT, folders[0], username)) if os.path.isdir(os.path.join(settings.MEDIA_ROOT, folders[0], username, item))]
+    # print(folder1)
     uploaded_files = []
 
     if username:
-        
-        # for file_name in os.listdir(user_upload_dir):
-        #     file_path = os.path.join(user_upload_dir, file_name)
-        #     is_dir = os.path.isdir(file_path)
-            
-        #     # Get file size and last modified date
-        #     file_size = os.path.getsize(file_path)
-        #     size_label = str(convert_size(file_size))
-        #     last_modified = os.path.getmtime(file_path)
-        #     last_modified_date = time.strftime('%m-%d-%Y', time.localtime(last_modified))
-
-        #     uploaded_files.append({
-        #         'name': file_name,
-        #         'size': size_label,
-        #         'date': last_modified_date,
-        #         'is_dir': is_dir,
-        #         'full_path': file_path
-        #     })
-        
-
-        
         try:
             user = Users.objects.get(username=username)
-            userfiles = FileDetails.objects.get(user_id = user.userid)
+            userfiles = FileDetails.objects.filter(user_id = user.userid)
             
-            print(userfiles)
+            for files in userfiles:
+                uploaded_files.append({
+                    'fileid': files.file_id,
+                    'filename': files.filename,
+                    'extension': files.extension,
+                    'size': files.size,
+                    'upload_date': files.upload_date,
+                    'path': files.path 
+                })
         
         except Exception as e:
             print(e)
-        
-        
-            # print(uploaded_files[0])
-            
             # uploaded_files.append({'name': file_name, 'size': file_size, 'last_modified': last_modified_date, 'is_dir': is_dir, 'full_path': file_path})  # Add full_path
-        return render(request, 'dashboardextend.html', {'username': username, 'uploaded_files': uploaded_files})
+        return render(request, 'dashboardextend.html', {'username': username, 'uploaded_files': uploaded_files, 'folders': folder1})
     else:
         return redirect('login')
     
@@ -106,22 +88,35 @@ def convert_size(size_bytes):
 
     return f"{size_bytes:.2f} {suffixes[-1]}"  # Fallback to largest suffix
 
-
-def download_file(request, file_name):
-    username = request.session.get('username', None)
-    userid = request.session.get('userid', None)
-    current_directory = request.GET.get('current_directory', '')  # Use request.GET to get query parameters
-    if username:
-        file_path = os.path.join(settings.MEDIA_ROOT, username, current_directory, file_name)
+import json
+from django.http import FileResponse
+def download_file(request):
+    if request.method == 'POST':
+        userid = request.session.get('userid', None)
+        
+        
+        file_id = request.POST.get('itemid')
+        
+        file_details = FileDetails.objects.get(file_id=file_id)
+        retrieved_paths_list = file_details.get_paths()
+        
+        for paths in retrieved_paths_list:
+            print(paths)
+        file_path = file_details.get_paths()[0]
         if os.path.exists(file_path):
-            with open(file_path, 'rb') as file:
-                response = HttpResponse(file.read(), content_type='application/force-download')
-                response['Content-Disposition'] = f'attachment; filename="{file_name}"'
-                return response
+        # Construct the response with X-Sendfile header
+            response = HttpResponse(content_type='application/force-download')
+            response['Content-Disposition'] = f'attachment; filename="{file_details.filename}{file_details.extension}"'
+            response['X-Sendfile'] = file_path
+
+            # Optionally, set additional headers
+            response['Content-Length'] = os.path.getsize(file_path)
+
+            return response
         else:
             return HttpResponse("File not found", status=404)
     else:
-        return HttpResponse("User not authenticated", status=401)
+        return HttpResponse("Method not allowed", status=405)
     
 def download_share_file (request):
     pass
@@ -134,39 +129,34 @@ def delete_item(request):
     if request.method == 'POST':
         username = request.session.get('username', None)
         userid = request.session.get('userid', None)
-        item_name = request.POST.get('item_name')
-        item_path = request.POST.get('item_path')  # Get the full item path
-
-        if username and item_path:
-            print(item_name.split(".")[0])
-            print(item_path)
+        itemid = request.POST.get('itemid')
+        
+        try:
+            file_details = FileDetails.objects.get(file_id=itemid)
+            share_details = SharingFiles.objects.get(file=file_details)
             
+            item_path = file_details.path
             
-            if os.path.exists(item_path):
-                try:
-                    if os.path.isdir(item_path):
-                        # Use shutil.rmtree for recursive deletion of folders and files
-                        shutil.rmtree(item_path)
-                    else:
-                        try:
-                            file = FileDetails.objects.get(filename=item_name.split(".")[0])
-                            if os.path.join(file.path, (file.filename + file.extension)) == item_path:
-                                file.delete()  # Delete the file from the database
-                            else:
-                                print(os.path.join(file.path, (file.filename + file.extension)))
-                                print(item_path)
-                        except FileDetails.DoesNotExist:
-                            return HttpResponse("Item not found", status=404)
-                        os.remove(item_path)  # Delete file
-
-                    deleted_item_directory = os.path.dirname(item_path)
-                    return redirect('view_folder', folder_path=deleted_item_directory)
-                except Exception as e:
-                    return JsonResponse({'success': False, 'message': f'Error deleting item: {str(e)}'})
-            else:
-                return HttpResponse("Item not found", status=404)
-        else:
-            return HttpResponse("Invalid request", status=400)
+            if item_path:
+                paths = file_details.get_paths()
+                for path in paths:
+                    
+                    if os.path.exists(path):
+                        file_path = os.path.join(path, str(file_details.filename + file_details.extension))
+                        print(path)
+                        print(file_path)
+                        os.remove(file_path)
+            
+            file_details.delete()
+            share_details.delete()
+            
+            return redirect('dashboard')
+            
+        except FileDetails.DoesNotExist:
+            return HttpResponse("File not found", status=404)
+        except SharingFiles.DoesNotExist:
+            return HttpResponse("Sharing information not found", status=404)
+        
     else:
         return HttpResponse("Method not allowed", status=405)
 
@@ -306,35 +296,36 @@ def search(request):
 def share_file(request):
     if request.method == 'POST':
         username = request.session.get('username', None)
-        current_directory = request.POST.get('current_directory', '')
-        curr_dir = os.path.join(settings.MEDIA_ROOT, username, current_directory)
-        item_name = request.POST.get('item_name', '')
-        print("itemname", item_name)
-        # print(curr_dir)
-        # item_name2 = item_name.split(".")[0]
-        # item_name3 = item_name.split(".")[-1]
-        item_name2 = os.path.splitext(item_name)[0]
-        item_name3 = os.path.splitext(item_name)[-1]
-        item_path = request.POST.get('item_path', None)
-        print(curr_dir)
+        userid = request.session.get('userid', None)
+        
+        itemid = request.POST.get('itemid')
         email = request.POST.get('email', None)
+        
+        
+        
         try:
-            # recipient = Users.objects.get(email=email)
-            fileuser = Users.objects.get(username=username)
-            # file_entry = FileDetails.objects.get(filename=item_name2, path=current_directory)
+            sharetouser = Users.objects.get(email=email)
             
-            SharingFiles.objects.create(
-                filename=item_name2,
-                extension=item_name3,
-                # file_id=file_entry.id,
-                path=curr_dir,
-                share_by=fileuser.email,
-                share_to=email
-            )
+            if sharetouser:
+                fileuser = Users.objects.get(userid=userid)
+                filedetails = FileDetails.objects.get(file_id=itemid)
+                
+                SharingFiles.objects.create(
+                    filename = filedetails.filename,
+                    extension = filedetails.extension,
+                    share_by = fileuser.email,
+                    share_to = sharetouser.email,
+                    path = filedetails.path,
+                    file=filedetails
+                )
+            
+            else:
+                return redirect('dashboard')
+            
             messages.success(request, f'File shared with {email} successfully!')
             print("SSUSSSSS")
         except FileDetails.DoesNotExist:
-            messages.error(request, f'File with name {item_name2} does not exist in the specified path!')
+            messages.error(request, f'File with id {itemid} does not exist in the specified path!')
             ("ASDADQWEQ")
         except Users.DoesNotExist:
             messages.error(request, f'User with email {email} does not exist!')
@@ -351,28 +342,23 @@ def share_files_section(request):
     # Retrieve the username from the session
     username = request.session.get('username', None)
     
-    current_directory = request.POST.get('current_directory', '')
-    print(current_directory)
-    
     if username:
         fileuser = Users.objects.get(username=username)
-        # Filter shared files where the username matches the 'shared_to' field
-        # shared_files = SharingFiles.objects.filter(share_to=fileuser.email)
-        # file_names = [shared_file.filename for shared_file in shared_files]
-        # file_details = FileDetails.objects.filter(Q(filename__in=[shared_file.filename for shared_file in shared_files]))
-        # share_details = SharingFiles.objects.filter(filename__in=file_names)
-        # for i in share_details:
         
         share_file_details = []
 
         shared_files = SharingFiles.objects.filter(share_to=fileuser.email)
-        file_names = [shared_file.filename for shared_file in shared_files]
-        file_details = FileDetails.objects.filter(filename__in=file_names)
+        file_ids = [shared_file.file_id for shared_file in shared_files]
+        file_details = FileDetails.objects.filter(file_id__in=file_ids)
+
+        print(file_ids)
+        print(file_details)
 
         for share in shared_files:
             for details in file_details:
-                if details.filename == share.filename and details.extension == share.extension and details.path == share.path:
+                if details.file_id == share.file_id:
                     share_file_details.append({
+                        'fileid': details.file_id,
                         'filename': share.filename,
                         'extension': share.extension,
                         'share_by': share.share_by,
@@ -383,8 +369,8 @@ def share_files_section(request):
                     })
 
         # Now share_file_details contains combined details from both SharingFiles and FileDetails
-        for detail in share_file_details:
-            print(detail)
+        # for detail in share_file_details:
+        #     print(detail)
             
 
         
@@ -404,34 +390,21 @@ def search(request):
     query = request.GET.get('query')
     username = request.session.get('username')
     userid = request.session.get('userid', None)
-    current_directory = request.GET.get('current_directory')
-    
-    if current_directory == "":
-        current_directory = os.path.join(settings.MEDIA_ROOT, username)
     
     retrieved_files = []
 
     if query == "":
         return render(request, 'dashboardextend.html')
     
+    files = FileDetails.objects.filter(Q(filename__icontains=query), user_id=userid).values('file_id', 'filename', 'size', 'extension', 'upload_date', 'path')
+    
+    
     search_results = []
 
-    for root, dirs, files in os.walk(current_directory):
-        for file_name in files:
-            if query.lower() in file_name.lower():
-                if current_directory == "":
-                    file_path = current_directory
-                else:
-                    file_path = os.path.join(root, file_name)
-                file_size = os.path.getsize(file_path)
-                file_size_formatted = get_formatted_file_size(file_size)
-                last_modified = os.path.getmtime(file_path)
-                last_modified_date = time.strftime('%m-%d-%Y', time.localtime(last_modified))
-                search_results.append({'filename': file_name, 'date': last_modified_date, 'size': file_size_formatted, 'path': file_path})
+    
     
     return render(request, 'search_form.html', {
-        'search_results': search_results,
-        'current_directory': current_directory,
+        'search_results': files,
         'query': query,  # Pass the query back to the template for displaying in the search input field
         'username': username
     })
@@ -682,9 +655,10 @@ def save_file_details(user, file_details):
         filename=file_details['filename'],  # Use 'filename' instead of 'name'
         extension=file_details['extension'],
         size=file_details['size'],
-        upload_date=file_details['upload_date'],
-        path=file_details['path']  # Use 'path' instead of 'file_path'
+        upload_date=file_details['upload_date']
     )
+    file_details_object.set_paths(file_details['path'])
+    file_details_object.save()
     return file_details_object
 
 

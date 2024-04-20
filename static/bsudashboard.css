@@ -390,10 +390,18 @@ header {
     justify-content: center;
 }
 
+
+
 .listfilefunctions1 form, .listfilefunctions2 form{
     width: 100%;
     display: flex;
     justify-content: center;
+}
+
+.listfilefunctions #download-file-form {
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
 
