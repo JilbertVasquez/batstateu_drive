@@ -133,8 +133,8 @@ def delete_item(request):
         
         try:
             file_details = FileDetails.objects.get(file_id=itemid)
-            share_details = SharingFiles.objects.get(file=file_details)
-            
+            share_details = SharingFiles.objects.filter(file=file_details).first()
+
             item_path = file_details.path
             
             if item_path:
@@ -148,7 +148,8 @@ def delete_item(request):
                         os.remove(file_path)
             
             file_details.delete()
-            share_details.delete()
+            if share_details:
+                share_details.delete()
             
             return redirect('dashboard')
             
@@ -591,7 +592,8 @@ def handle_file_upload(request):
                     
                         # if current_directory:
                             # Redirect back to the view_folder with the current directory path included
-                        return redirect(reverse('view_folder', kwargs={'folder_path': user_directory}))
+                        # return redirect(reverse('view_folder', kwargs={'folder_path': user_directory}))
+                        return redirect('dashboard')
                         # else:
                             # Redirect to dashboard if current_directory is empty
                             # return redirect('dashboard')

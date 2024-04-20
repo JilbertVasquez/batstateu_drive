@@ -89,7 +89,7 @@
                                 <form id="download-file-form" method="POST" action="{% url 'download_file' %}">
                                     {% csrf_token %}
                                     <input type="hidden" id="item-download-name" name="itemid" value="{{ file_info.fileid }}">
-                                    <button class="buttonClassShare" type="submit">Download</button>
+                                    <button type="submit"><i class='bx bxs-download'></i>Download</button>
                                 </form>
                             </div>
                             <div class="listfilefunctions">
