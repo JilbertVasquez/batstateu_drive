@@ -20,6 +20,7 @@ import time
 from cryptography.fernet import Fernet
 
 def encrypt_file(input_file_path, output_file_path, key):
+    print("fileeeee dataaaaaaa", input_file_path)
     """
     Encrypts a file using Fernet encryption.
     
@@ -28,8 +29,13 @@ def encrypt_file(input_file_path, output_file_path, key):
     - output_file_path: Path to save the encrypted output file.
     - key: Fernet encryption key.
     """
-    cipher_suite = Fernet(key)
     
+    batstateu = b'batstateukey'
+    combined = key + batstateu
+    # print(']]]]]]]]]]]]]]]]]]]]]]]')
+    # print(type(key))
+    cipher_suite = Fernet(key)
+    # print(cipher_suite)
     with open(input_file_path, 'rb') as file:
         file_data = file.read()
         
@@ -37,6 +43,38 @@ def encrypt_file(input_file_path, output_file_path, key):
 
     with open(output_file_path, 'wb') as encrypted_file:
         encrypted_file.write(encrypted_data)
+        
+
+def decrypt_file(input_file_path, output_file_path, key):
+    
+    """
+    Decrypts a file using Fernet encryption.
+    
+    Args:
+    - input_file_path: Path to the input file to be decrypted.
+    - output_file_path: Path to save the decrypted output file.
+    - key: Fernet encryption key.
+    """
+    
+    batstateu = b'batstateukey'
+    # concat = key[2:-1]
+    
+    # key_bytes = base64.urlsafe_b64decode(concat.encode())
+    
+    # combined = key + batstateu
+    # print(']]]]]]]]]]]]]]]]]]]]]]]')
+    # print(type(key))
+    # print(combined, 'COOOOOOOOOOOOOOOOOOOOOO')
+    
+    cipher_suite = Fernet(key)
+    
+    with open(input_file_path, 'rb') as encrypted_file:
+        encrypted_data = encrypted_file.read()
+    
+    decrypted_data = cipher_suite.decrypt(encrypted_data)
+    print("dataaaaaaafileeeee", input_file_path)
+    with open(output_file_path, 'wb') as decrypted_file:
+        decrypted_file.write(decrypted_data)
 
 # Create your views here.
 
@@ -65,6 +103,7 @@ def dashboard(request):
                     'extension': files.extension,
                     'size': files.size,
                     'upload_date': files.upload_date,
+                    'key': files.key,
                     'path': files.path 
                 })
         
@@ -90,6 +129,8 @@ def convert_size(size_bytes):
 
 import json
 from django.http import FileResponse
+import shutil
+
 def download_file(request):
     if request.method == 'POST':
         userid = request.session.get('userid', None)
@@ -99,18 +140,32 @@ def download_file(request):
         
         file_details = FileDetails.objects.get(file_id=file_id)
         retrieved_paths_list = file_details.get_paths()
-        
-        for paths in retrieved_paths_list:
-            print(paths)
+        # print(file_details.key, 'keyyyyyyyyyyyyyy')
+        # for paths in retrieved_paths_list:
+        #     print(paths)
         file_path = file_details.get_paths()[0]
+        
         if os.path.exists(file_path):
+            
+            temp_path = os.path.join(settings.MEDIA_TEMP, file_details.filename + file_details.extension)
+            
+            encrypted_filepath = os.path.join(file_path, file_details.filename + file_details.extension)
+            # print("----------------", temp_path)
+            with open('key.txt', 'rb') as key_file:
+                key = key_file.read()
+            decrypt_file(encrypted_filepath, temp_path, key)
+            
         # Construct the response with X-Sendfile header
             response = HttpResponse(content_type='application/force-download')
             response['Content-Disposition'] = f'attachment; filename="{file_details.filename}{file_details.extension}"'
-            response['X-Sendfile'] = file_path
+            response['X-Sendfile'] = settings.MEDIA_TEMP
 
             # Optionally, set additional headers
-            response['Content-Length'] = os.path.getsize(file_path)
+            
+            # response['Content-Length'] = os.path.getsize(file_path)
+            
+            # delete_temp = os.path.join(file_path, str(file_details.filename + file_details.extension))
+            # os.remove(delete_temp)
 
             return response
         else:
@@ -143,8 +198,8 @@ def delete_item(request):
                     
                     if os.path.exists(path):
                         file_path = os.path.join(path, str(file_details.filename + file_details.extension))
-                        print(path)
-                        print(file_path)
+                        # print(path)
+                        # print(file_path)
                         os.remove(file_path)
             
             file_details.delete()
@@ -324,13 +379,13 @@ def share_file(request):
                 return redirect('dashboard')
             
             messages.success(request, f'File shared with {email} successfully!')
-            print("SSUSSSSS")
+            # print("SSUSSSSS")
         except FileDetails.DoesNotExist:
             messages.error(request, f'File with id {itemid} does not exist in the specified path!')
-            ("ASDADQWEQ")
+            # ("ASDADQWEQ")
         except Users.DoesNotExist:
             messages.error(request, f'User with email {email} does not exist!')
-            print("!@#!#")
+            # print("!@#!#")
             
 
         return redirect('dashboard')
@@ -352,8 +407,8 @@ def share_files_section(request):
         file_ids = [shared_file.file_id for shared_file in shared_files]
         file_details = FileDetails.objects.filter(file_id__in=file_ids)
 
-        print(file_ids)
-        print(file_details)
+        # print(file_ids)
+        # print(file_details)
 
         for share in shared_files:
             for details in file_details:
@@ -435,9 +490,9 @@ def rename_file(request):
         current_dir = request.POST.get("current_directory")
         if current_dir == "":
             current_dir = os.path.join(settings.MEDIA_ROOT, username) + "\\"
-        print(new_name)
-        print(last_name2)
-        print(current_dir)
+        # print(new_name)
+        # print(last_name2)
+        # print(current_dir)
         try:
             # Rename the file
             os.rename(item_path, os.path.join(os.path.dirname(item_path), new_name))
@@ -565,21 +620,28 @@ def handle_file_upload(request):
                         
                         for folder in folders:
                             key = Fernet.generate_key()
+                            
+                            print(key)
+                            
                             user_directory = os.path.join(settings.MEDIA_ROOT, folder, username)
                             list_of_dir_copy.append(user_directory)
-                            print(list_of_dir_copy)
+                            # print(list_of_dir_copy)
                             fs = FileSystemStorage(location=user_directory)
                             fs.save(uploaded_file.name, uploaded_file)
                             
                             input_file_path = os.path.join(user_directory, uploaded_file.name)
                             output_file_path = os.path.join(user_directory, uploaded_file.name)
-                            print(input_file_path)
-                            print(output_file_path)
+                            # print(input_file_path)
+                            # print(output_file_path)
                             encrypt_file(input_file_path, output_file_path, key)
-                            print("SS________________")
+                            # print("SS________________")
+                        
+                        
+                        with open('key.txt', 'rb') as key_file:
+                            key2 = key_file.read()
                         
                         file_details = get_file_details(uploaded_file, list_of_dir_copy)
-                        save_file_details(user, file_details)
+                        save_file_details(user, file_details, key2)
                             
                         # input_file_path = os.path.join(user_upload_dir, uploaded_file.name)
                         # output_file_path = os.path.join(user_upload_dir, uploaded_file.name)
@@ -648,7 +710,7 @@ def get_file_details(uploaded_file, file_path):
 
 
 
-def save_file_details(user, file_details):
+def save_file_details(user, file_details, key):
     """
     Function to save file details into the database.
     """
@@ -657,10 +719,19 @@ def save_file_details(user, file_details):
         filename=file_details['filename'],  # Use 'filename' instead of 'name'
         extension=file_details['extension'],
         size=file_details['size'],
-        upload_date=file_details['upload_date']
+        upload_date=file_details['upload_date'],
+        key=key
     )
     file_details_object.set_paths(file_details['path'])
     file_details_object.save()
+    
+    print(key)
+    
+    file_details_objectss = FileDetails.objects.get(filename=file_details['filename'])
+    
+    if key == file_details_objectss.key:
+        print("TUERRRRRRRRRRRRR")
+    
     return file_details_object
 
 

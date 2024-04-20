@@ -116,6 +116,7 @@ class FileDetails(models.Model):
     size = models.CharField(max_length=50)
     extension = models.CharField(max_length=50)
     upload_date = models.DateField()
+    key = models.BinaryField(max_length=255)  # Provide a default value
     path = models.TextField()  # Change to TextField to accommodate longer strings
 
     def set_paths(self, paths_list):

@@ -147,6 +147,8 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # MEDIA_ROOT = os.path.join(BASE_DIR, 'uploadedfiles')
 MEDIA_ROOT = r'\\DESKTOP-UUTKA7R\uploadedfiles'
+
+MEDIA_TEMP = r'D:\batstateu_drive\temp_folder'
 # MEDIA_ROOT = "D:\\uploadedfiles"
 
 LOGIN_URL = '/login/'

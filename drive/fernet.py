@@ -1,6 +1,7 @@
 from cryptography.fernet import Fernet
 
 def encrypt_file(input_file_path, output_file_path, key):
+    print("enc", key)
     """
     Encrypts a file using Fernet encryption.
     
@@ -21,6 +22,7 @@ def encrypt_file(input_file_path, output_file_path, key):
 
 
 def decrypt_file(input_file_path, output_file_path, key):
+    print("dec", key)
     """
     Decrypts a file using Fernet encryption.
     
@@ -44,7 +46,7 @@ def decrypt_file(input_file_path, output_file_path, key):
 key = Fernet.generate_key()
 
 # Encrypt a file
-encrypt_file('fileee.jpg', 'encrypted_fileee.jpg', key)
+encrypt_file('drive\\asd.py', 'drive\des.py', key)
 
 # Decrypt a file
-decrypt_file('encrypted_fileee.jpg', 'decrypted_fileee.jpg', key)
+decrypt_file('drive\des.py', 'drive\sss.py', key)
