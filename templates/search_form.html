@@ -1,22 +1,9 @@
 {% extends 'basedashboard.html' %}
 
 {% block content %}
-
-    {% comment %} {% if search_results %}
-        <h2>Search Results:</h2>
-        <ul>
-            <!-- Display search results -->
-            {% for result in search_results %}
-                <li>{{ result.filename }}</li> <!-- Modify this according to your model fields -->
-            {% endfor %}
-        </ul>
-    {% else %}
-        <p>No results found.</p>
-    {% endif %} {% endcomment %}
 <div class="filefolderheader">
     {% if search_results %}
         <h2>Search Results:</h2>
-        <!-- Back button to return to the previous display -->
         <form method="get" action="{% if parent_directory %}{% url 'view_folder' folder_path=parent_directory %}{% else %}{% url 'dashboard' %}{% endif %}">
             <button type="submit">Back</button>
         </form>
@@ -47,7 +34,6 @@
     </div>
 
         <ul>
-            <!-- Display search results -->
             {% for result in search_results %}
                 <li class="listdirxfile">
                     <div class="filesfolders">
@@ -61,7 +47,6 @@
                             <div class="listfilefunctions">
                                 <span>{{ result.size }}</span>
                             </div>
-                            <!-- Add download link -->
                             <div class="listfilefunctions">
                                 <form id="download-file-form" method="POST" action="{% url 'download_file' %}">
                                     {% csrf_token %}
@@ -72,10 +57,8 @@
                             </div>
 
                             <div class="listfilefunctions">
-                                <!-- Add rename button -->
                                 <button class="rename-btn-file" data-item="{{ result.filename }}{{result.extension}}" data-is-dir="false">Rename</button>
                             </div>
-                                <!-- Add delete button -->
                                 <div class="listfilefunctions">
                                     <form method="post" action="{% url 'delete_item' %}">
                                         {% csrf_token %}
@@ -93,7 +76,6 @@
             {% endfor %}
         </ul>
     {% else %}
-        {% comment %} <p>No results found.</p> {% endcomment %}
         <div class="listfilename">
             <span>No results found.</span>
         </div>
@@ -101,11 +83,6 @@
             <button type="submit">Back</button>
         </form>
     {% endif %}
-        
-    
-
-
-    <!-- Floating section for renaming file -->
     <div class="rename-section-file" style="display: none;">
         <form id="rename-form-file" method="POST" action="{% url 'rename_file' %}">
             {% csrf_token %}
@@ -128,7 +105,6 @@
         </form>
     </div>
 
-    <!-- JavaScript to handle renaming for file -->
     <script>
         document.querySelectorAll('.download-link').forEach(link => {
             link.addEventListener('click', function(event) {
@@ -141,24 +117,7 @@
         });
     </script>
     <script>
-        // Toggle rename form for file
-        {% comment %} document.querySelectorAll('.rename-btn-file').forEach(btn => {
-            btn.addEventListener('click', function() {
-                const itemName = this.dataset.item;
-                const itemPath = this.parentElement.querySelector('[name="item_path"]').value;
-                console.log(itemPath);
-                const renameSectionFile = document.querySelector('.rename-section-file');
-                if (renameSectionFile.style.display === 'none' || renameSectionFile.querySelector('#rename-item-name-file').value !== itemPath) {
-                    renameSectionFile.style.display = 'block';
-                    renameSectionFile.querySelector('#rename-item-name-file').value = itemPath;
-                    renameSectionFile.querySelector('#new-name-file').value = itemName;
-                } else {
-                    renameSectionFile.style.display = 'none';
-                }
-            });
-        }); {% endcomment %}
 
-        // Toggle rename form for file
     document.querySelectorAll('.rename-btn-file').forEach(btn => {
         btn.addEventListener('click', function() {
             const itemName = this.dataset.item;
@@ -166,7 +125,6 @@
             console.log(itemPath);
             const renameSectionFile = document.querySelector('.rename-section-file');
             if (renameSectionFile.style.display === 'none' || renameSectionFile.querySelector('#rename-item-name-file').value !== itemPath) {
-                // Hide all other sections before showing the current one
                 document.querySelectorAll('.rename-section-file').forEach(section => {
                     section.style.display = 'none';
                 });
@@ -196,7 +154,7 @@
             } else {
                 shareSectionFile.style.display = 'none';
             }
-            // Hide rename sections if visible
+
             document.querySelector('.rename-section-file').style.display = 'none';
             document.querySelector('.rename-section-folder').style.display = 'none';
         });

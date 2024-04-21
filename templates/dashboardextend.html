@@ -6,9 +6,7 @@
     <div class="filefolderheader">
         <h2>My Drive</h2>
         {% if current_directory %}
-            {% comment %} <p style="color: red;">Current Directory: {{ current_directory }}</p> {% endcomment %}
         {% endif %}
-        <!-- Back button to return to the previous display -->
         <form method="get" action="{% if parent_directory %}{% url 'view_folder' folder_path=parent_directory %}{% else %}{% url 'dashboard' %}{% endif %}">
             <button type="submit"><i class='bx bx-left-arrow-alt'></i>Back</button>
         </form>
@@ -38,38 +36,7 @@
         </div>
     </div>
 
-    {% comment %} <ul>
-        <!-- Inside the block content -->
-        {% if folders %}
-            {% for folder in folders %}
-                <li class="listdirxfile">
-                    <div class="filesfolders">
-                        <div class="files-folders-folders">
-                            <div class="listfilename">
-                                <span><i class='bx bxs-file-blank' ></i>{{ folder }}</span>
-                            </div>
-                            <div class="listfilefunctions">
-                                <span></span>
-                            </div>
-                            <div class="listfilefunctions">
-                                <span></span>
-                            </div>
-                            <div class="listfilefunctions">
-                                <form id="view-folder-form" method="POST" action="{% url 'view_folder' %}">
-                                    {% csrf_token %}
-                                    <input type="hidden" id="item-download-name" name="itemid" value="{{ file_info.fileid }}">
-                                    <button class="buttonClassShare" type="submit"><i class='bx bxs-folder-open'></i>View Folder</button>
-                                </form>
-                            </div>
-                        </div>
-                    </div>
-                </li>
-            {% endfor %}
-        {% endif %}
-    </ul> {% endcomment %}
-
     <ul>
-        <!-- Inside the block content -->
         {% if uploaded_files %}
             {% for file_info in uploaded_files %}
                 <li class="listdirxfile">
@@ -85,7 +52,6 @@
                                 <span>{{ file_info.size }}</span>
                             </div>
                             <div class="listfilefunctions">
-                                <!-- Add download link -->
                                 <form id="download-file-form" method="POST" action="{% url 'download_file' %}">
                                     {% csrf_token %}
                                     <input type="hidden" id="item-key-name" name="itemid" value="{{ file_info.key }}">
@@ -114,39 +80,6 @@
         {% endif %}
     </ul>
 
-    <!-- Floating section for renaming folder -->
-    {% comment %} <div class="rename-section-folder" style="display: none;">
-        <form id="rename-form-folder" method="POST" action="{% url 'rename_folder' %}">
-            {% csrf_token %}
-            <input type="hidden" name="current_directory" value="{{ current_directory }}">
-            <input type="hidden" id="rename-item-name-folder" name="item_path">
-            <input type="text" id="new-name-folder" name="new_name" placeholder="Enter new folder name">
-            <button class="buttonClassrename" type="submit">Rename Folder</button>
-        </form>
-    </div> {% endcomment %}
-
-    <!-- JavaScript to handle renaming for folder -->
-    {% comment %} <script>
-        // Toggle rename form for folder
-        document.querySelectorAll('.rename-btn-folder').forEach(btn => {
-            btn.addEventListener('click', function() {
-                const itemName = this.dataset.item;
-                const itemPath = this.parentElement.querySelector('[name="item_path"]').value;
-                const renameSectionFolder = document.querySelector('.rename-section-folder');
-                const renameSectionFile = document.querySelector('.rename-section-file');
-                if (renameSectionFolder.style.display === 'none' || renameSectionFolder.querySelector('#rename-item-name-folder').value !== itemPath) {
-                    renameSectionFolder.style.display = 'block';
-                    renameSectionFolder.querySelector('#rename-item-name-folder').value = itemPath;
-                    renameSectionFolder.querySelector('#new-name-folder').value = itemName;
-                    renameSectionFile.style.display = 'none';
-                } else {
-                    renameSectionFolder.style.display = 'none';
-                }
-            });
-        });
-    </script> {% endcomment %}
-
-    <!-- Floating section for renaming file -->
     <div class="rename-section-file" style="display: none;">
         <form id="rename-form-file" method="POST" action="{% url 'rename_file' %}">
             {% csrf_token %}
@@ -169,7 +102,6 @@
         </form>
     </div>
 
-    <!-- Floating section for sharing file -->
     <div class="share-file-section" style="display: none;">
         <form id="share-file-form" method="POST" action="{% url 'share_file' %}">
             {% csrf_token %}
@@ -182,9 +114,7 @@
         </form>
     </div>
 
-    <!-- JavaScript to handle renaming for file -->
     <script>
-        // Toggle rename form for file
         document.querySelectorAll('.rename-btn-file').forEach(btn => {
             btn.addEventListener('click', function() {
                 const itemName = this.dataset.item;
@@ -199,17 +129,14 @@
                     renameSectionFile.querySelector('#rename-item-name-file').value = itemPath;
                     renameSectionFile.querySelector('#item-file-name').value = itemName;
                     renameSectionFile.querySelector('#new-name-file').value = itemName;
-                    //renameSectionFile.querySelector('#new-name-file').value = itemName; // Set the initial value to the current filename
                     renameSectionFolder.style.display = 'none';
                 } else {
                     renameSectionFile.style.display = 'none';
                 }
-                // Hide share section if visible
                 document.querySelector('.share-file-section').style.display = 'none';
             });
         });
     
-        // Toggle rename form for folder
         document.querySelectorAll('.rename-btn-folder').forEach(btn => {
             btn.addEventListener('click', function() {
                 const itemName = this.dataset.item;
@@ -228,12 +155,10 @@
                 } else {
                     renameSectionFolder.style.display = 'none';
                 }
-                // Hide share section if visible
                 document.querySelector('.share-file-section').style.display = 'none';
             });
         });
     
-        // Toggle share section for file
         document.querySelectorAll('.share-btn-file').forEach(btn => {
             btn.addEventListener('click', function() {
                 const itemPathElement = this.closest('.filesfolders').querySelector('[name="item_path"]');
@@ -251,26 +176,9 @@
                 } else {
                     shareSectionFile.style.display = 'none';
                 }
-                // Hide rename sections if visible
                 document.querySelector('.rename-section-file').style.display = 'none';
                 document.querySelector('.rename-section-folder').style.display = 'none';
             });
         });
     </script>
-    
-    
-    
-
-    {% comment %} {% if search_results %}
-        <h2>Search Results:</h2>
-        <ul>
-            <!-- Display search results -->
-            {% for result in search_results %}
-                <li>{{ result.filename }}</li> <!-- Modify this according to your model fields -->
-            {% endfor %}
-        </ul>
-    {% else %}
-        <p>No results found.</p>
-    {% endif %} {% endcomment %}
-    
 {% endblock %}

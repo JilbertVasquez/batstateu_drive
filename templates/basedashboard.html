@@ -16,7 +16,6 @@
             {% csrf_token %}
             <input type="text" id="folder-field" name="folder_name" placeholder="Enter folder name" required>
             <input type="hidden" id="current_directory_input" name="current_directory" value="{{ current_directory }}">
-            {% comment %} <h1>{{ current_directory }}</h1> {% endcomment %}
             <button class="buttonClass" type="submit">Create Folder</button>
         </form>
     </div>
@@ -30,20 +29,11 @@
                 <div class="add">
                     <button onclick="toggleUploadButtons()"><i class='bx bx-plus' ></i>Add New</button>
                 </div>
-                {% comment %} <div class = "foldercreation">
-                </div> {% endcomment %}
                 <div class="upload-buttons">
-                    {% comment %} <form method="POST" enctype="multipart/form-data" id="upload-form" action="{% url 'handle_create_folder' %}">
-                        {% csrf_token %}
-                        <input type="text" id="folder-field" name="folder_name" placeholder="Enter folder name" required>
-                        <input type="hidden" id="current_directory_input" name="current_directory" value="{{ current_directory }}">
-                        <button class="buttonClass" type="submit">Create Folder</button>
-                    </form> {% endcomment %}
                     <button class="buttonClass" type="button" onclick="toggleFolderCreation()">Create Folder</button>
                     <form method="POST" enctype="multipart/form-data" id="file-upload-form" action="{% url 'handle_file_upload' %}">
                         {% csrf_token %}
                         <input type="file" name="file" id="file" multiple style="display: none;">
-                        {% comment %} <input type="hidden" id="current_directory_input" name="current_directory" value="{{ current_directory }}"> {% endcomment %}
                         <input type="hidden" id="current_directory_input_file_upload" name="current_directory" value="{{ current_directory }}">
                         <button class="buttonClass" type="button" onclick="uploadFile()">Upload Files</button>
                     </form>
@@ -56,9 +46,7 @@
                 <div class="optionfolders">
                     <a href=" {% url 'dashboard' %} "><i class='bx bxs-folder-open'></i>My Drive</a>
                     <a href="#"><i class='bx bx-history' ></i>Recent</a>
-                    <!-- <a href="#"><i class='bx bx-download' ></i>Downloads</a> -->
                     <a href=" {% url 'share_files_section' %}"><i class='bx bxs-user-plus'></i>Shared Files</a>
-                    <!-- <a href="#"><i class='bx bxs-trash' ></i>Recycle Bin</a> -->
                 </div>
                 <div class="optionaccount">
                     <a href="#"><i class='bx bxs-user-circle'></i>My Profile</a>
@@ -68,12 +56,8 @@
             
         </div>
         <div class="rightsection">
-            <!-- <div class="upperrightsection">
-                <h1>upper</h1>
-            </div> -->
             <header>
                 <div class="searchsection">
-                    <!-- <h1>Welcome, {{ username }}</h1> -->
                     <form method="GET" action="{% url 'search' %}">
                         <input class="searchinput" type="text" name="query" placeholder="Search in TNEU Drive..." value="{{ query }}">
                         <button type="submit"><i class='bx bx-search'></i></button>
@@ -86,9 +70,6 @@
                     </div>
                 </div>
             </header>
-            {% comment %} <div class="drivesection">
-                <h1>lower</h1>
-            </div> {% endcomment %}
             <div class="download-section">
                 {% block content  %}
                 {% endblock %}
@@ -99,19 +80,17 @@
 
 
     <script>
-        // Function to update current directory value
         function updateCurrentDirectory(directory) {
             document.getElementById('current_directory_input').value = directory;
             document.getElementById('current_directory_input_file_upload').value = directory;
         }
-    
-        // Attach event listener to "View Folder" buttons
+
         var viewFolderButtons = document.querySelectorAll('.view-folder-btn');
         viewFolderButtons.forEach(function(button) {
             button.addEventListener('click', function() {
-                var folderName = this.dataset.folderName; // Get folder name from data attribute
-                var currentDirectory = document.getElementById('current_directory_input').value; // Get current directory value
-                var updatedDirectory = currentDirectory ? currentDirectory + '/' + folderName : folderName; // Update current directory value
+                var folderName = this.dataset.folderName;
+                var currentDirectory = document.getElementById('current_directory_input').value;
+                var updatedDirectory = currentDirectory ? currentDirectory + '/' + folderName : folderName;
                 updateCurrentDirectory(updatedDirectory);
             });
         });

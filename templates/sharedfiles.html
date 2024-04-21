@@ -4,7 +4,9 @@
 
     <div class="filefolderheader">
         <h2>Shared Files</h2>
-        <h2>{{current_directory}}</h2>
+        <form method="get" action="{% if parent_directory %}{% url 'view_folder' folder_path=parent_directory %}{% else %}{% url 'dashboard' %}{% endif %}">
+            <button type="submit">Back</button>
+        </form>
     </div>
     <div class="files-folders-folders">
         <div class="listfilename">
@@ -24,7 +26,6 @@
         </div>
     </div>
     <ul>
-        <!-- Display search results -->
         {% for files in shared_files %}
             <li class="listdirxfile">
                 <div class="filesfolders">
@@ -41,7 +42,6 @@
                         <div class="listfilefunctions2">
                             <span>{{files.share_by}}</span>
                         </div>
-                        <!-- Add download link -->
                         <div class="listfilefunctions1">
                             {% csrf_token %}
                             <form id="download-file-form" method="POST" action="{% url 'download_file' %}">
@@ -51,24 +51,6 @@
                                 <button type="submit"><i class='bx bxs-download'></i>Download</button>
                             </form>
                         </div>
-                        
-
-                        {% comment %} <div class="listfilefunctions">
-                            
-                            <button class="rename-btn-file" data-item="{{ files.filename }}{{files.extension}}" data-is-dir="false">Rename</button>
-                        </div>
-                            
-                        <div class="listfilefunctions">
-                            <form method="post" action="{% url 'delete_item_search' %}">
-                                {% csrf_token %}
-                                <input type="hidden" name="item_name" value="{{ files.filename }}{{files.extension}}">
-                                <input type="hidden" name="item_path" value="{{ files.path }}">
-                                <button type="submit">Delete</button>
-                            </form>
-                        </div>
-                        <div class="listfilefunctions">
-                            <button class="share-btn-file" data-item="{{ file_info.name }}" data-is-dir="false">Share</button>
-                        </div> {% endcomment %}
                     </div>
                 </div>
             </li>
