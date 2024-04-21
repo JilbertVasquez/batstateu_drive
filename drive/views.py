@@ -30,8 +30,8 @@ def encrypt_file(input_file_path, output_file_path, key):
     - key: Fernet encryption key.
     """
     
-    batstateu = b'batstateukey'
-    combined = key + batstateu
+    # batstateu = b'batstateukey'
+    # combined = key + batstateu
     # print(']]]]]]]]]]]]]]]]]]]]]]]')
     # print(type(key))
     cipher_suite = Fernet(key)
@@ -46,6 +46,8 @@ def encrypt_file(input_file_path, output_file_path, key):
         
 
 def decrypt_file(input_file_path, output_file_path, key):
+    print(input_file_path, "innnnnnnnnputtttt")
+    print(output_file_path, 'outpuuuuuuuutttt')
     
     """
     Decrypts a file using Fernet encryption.
@@ -56,7 +58,7 @@ def decrypt_file(input_file_path, output_file_path, key):
     - key: Fernet encryption key.
     """
     
-    batstateu = b'batstateukey'
+    # batstateu = b'batstateukey'
     # concat = key[2:-1]
     
     # key_bytes = base64.urlsafe_b64decode(concat.encode())
@@ -70,15 +72,30 @@ def decrypt_file(input_file_path, output_file_path, key):
     
     with open(input_file_path, 'rb') as encrypted_file:
         encrypted_data = encrypted_file.read()
-    
-    decrypted_data = cipher_suite.decrypt(encrypted_data)
     print("dataaaaaaafileeeee", input_file_path)
+    decrypted_data = cipher_suite.decrypt(encrypted_data)
+    
     with open(output_file_path, 'wb') as decrypted_file:
         decrypted_file.write(decrypted_data)
 
 # Create your views here.
 
 def dashboard(request):
+    
+    for filename in os.listdir(settings.MEDIA_TEMP):
+        file_path = os.path.join(settings.MEDIA_TEMP, filename)
+        try:
+            # Check if the path is a file
+            if os.path.isfile(file_path):
+                # Attempt to remove the file
+                os.remove(file_path)
+                print(f"Deleted: {file_path}")
+            else:
+                # Skip directories
+                continue
+        except Exception as e:
+            print(f"Error deleting {file_path}: {e}")
+    
     username = request.session.get('username', None)
     userid = request.session.get('userid', None)
     user_upload_dir = os.path.join(settings.MEDIA_ROOT, username)
@@ -150,22 +167,33 @@ def download_file(request):
             temp_path = os.path.join(settings.MEDIA_TEMP, file_details.filename + file_details.extension)
             
             encrypted_filepath = os.path.join(file_path, file_details.filename + file_details.extension)
+            print('22222222222222222222222222', encrypted_filepath)
             # print("----------------", temp_path)
-            with open('key.txt', 'rb') as key_file:
-                key = key_file.read()
-            decrypt_file(encrypted_filepath, temp_path, key)
+            
+            decrypt_file(encrypted_filepath, temp_path, file_details.key)
             
         # Construct the response with X-Sendfile header
-            response = HttpResponse(content_type='application/force-download')
-            response['Content-Disposition'] = f'attachment; filename="{file_details.filename}{file_details.extension}"'
-            response['X-Sendfile'] = settings.MEDIA_TEMP
+            # response = HttpResponse(content_type='application/force-download')
+            # response['Content-Disposition'] = f'attachment; filename="{file_details.filename}{file_details.extension}"'
+            # response['X-Sendfile'] = settings.MEDIA_TEMP
+            
+            if os.path.exists(temp_path):
+                # Serve the decrypted file directly using FileResponse
+                response = FileResponse(open(temp_path, 'rb'), content_type='application/force-download')
+                response['Content-Disposition'] = f'attachment; filename="{file_details.filename}{file_details.extension}"'
+                
+                # delete_temp = os.path.join(temp_path)
+                # os.remove(temp_path)
+                
+                return response
+            else:
+                return HttpResponse("Decrypted file not found", status=404)
 
             # Optionally, set additional headers
             
             # response['Content-Length'] = os.path.getsize(file_path)
             
-            # delete_temp = os.path.join(file_path, str(file_details.filename + file_details.extension))
-            # os.remove(delete_temp)
+            
 
             return response
         else:
@@ -618,10 +646,12 @@ def handle_file_upload(request):
                         
                         list_of_dir_copy = []
                         
-                        for folder in folders:
-                            key = Fernet.generate_key()
+                        key = Fernet.generate_key()
                             
-                            print(key)
+                        print(key)
+                        
+                        for folder in folders:
+                            
                             
                             user_directory = os.path.join(settings.MEDIA_ROOT, folder, username)
                             list_of_dir_copy.append(user_directory)
@@ -631,17 +661,14 @@ def handle_file_upload(request):
                             
                             input_file_path = os.path.join(user_directory, uploaded_file.name)
                             output_file_path = os.path.join(user_directory, uploaded_file.name)
-                            # print(input_file_path)
-                            # print(output_file_path)
+                            print(input_file_path)
+                            print(output_file_path)
                             encrypt_file(input_file_path, output_file_path, key)
                             # print("SS________________")
                         
                         
-                        with open('key.txt', 'rb') as key_file:
-                            key2 = key_file.read()
-                        
                         file_details = get_file_details(uploaded_file, list_of_dir_copy)
-                        save_file_details(user, file_details, key2)
+                        save_file_details(user, file_details, key)
                             
                         # input_file_path = os.path.join(user_upload_dir, uploaded_file.name)
                         # output_file_path = os.path.join(user_upload_dir, uploaded_file.name)
