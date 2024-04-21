@@ -16,6 +16,7 @@ from django.urls import reverse
 from cryptography.fernet import Fernet
 from django.http import FileResponse
 from django.db.models import Q
+import random
 
 # Create your views here.
 
@@ -150,6 +151,7 @@ def delete_item(request):
                     
                     if os.path.exists(path):
                         file_path = os.path.join(path, str(file_details.filename + file_details.extension))
+                        # print(file_path)
                         os.remove(file_path)
             
             file_details.delete()
@@ -394,6 +396,25 @@ def rename_folder(request):
         return JsonResponse({'success': False, 'error': 'Method not allowed'})
 
 
+
+
+
+def is_folder_accessible(folder_path):
+    # Check if the folder exists
+    path = os.path.join(settings.MEDIA_ROOT, folder_path)
+    if not os.path.exists(path):
+        # print("NOOOOOO", path)
+        return False
+    
+    try:
+        _ = os.listdir(path)
+        # print("YESSSSS", path)
+        return True
+    except Exception as e:
+        print(f"Error accessing folder: {e}")
+        return False
+
+
 def handle_file_upload(request):
     if request.method == 'POST':
         if 'file' in request.FILES:
@@ -409,11 +430,36 @@ def handle_file_upload(request):
                 for uploaded_file in uploaded_files:
                     try:
                         contents = os.listdir(settings.MEDIA_ROOT)
-                        folders = [item for item in contents if os.path.isdir(os.path.join(settings.MEDIA_ROOT, item))]
-                        list_of_dir_copy = []
+                        
+                        newcontentlist = []
+                        
+                        for folder in contents:
+                            if is_folder_accessible(folder):
+                                newcontentlist.append(folder)
+                                
+                        
+                        folders = [item for item in newcontentlist if os.path.isdir(os.path.join(settings.MEDIA_ROOT, item))]
+                        
+                        newfolderlist = []
+                        
                         key = Fernet.generate_key()
-                        for folder in folders:
-                            user_directory = os.path.join(settings.MEDIA_ROOT, folder, username)
+                        
+                        size = len(folders)
+                        if size <= 3:
+                            distribute = size
+                        elif size == 3:
+                            distribute = 3
+                        else:
+                            distribute = int(size / 3) + 1
+                        
+                        
+                        list_of_dir_copy = []
+                        
+                        for i in range(distribute):
+                            ran = random.choice(folders)
+                            
+                            user_directory = os.path.join(settings.MEDIA_ROOT, ran, username)
+                            
                             list_of_dir_copy.append(user_directory)
                             fs = FileSystemStorage(location=user_directory)
                             fs.save(uploaded_file.name, uploaded_file)
@@ -421,10 +467,10 @@ def handle_file_upload(request):
                             input_file_path = os.path.join(user_directory, uploaded_file.name)
                             output_file_path = os.path.join(user_directory, uploaded_file.name)
                             encrypt_file(input_file_path, output_file_path, key)
+                            folders.remove(ran)
                             
                         file_details = get_file_details(uploaded_file, list_of_dir_copy)
                         save_file_details(user, file_details, key)
-                        
                         return redirect('dashboard')
                     
                     except Exception as e:
@@ -434,6 +480,66 @@ def handle_file_upload(request):
             else:
                 return redirect('dashboard')
     return redirect('dashboard')
+
+
+
+
+# def is_folder_accessible(folder_path):
+#     # Check if the folder exists
+#     if not os.path.exists(folder_path):
+#         return False
+    
+#     # Check network accessibility by attempting to access a file within the folder
+#     try:
+#         return True
+#     except Exception as e:
+#         print(f"Error accessing folder: {e}")
+#         return False
+
+
+# def handle_file_upload(request):
+#     if request.method == 'POST':
+#         if 'file' in request.FILES:
+#             uploaded_files = request.FILES.getlist('file')
+            
+#             username = request.session.get('username')
+#             userid = request.session.get('userid', None)
+#             current_directory = request.POST.get('current_directory', '')
+            
+#             if username:
+#                 user = Users.objects.get(userid=userid)
+
+#                 for uploaded_file in uploaded_files:
+#                     try:
+#                         contents = os.listdir(settings.MEDIA_ROOT)
+#                         folders = [item for item in contents if os.path.isdir(os.path.join(settings.MEDIA_ROOT, item))]
+                        
+                        
+                        
+#                         list_of_dir_copy = []
+#                         key = Fernet.generate_key()
+#                         for folder in folders:
+#                             user_directory = os.path.join(settings.MEDIA_ROOT, folder, username)
+#                             list_of_dir_copy.append(user_directory)
+#                             fs = FileSystemStorage(location=user_directory)
+#                             fs.save(uploaded_file.name, uploaded_file)
+                            
+#                             input_file_path = os.path.join(user_directory, uploaded_file.name)
+#                             output_file_path = os.path.join(user_directory, uploaded_file.name)
+#                             encrypt_file(input_file_path, output_file_path, key)
+                            
+#                         file_details = get_file_details(uploaded_file, list_of_dir_copy)
+#                         save_file_details(user, file_details, key)
+                        
+#                         return redirect('dashboard')
+                    
+#                     except Exception as e:
+#                         return render(request, 'basedashboard.html', {'error': str(e)})
+                    
+#                 return redirect('dashboard')
+#             else:
+#                 return redirect('dashboard')
+#     return redirect('dashboard')
 
 
 def get_file_details(uploaded_file, file_path):
