@@ -503,10 +503,6 @@ header {
     margin: 0 1%;
 }
 
-.searchsection-profile button {
-    width: 20%;
-}
-
 .searchsection button {
     /* background-color: red; */
     padding: 0.5%;
@@ -521,4 +517,8 @@ header {
 
 .searchsection-profile button {
     width: 20%;
+}
+
+.searchsection-profile form button {
+    font-size: 16px;
 }

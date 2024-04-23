@@ -22,6 +22,7 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('', views.signupPage, name='signup'),
     path('login/', views.loginPage, name='login'),
+    path('login2/', views.loginPage2, name='login2'),
     path('dashboard/', views.dashboard, name='dashboard'),
     path('handle_file_upload/', views.handle_file_upload, name='handle_file_upload'),
     path('handle_folder_upload/', views.handle_folder_upload, name='handle_folder_upload'),

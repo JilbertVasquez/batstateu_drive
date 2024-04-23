@@ -109,26 +109,36 @@ def download_file(request):
         file_details = FileDetails.objects.get(file_id=file_id)
         retrieved_paths_list = file_details.get_paths()
 
-        file_path = file_details.get_paths()[0]
+
+        path_index = 0
         
-        if os.path.exists(file_path):
+        while True:
+            file_path = file_details.get_paths()[path_index]
             
-            temp_path = os.path.join(settings.MEDIA_TEMP, file_details.filename + file_details.extension)
-            
-            encrypted_filepath = os.path.join(file_path, file_details.filename + file_details.extension)
-            
-            decrypt_file(encrypted_filepath, temp_path, file_details.key)
-            
-            if os.path.exists(temp_path):
-                response = FileResponse(open(temp_path, 'rb'), content_type='application/force-download')
-                response['Content-Disposition'] = f'attachment; filename="{file_details.filename}{file_details.extension}"'
+            if os.path.exists(file_path):
+                print(file_path)
+                temp_path = os.path.join(settings.MEDIA_TEMP, file_details.filename + file_details.extension)
                 
-                return response
+                encrypted_filepath = os.path.join(file_path, file_details.filename + file_details.extension)
+                if os.path.exists(file_path):
+
+                    decrypt_file(encrypted_filepath, temp_path, file_details.key)
+                    
+                    if os.path.exists(temp_path):
+                        
+                        response = FileResponse(open(temp_path, 'rb'), content_type='application/force-download')
+                        response['Content-Disposition'] = f'attachment; filename="{file_details.filename}{file_details.extension}"'
+                        
+                        return response
+                    else:
+                        path_index += 1
+                        # return HttpResponse("Decrypted file not found", status=404)
+                else:
+                    path_index += 1
+                
             else:
-                return HttpResponse("Decrypted file not found", status=404)
-            
-        else:
-            return HttpResponse("File not found", status=404)
+                path_index += 1
+                # return HttpResponse("File not found", status=404)
     else:
         return HttpResponse("Method not allowed", status=405)
 
@@ -399,7 +409,7 @@ def rename_folder(request):
 
 
 
-def is_folder_accessible(folder_path):
+def is_folder_accessible_upload(folder_path):
     # Check if the folder exists
     path = os.path.join(settings.MEDIA_ROOT, folder_path)
     if not os.path.exists(path):
@@ -434,7 +444,7 @@ def handle_file_upload(request):
                         newcontentlist = []
                         
                         for folder in contents:
-                            if is_folder_accessible(folder):
+                            if is_folder_accessible_upload(folder):
                                 newcontentlist.append(folder)
                                 
                         
@@ -708,6 +718,29 @@ def loginPage(request):
         
     else:
         return render(request, 'login.html')
+    
+
+def loginPage2(request):
+    if request.method == 'POST':
+
+        email = request.POST.get("email")
+        pass1 = request.POST.get("password")
+        
+        try:
+            user = Users.objects.get(email=email)
+            
+            if check_password(pass1, user.password):
+                request.session['username'] = user.username
+                request.session['userid'] = user.userid
+                return redirect('dashboard')
+            else:
+                return HttpResponse("Username or Password is incorrect")
+            
+        except Users.DoesNotExist:
+            return HttpResponse("User does not exist!!")
+        
+    else:
+        return render(request, 'login2.html')
 
 def logout(request):
     request.session.flush()
