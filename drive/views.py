@@ -257,7 +257,8 @@ def share_file(request):
                     file=filedetails
                 )
             else:
-                return redirect('dashboard')
+                errors = "Account does not exist."
+                return redirect('dashboard', {"errors": errors})
             
             messages.success(request, f'File shared with {email} successfully!')
         except FileDetails.DoesNotExist:
@@ -268,7 +269,7 @@ def share_file(request):
 
         return redirect('dashboard')
     else:
-        pass
+        return redirect('dashboard')
 
 
 def share_files_section(request):

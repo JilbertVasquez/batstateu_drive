@@ -31,6 +31,9 @@
         <div class="listfilefunctions">
             <span></span>
         </div>
+        <div class="listfilefunctions">
+            <span></span>
+        </div>
     </div>
 
     <ul>
@@ -39,16 +42,16 @@
                 <li class="listdirxfile">
                     <div class="filesfolders">
                         <div class="files-folders-folders">
-                            <div class="listfilename items" >
+                            <div class="listfilename">
                                 <span><i class='bx bxs-file-blank' ></i>{{ file_info.filename }}{{ file_info.extension }}</span>
                             </div>
-                            <div class="listfilefunctions items">
+                            <div class="listfilefunctions">
                                 <span>{{ file_info.upload_date }}</span>
                             </div>
-                            <div class="listfilefunctions items">
+                            <div class="listfilefunctions">
                                 <span>{{ file_info.size }}</span>
                             </div>
-                            <div class="listfilefunctions items">
+                            <div class="listfilefunctions">
                                 <form id="download-file-form" method="POST" action="{% url 'download_file' %}">
                                     {% csrf_token %}
                                     <input type="hidden" id="item-key-name" name="itemid" value="{{ file_info.key }}">
@@ -56,14 +59,17 @@
                                     <button type="submit"><i class='bx bxs-download'></i>Download</button>
                                 </form>
                             </div>
-                            <div class="listfilefunctions items">
+                            <div class="listfilefunctions">
+                                <button class="rename-btn-file" data-item="{{ file_info.name }}" data-is-dir="false"><i class='bx bxs-edit'></i>Rename</button>
+                            </div>
+                            <div class="listfilefunctions">
                                 <form method="post" action="{% url 'delete_item' %}">
                                     {% csrf_token %}
                                     <input type="hidden" id="item-delete-name" name="itemid" value="{{ file_info.fileid }}">
                                     <button type="submit"><i class='bx bxs-trash-alt' ></i>Delete</button>
                                 </form>
                             </div>
-                            <div class="listfilefunctions items">
+                            <div class="listfilefunctions">
                                 <input type="hidden" id="item-share-name" name="itemid" value="{{ file_info.fileid }}">
                                 <button class="share-btn-file" data-item="{{ file_info.name }}" data-is-dir="false"><i class='bx bx-share-alt' ></i>Share</button>
                             </div>
@@ -85,6 +91,17 @@
         </form>
     </div>
 
+    <div class="rename-section-folder" style="display: none;">
+        <form id="rename-form-folder" method="POST" action="{% url 'rename_folder' %}">
+            {% csrf_token %}
+            <input type="hidden" id="item-folder-name" name="itemname">
+            <input type="hidden" name="current_directory" value="{{ current_directory }}">
+            <input type="hidden" id="rename-item-name-folder" name="item_path">
+            <input type="text" id="new-name-folder" name="new_name" placeholder="Enter new folder name">
+            <button class="buttonClassrename" type="submit">Rename Folder</button>
+        </form>
+    </div>
+
     <div class="share-file-section" style="display: none;">
         <form id="share-file-form" method="POST" action="{% url 'share_file' %}">
             {% csrf_token %}
@@ -97,24 +114,13 @@
         </form>
     </div>
 
-    {% comment %} {% if request.GET.errors %}
+    {% if errors %}
         <div class="error-section" style="display: block;">
             <div class="message">
-                <p>{{ request.GET.errors }}</p>
+                <p>{{ errors }}</p>
                 <button class="buttonClass" onclick="closebutton()">Okay</button>
             </div>
         </div>
-    {% endif %} {% endcomment %}
-
-    {% if messages %}
-        {% for message in messages %}
-            <div class="error-section" style="display: block;">
-                <div class="message">
-                    <p>{{ message }}</p>
-                    <button class="buttonClass" onclick="closebutton()">Okay</button>
-                </div>
-            </div>
-        {% endfor %}
     {% endif %}
 
     <script>
@@ -140,6 +146,27 @@
             });
         });
     
+        document.querySelectorAll('.rename-btn-folder').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const itemName = this.dataset.item;
+                const itemPathElement = this.closest('.filesfolders').querySelector('[name="item_path"]');
+                const itemPath = itemPathElement ? itemPathElement.value : null;
+    
+                const renameSectionFolder = document.querySelector('.rename-section-folder');
+                const renameSectionFile = document.querySelector('.rename-section-file');
+    
+                if (renameSectionFolder.style.display === 'none' || renameSectionFolder.querySelector('#rename-item-name-folder').value !== itemPath) {
+                    renameSectionFolder.style.display = 'block';
+                    renameSectionFolder.querySelector('#rename-item-name-folder').value = itemPath;
+                    renameSectionFolder.querySelector('#item-folder-name').value = itemName;
+                    renameSectionFolder.querySelector('#new-name-folder').value = itemName;
+                    renameSectionFile.style.display = 'none';
+                } else {
+                    renameSectionFolder.style.display = 'none';
+                }
+                document.querySelector('.share-file-section').style.display = 'none';
+            });
+        });
     
         document.querySelectorAll('.share-btn-file').forEach(btn => {
             btn.addEventListener('click', function() {

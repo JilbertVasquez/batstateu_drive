@@ -30,19 +30,19 @@
             <li class="listdirxfile">
                 <div class="filesfolders">
                     <div class="files-folders-folders">
-                        <div class="listfilename">
+                        <div class="listfilename items">
                             <span><i class='bx bxs-file-blank' ></i>{{ files.filename }}{{files.extension}}</span>
                         </div>
-                        <div class="listfilefunctions1">
+                        <div class="listfilefunctions1 items">
                             <span>{{ files.upload_date }}</span>
                         </div>
-                        <div class="listfilefunctions1">
+                        <div class="listfilefunctions1 items">
                             <span>{{ files.size }}</span>
                         </div>
-                        <div class="listfilefunctions2">
+                        <div class="listfilefunctions2 items">
                             <span>{{files.share_by}}</span>
                         </div>
-                        <div class="listfilefunctions1">
+                        <div class="listfilefunctions1 items">
                             {% csrf_token %}
                             <form id="download-file-form" method="POST" action="{% url 'download_file' %}">
                                 {% csrf_token %}
