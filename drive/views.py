@@ -707,18 +707,28 @@ def signupPage2(request):
         email = request.POST.get('email')
         pass1 = request.POST.get('password')
         pass2 = request.POST.get('password2')
+        
+        if fname == "" or lname == "" or uname == "" or email == "" or pass1 == "" or pass2 == "":
+            errors = "Don't leave it blank."
+            return render(request, 'signup2.html', {'errors': errors})
 
         if Users.objects.filter(username=uname).exists():
-            messages.error(request, "Username already exists.")
-            return render(request, 'signup2.html', {'messages': messages})
+            # messages.error(request, "Username already exists.")
+            errors = "Username already exists."
+            return render(request, 'signup2.html', {'errors': errors})
 
         if Users.objects.filter(email=email).exists():
-            messages.error(request, "Email already exists.")
-            return render(request, 'signup2.html', {'messages': messages})
+            # messages.error(request, "Email already exists.")
+            # return render(request, 'signup2.html', {'messages': messages})
+            errors = "Account already exists."
+            return render(request, 'signup2.html', {'errors': errors})
         
         if pass1 != pass2:
-            messages.error(request, "Your password is not the same !!")
-            return render(request, 'signup2.html', {'messages': messages})
+            # messages.error(request, "Your password is not the same !!")
+            # return render(request, 'signup2.html', {'messages': messages})
+            errors = "Your password is not the same !!"
+            return render(request, 'signup2.html', {'errors': errors})
+        
         else:
             hashed_password = make_password(pass1)
             my_user = Users(firstname=fname, lastname=lname, username=uname, email=email, password=hashed_password)

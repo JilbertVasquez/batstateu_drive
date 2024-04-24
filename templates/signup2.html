@@ -78,13 +78,14 @@
         </div>
     </div>  
 
-    <div class="error-section" style="display: block;">
-        <div class="message">
-            <p>asdsada</p>
-            <button class="buttonClass" onclick="closebutton()">Okay</button>
+    {% if errors %}
+        <div class="error-section" style="display: block;">
+            <div class="message">
+                <p>{{ errors }}</p>
+                <button class="buttonClass" onclick="closebutton()">Okay</button>
+            </div>
         </div>
-        
-    </div>
+    {% endif %}
     
     <script>
         function togglePasswordVisibility() {
