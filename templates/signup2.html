@@ -1,0 +1,127 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+    <link rel="stylesheet" href="{% static 'signup2.css' %}">
+    <title>BatStateU | SignUp</title>
+</head>
+<body>
+    <div class="wrapper">
+        <div class='center-form'>
+            <nav class="nav">
+                <div class="nav-logo">
+                    <img src={% static 'logo.jpg' %} alt="logo">
+                    <p> BatStateU-Alangilan</p>
+                </div>
+            </nav>
+
+            <div class="form-box">
+                <div class="register-container" id="register">
+                    <div class="top">
+                        <header>Sign Up</header>
+                    </div>
+                    <form action="{% url 'signup2' %}" method="POST">
+                        {% csrf_token %}
+                        <div class="two-forms">
+                            <div class="input-box">
+                                <input type="text" class="input-field" placeholder="First Name" name="firstname">
+                                <i class="bx bx-user"></i>
+                            </div>
+                            <div class="input-box">
+                                <input type="text" class="input-field" placeholder="Last Name" name="lastname">
+                                <i class="bx bx-user"></i>
+                            </div>
+                        </div>
+                        <div class="input-box">
+                            <input type="text" class="input-field" placeholder="Username" name="username">
+                            <i class="bx bx-user"></i>
+                            {% if messages.username %}
+                                <h2 class="error-message">{{ messages.username }}</h2>
+                            {% endif %}
+                        </div>
+                        <div class="input-box">
+                            <input type="text" class="input-field" placeholder="Email" name="email">
+                            <i class="bx bx-envelope"></i>
+                            {% if messages.email %}
+                                <h2 class="error-message">{{ messages.email }}</h2>
+                            {% endif %}
+                        </div>
+                        <div class="input-box">
+                            <input id="password" type="password" class="input-field" placeholder="Password" name="password">
+                            <i class="bx bx-lock-alt"></i>
+                            <span class="toggle-password" onclick="togglePasswordVisibility()">Show</span>
+                        </div>
+                        <div class="input-box">
+                            <input id="password2" type="password" class="input-field" placeholder="Retype Password" name="password2">
+                            <i class="bx bx-lock-alt"></i>
+                            <span class="toggle-password2" onclick="togglePasswordVisibility2()">Show</span>
+                            {% if messages.password %}
+                                <h2 class="error-message">{{ messages.password }}</h2>
+                            {% endif %}
+                        </div>
+                        <div class="input-box" id ="submitbutton">
+                            <input type="submit" class="submit" value="Register">
+                        </div>
+                        <div class="top">
+                            <span>Have an account? <a href="{% url 'login2' %}" onclick="login()">Login</a></span>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            <div class="buttom">
+            </div>
+        </div>
+    </div>  
+
+    <div class="error-section" style="display: block;">
+        <div class="message">
+            <p>asdsada</p>
+            <button class="buttonClass" onclick="closebutton()">Okay</button>
+        </div>
+        
+    </div>
+    
+    <script>
+        function togglePasswordVisibility() {
+            var passwordInput = document.getElementById("password");
+            var toggleButton = document.querySelector(".toggle-password");
+            
+            if (passwordInput.type === "password") {
+                passwordInput.type = "text";
+                toggleButton.textContent = "Hide";
+            } else {
+                passwordInput.type = "password";
+                toggleButton.textContent = "Show";
+            }
+        }
+
+        function togglePasswordVisibility2() {
+            var passwordInput = document.getElementById("password2");
+            var toggleButton = document.querySelector(".toggle-password2");
+            
+            if (passwordInput.type === "password") {
+                passwordInput.type = "text";
+                toggleButton.textContent = "Hide";
+            } else {
+                passwordInput.type = "password";
+                toggleButton.textContent = "Show";
+            }
+        }
+
+        function closebutton() {
+            const shareSectionFile = document.querySelector('.error-section');
+            if (shareSectionFile.style.display === 'none') {
+                shareSectionFile.style.display = 'block';
+            } else {
+                shareSectionFile.style.display = 'none';
+            }
+        };
+    </script>
+
+</body>
+</html>

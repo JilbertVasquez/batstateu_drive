@@ -20,7 +20,8 @@ from drive import views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', views.signupPage, name='signup'),
+    # path('', views.signupPage, name='signup'),
+    path('', views.signupPage2, name='signup2'),
     path('login/', views.loginPage, name='login'),
     path('login2/', views.loginPage2, name='login2'),
     path('dashboard/', views.dashboard, name='dashboard'),

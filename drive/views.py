@@ -696,6 +696,47 @@ def signupPage(request):
         
     else:
         return render(request, 'signup.html')
+    
+    
+
+def signupPage2(request):
+    if request.method == 'POST':
+        fname = request.POST.get('firstname')
+        lname = request.POST.get('lastname')
+        uname = request.POST.get('username')
+        email = request.POST.get('email')
+        pass1 = request.POST.get('password')
+        pass2 = request.POST.get('password2')
+
+        if Users.objects.filter(username=uname).exists():
+            messages.error(request, "Username already exists.")
+            return render(request, 'signup2.html', {'messages': messages})
+
+        if Users.objects.filter(email=email).exists():
+            messages.error(request, "Email already exists.")
+            return render(request, 'signup2.html', {'messages': messages})
+        
+        if pass1 != pass2:
+            messages.error(request, "Your password is not the same !!")
+            return render(request, 'signup2.html', {'messages': messages})
+        else:
+            hashed_password = make_password(pass1)
+            my_user = Users(firstname=fname, lastname=lname, username=uname, email=email, password=hashed_password)
+            my_user.save()
+            
+            contents = os.listdir(settings.MEDIA_ROOT)
+
+            folders = [item for item in contents if os.path.isdir(os.path.join(settings.MEDIA_ROOT, item))]
+
+            for folder in folders:
+                user_directory = os.path.join(settings.MEDIA_ROOT, folder, uname)
+                os.makedirs(user_directory, exist_ok=True)
+            
+            return redirect('login2')
+        
+    else:
+        return render(request, 'signup2.html')
+
 
 def loginPage(request):
     if request.method == 'POST':
@@ -734,14 +775,16 @@ def loginPage2(request):
                 request.session['userid'] = user.userid
                 return redirect('dashboard')
             else:
-                return HttpResponse("Username or Password is incorrect")
+                errors = "Username or Password is incorrect"
+                return render(request, 'login2.html', {'errors': errors})
             
         except Users.DoesNotExist:
-            return HttpResponse("User does not exist!!")
+            errors = "User does not exist!!"
+            return render(request, 'login2.html', {'errors': errors})
         
     else:
         return render(request, 'login2.html')
 
 def logout(request):
     request.session.flush()
-    return redirect('login')
+    return redirect('login2')

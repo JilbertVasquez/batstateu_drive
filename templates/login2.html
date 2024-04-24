@@ -26,7 +26,7 @@
                     <div class="top">
                         <header>Login</header>
                     </div>
-                    <form action="{% url 'login' %}" method="POST">
+                    <form action="{% url 'login2' %}" method="POST">
                         {% csrf_token %}
                         <div class="input-box">
                             <input type="text" class="input-field" placeholder="Email" name="email">
@@ -41,7 +41,7 @@
                             <input type="submit" class="submit" value="Login">
                         </div>
                         <div class="top">
-                            <span>Don't have an account? <a href="{% url 'signup' %}" onclick="register()">Sign Up</a></span>
+                            <span>Don't have an account? <a href="{% url 'signup2' %}" onclick="register()">Sign Up</a></span>
                         </div>
                     </form>
                 </div>
@@ -51,13 +51,14 @@
         </div>
     </div>
 
-    <div class="share-file-section" style="display: block;">
-        <div class="message">
-            <p>asdsada</p>
-            <button class="buttonClass" onclick="closebutton()">Okay</button>
+    {% if errors %}
+        <div class="error-section" style="display: block;">
+            <div class="message">
+                <p>{{ errors }}</p>
+                <button class="buttonClass" onclick="closebutton()">Okay</button>
+            </div>
         </div>
-        
-    </div>
+    {% endif %}
 
         <script>
             function togglePasswordVisibility() {
@@ -74,7 +75,7 @@
             }
 
             function closebutton() {
-                    const shareSectionFile = document.querySelector('.share-file-section');
+                    const shareSectionFile = document.querySelector('.error-section');
                     if (shareSectionFile.style.display === 'none') {
                         shareSectionFile.style.display = 'block';
                     } else {
