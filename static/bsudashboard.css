@@ -194,6 +194,7 @@
     display: flex;
     flex-direction: column;
     overflow-y: auto;
+    background-color: #f8fafd;
 }
 
 .upperrightsection {
@@ -215,7 +216,7 @@
     padding: 2%;
     padding-bottom: 3%;
     overflow-y: auto;
-    border-radius: 15px 0 0 0 ;
+    border-radius: 20px 0 0 0 ;
 }
 
 header {

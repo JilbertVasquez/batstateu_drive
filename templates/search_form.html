@@ -35,44 +35,74 @@
 
         <ul>
             {% for result in search_results %}
+                {% if current_section == 'MyDrive' %}
+                    <li class="listdirxfile">
+                        <div class="filesfolders">
+                            <div class="files-folders-folders">
+                                <div class="listfilename">
+                                    <span><i class='bx bxs-file-blank' ></i>{{ result.filename }}{{result.extension}}</span>
+                                </div>
+                                <div class="listfilefunctions">
+                                    <span>{{ result.upload_date }}</span>
+                                </div>
+                                <div class="listfilefunctions">
+                                    <span>{{ result.size }}</span>
+                                </div>
+                                <div class="listfilefunctions">
+                                    <form id="download-file-form" method="POST" action="{% url 'download_file' %}">
+                                        {% csrf_token %}
+                                        <input type="hidden" id="item-key-name" name="itemid" value="{{ file_info.key }}">
+                                        <input type="hidden" id="item-download-name" name="itemid" value="{{ result.file_id }}">
+                                        <button type="submit"><i class='bx bxs-download'></i>Download</button>
+                                    </form>
+                                </div>
+
+                                <div class="listfilefunctions">
+                                    <button class="rename-btn-file" data-item="{{ result.filename }}{{result.extension}}" data-is-dir="false">Rename</button>
+                                </div>
+                                    <div class="listfilefunctions">
+                                        <form method="post" action="{% url 'delete_item' %}">
+                                            {% csrf_token %}
+                                            <input type="hidden" id="item-delete-name" name="itemid" value="{{ file_info.fileid }}">
+                                            <button type="submit"><i class='bx bxs-trash-alt' ></i>Delete</button>
+                                        </form>
+                                    </div>
+                                    <div class="listfilefunctions">
+                                        <input type="hidden" id="item-share-name" name="itemid" value="{{ file_info.fileid }}">
+                                        <button class="share-btn-file" data-item="{{ file_info.name }}" data-is-dir="false"><i class='bx bx-share-alt' ></i>Share</button>
+                                    </div>
+                            </div>
+                        </div>
+                    </li>
+                {% else %}
                 <li class="listdirxfile">
                     <div class="filesfolders">
                         <div class="files-folders-folders">
-                            <div class="listfilename">
+                            <div class="listfilename items">
                                 <span><i class='bx bxs-file-blank' ></i>{{ result.filename }}{{result.extension}}</span>
                             </div>
-                            <div class="listfilefunctions">
+                            <div class="listfilefunctions1 items">
                                 <span>{{ result.upload_date }}</span>
                             </div>
-                            <div class="listfilefunctions">
+                            <div class="listfilefunctions1 items">
                                 <span>{{ result.size }}</span>
                             </div>
-                            <div class="listfilefunctions">
+                            <div class="listfilefunctions2 items">
+                                <span>{{result.share_by}}</span>
+                            </div>
+                            <div class="listfilefunctions1 items">
+                                {% csrf_token %}
                                 <form id="download-file-form" method="POST" action="{% url 'download_file' %}">
                                     {% csrf_token %}
-                                    <input type="hidden" id="item-key-name" name="itemid" value="{{ file_info.key }}">
-                                    <input type="hidden" id="item-download-name" name="itemid" value="{{ result.file_id }}">
+                                    <input type="hidden" id="item-key-name" name="itemid" value="{{ result.key }}">
+                                    <input type="hidden" id="item-download-name" name="itemid" value="{{ result.fileid }}">
                                     <button type="submit"><i class='bx bxs-download'></i>Download</button>
                                 </form>
                             </div>
-
-                            <div class="listfilefunctions">
-                                <button class="rename-btn-file" data-item="{{ result.filename }}{{result.extension}}" data-is-dir="false">Rename</button>
-                            </div>
-                                <div class="listfilefunctions">
-                                    <form method="post" action="{% url 'delete_item' %}">
-                                        {% csrf_token %}
-                                        <input type="hidden" id="item-delete-name" name="itemid" value="{{ file_info.fileid }}">
-                                        <button type="submit"><i class='bx bxs-trash-alt' ></i>Delete</button>
-                                    </form>
-                                </div>
-                                <div class="listfilefunctions">
-                                    <input type="hidden" id="item-share-name" name="itemid" value="{{ file_info.fileid }}">
-                                    <button class="share-btn-file" data-item="{{ file_info.name }}" data-is-dir="false"><i class='bx bx-share-alt' ></i>Share</button>
-                                </div>
                         </div>
                     </div>
                 </li>
+                {% endif %}
             {% endfor %}
         </ul>
     {% else %}

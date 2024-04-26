@@ -61,7 +61,8 @@ def dashboard(request):
 
     folders = [item for item in contents if os.path.isdir(os.path.join(settings.MEDIA_ROOT, item))]
     
-    folder1 = [item for item in os.listdir(os.path.join(settings.MEDIA_ROOT, folders[0], username)) if os.path.isdir(os.path.join(settings.MEDIA_ROOT, folders[0], username, item))]
+    # folder1 = [item for item in os.listdir(os.path.join(settings.MEDIA_ROOT, folders[0], username)) if os.path.isdir(os.path.join(settings.MEDIA_ROOT, folders[0], username, item))]
+
     uploaded_files = []
 
     if username:
@@ -82,7 +83,11 @@ def dashboard(request):
         
         except Exception as e:
             print(e)
-        return render(request, 'dashboardextend.html', {'username': username, 'uploaded_files': uploaded_files, 'folders': folder1})
+        
+        request.session['current-section'] = 'MyDrive'
+        
+        # return render(request, 'dashboardextend.html', {'username': username, 'uploaded_files': uploaded_files, 'folders': folder1})
+        return render(request, 'dashboardextend.html', {'username': username, 'uploaded_files': uploaded_files})
     else:
         return redirect('login')
 
@@ -113,23 +118,32 @@ def download_file(request):
         path_index = 0
         
         while True:
+            
+            
+            if len(file_details.get_paths()) == path_index:
+                # return render(request, 'basedashboard.html')
+                return redirect('dashboard') 
+            # print(file_details.get_paths()[path_index])
+            
             file_path = file_details.get_paths()[path_index]
             
             if os.path.exists(file_path):
-                print(file_path)
+                # print(file_path)
                 temp_path = os.path.join(settings.MEDIA_TEMP, file_details.filename + file_details.extension)
                 
                 encrypted_filepath = os.path.join(file_path, file_details.filename + file_details.extension)
-                if os.path.exists(file_path):
-
+                if os.path.exists(encrypted_filepath):
+                    
                     decrypt_file(encrypted_filepath, temp_path, file_details.key)
                     
                     if os.path.exists(temp_path):
-                        
+                        print(encrypted_filepath)
                         response = FileResponse(open(temp_path, 'rb'), content_type='application/force-download')
                         response['Content-Disposition'] = f'attachment; filename="{file_details.filename}{file_details.extension}"'
                         
                         return response
+                        # messages.success(request, f'Download File Successful.')
+                        # return render(response, 'dashboard')
                     else:
                         path_index += 1
                         # return HttpResponse("Decrypted file not found", status=404)
@@ -140,7 +154,9 @@ def download_file(request):
                 path_index += 1
                 # return HttpResponse("File not found", status=404)
     else:
-        return HttpResponse("Method not allowed", status=405)
+        # return HttpResponse("Method not allowed", status=405)
+        messages.error(request, f'Method not allowed.')
+        return redirect('dashboard')
 
 
 def delete_item(request):
@@ -161,8 +177,11 @@ def delete_item(request):
                     
                     if os.path.exists(path):
                         file_path = os.path.join(path, str(file_details.filename + file_details.extension))
+                        if os.path.exists(file_path):
                         # print(file_path)
-                        os.remove(file_path)
+                            os.remove(file_path)
+                        else:
+                            pass
             
             file_details.delete()
             if share_details:
@@ -297,6 +316,8 @@ def share_files_section(request):
                         'size': details.size,
                         'upload_date': details.upload_date
                     })
+                    
+        request.session['current-section'] = 'SharedFiles'
 
         return render(request, 'sharedfiles.html', {'shared_files': share_file_details})
     else:
@@ -308,12 +329,39 @@ def search(request):
     username = request.session.get('username')
     userid = request.session.get('userid', None)
     
+    fileuser = Users.objects.get(username=username)
     if query == "":
         return render(request, 'dashboardextend.html')
     
-    files = FileDetails.objects.filter(Q(filename__icontains=query), user_id=userid).values('file_id', 'filename', 'size', 'extension', 'upload_date', 'path')
+    current_section = request.session.get('current-section')
+    
+    if current_section == "MyDrive":
+    
+        files = FileDetails.objects.filter(Q(filename__icontains=query), user_id=userid).values('file_id', 'filename', 'size', 'extension', 'upload_date', 'path')
+    
+    else:
+        files = []
+
+        shared_files = SharingFiles.objects.filter(share_to=fileuser.email)
+        file_ids = [shared_file.file_id for shared_file in shared_files]
+        file_details = FileDetails.objects.filter(file_id__in=file_ids)
+
+        for share in shared_files:
+            for details in file_details:
+                if details.file_id == share.file_id:
+                    files.append({
+                        'fileid': details.file_id,
+                        'filename': share.filename,
+                        'extension': share.extension,
+                        'share_by': share.share_by,
+                        'share_to': share.share_to,
+                        'path': share.path,
+                        'size': details.size,
+                        'upload_date': details.upload_date
+                    })
     
     return render(request, 'search_form.html', {
+        'current_section': current_section,
         'search_results': files,
         'query': query,
         'username': username
@@ -482,6 +530,7 @@ def handle_file_upload(request):
                             
                         file_details = get_file_details(uploaded_file, list_of_dir_copy)
                         save_file_details(user, file_details, key)
+                        messages.success(request, f'Upload File Successful.')
                         return redirect('dashboard')
                     
                     except Exception as e:
