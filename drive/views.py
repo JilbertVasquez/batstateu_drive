@@ -239,7 +239,6 @@ def view_folder(request, folder_path):
 
 def share_file(request):
     if request.method == 'POST':
-        username = request.session.get('username', None)
         userid = request.session.get('userid', None)
         
         itemid = request.POST.get('itemid')
@@ -270,7 +269,6 @@ def share_file(request):
         except Users.DoesNotExist:
             messages.error(request, f'User with email {email} does not exist!')
             
-
         return redirect('dashboard')
     else:
         return redirect('dashboard')
