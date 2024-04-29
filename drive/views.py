@@ -106,29 +106,20 @@ def convert_size(size_bytes):
 
 def download_file(request):
     if request.method == 'POST':
-        userid = request.session.get('userid', None)
-        
-        
         file_id = request.POST.get('itemid')
         
         file_details = FileDetails.objects.get(file_id=file_id)
-        retrieved_paths_list = file_details.get_paths()
-
 
         path_index = 0
         
         while True:
             
-            
             if len(file_details.get_paths()) == path_index:
-                # return render(request, 'basedashboard.html')
                 return redirect('dashboard') 
-            # print(file_details.get_paths()[path_index])
             
             file_path = file_details.get_paths()[path_index]
             
             if os.path.exists(file_path):
-                # print(file_path)
                 temp_path = os.path.join(settings.MEDIA_TEMP, file_details.filename + file_details.extension)
                 
                 encrypted_filepath = os.path.join(file_path, file_details.filename + file_details.extension)
@@ -142,19 +133,13 @@ def download_file(request):
                         response['Content-Disposition'] = f'attachment; filename="{file_details.filename}{file_details.extension}"'
                         
                         return response
-                        # messages.success(request, f'Download File Successful.')
-                        # return render(response, 'dashboard')
                     else:
                         path_index += 1
-                        # return HttpResponse("Decrypted file not found", status=404)
                 else:
                     path_index += 1
-                
             else:
                 path_index += 1
-                # return HttpResponse("File not found", status=404)
     else:
-        # return HttpResponse("Method not allowed", status=405)
         messages.error(request, f'Method not allowed.')
         return redirect('dashboard')
 
@@ -481,7 +466,6 @@ def handle_file_upload(request):
             
             username = request.session.get('username')
             userid = request.session.get('userid', None)
-            current_directory = request.POST.get('current_directory', '')
             
             if username:
                 user = Users.objects.get(userid=userid)
@@ -496,10 +480,7 @@ def handle_file_upload(request):
                             if is_folder_accessible_upload(folder):
                                 newcontentlist.append(folder)
                                 
-                        
                         folders = [item for item in newcontentlist if os.path.isdir(os.path.join(settings.MEDIA_ROOT, item))]
-                        
-                        newfolderlist = []
                         
                         key = Fernet.generate_key()
                         
@@ -511,13 +492,15 @@ def handle_file_upload(request):
                         else:
                             distribute = int(size / 3) + 1
                         
-                        
                         list_of_dir_copy = []
                         
                         for i in range(distribute):
                             ran = random.choice(folders)
                             
                             user_directory = os.path.join(settings.MEDIA_ROOT, ran, username)
+                            
+                            if not os.path.exists(user_directory):
+                                os.makedirs(user_directory, exist_ok=True)
                             
                             list_of_dir_copy.append(user_directory)
                             fs = FileSystemStorage(location=user_directory)
