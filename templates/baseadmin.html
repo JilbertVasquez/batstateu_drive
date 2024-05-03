@@ -1,0 +1,44 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+    <link rel="stylesheet" href="{% static 'bsudashboard.css' %}">
+
+    <title></title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+
+    <title>BatStateU | Login</title>
+</head>
+<body>
+    <div class="container">
+        <div class="leftsection">
+            <div class="leftsectionupper">
+                <img src="{% static 'logo.jpg' %}" alt="logo">
+                <h2>BatStateU</h2>
+            </div>
+            <div class="options">
+                <div class="add">
+                </div>
+                <div class="optionfolders">
+                    <a href=""><i class='bx bxs-lock-open'></i>Change User Password</a>
+                    <br>
+                    <a href="{% url 'disk_usage_view' %}"><i class='bx bxs-hdd'></i>Available Storage</a>
+                </div>
+            </div>
+            
+        </div>
+        <div class="rightsection">
+            <div class="download-section">
+                {% block content  %}
+                {% endblock %}
+            </div>
+        </div>
+    </div>
+</body>
+</html>

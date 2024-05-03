@@ -1,42 +1,29 @@
-{% load static %}
-<!DOCTYPE html>
-<html>
-<head>
-<title>Disk Storage</title>
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
-<style>
-    .disk-container {
-        margin-bottom: 10px;
-    }
-    .disk-bar {
-        background-color: #f4f4f4;
-        border-radius: 5px;
-        padding: 5px;
-    }
-    .disk-progress {
-        background-color: #4CAF50;
-        height: 30px;
-        border-radius: 5px;
-        color: white;
-        text-align: center;
-        line-height: 30px;
-    }
-</style>
-</head>
-<body>
+{% extends 'baseadmin.html' %}
 
-{% for disk in disk_usage_percentage %}
+{% block content %}
+
+<style>
+    
+</style>
+
+<body>
 <div class="disk-container">
-    <div class="disk-bar">
-        <div class="disk-progress" style="width: {{ disk.disk_percentage }}%;">{{ disk.disk_percentage }}%</div>
-    </div>
-    <div>
-        Drive Usage: {{ disk.disk_used }} / {{ disk.disk_total }} bytes
-    </div>
+    <p>Drives Usage: </p>
+    {% for disk in disk_usage_percentage %}
+
+        <div class="disk-bar">
+            <div class="disk-progress" style="width: {{ disk.disk_percentage }}%;">{{ disk.disk_percentage }}%</div>
+        </div>
+        <div class="usedxtotal">
+            <p>{{ disk.disk_used }}GB</p>
+            <p>{{ disk.disk_total }}GB</p>
+        </div>
+
+    {% endfor %}
 </div>
-{% endfor %}
+
 
 </body>
-</html>
+{% endblock %}
+
 

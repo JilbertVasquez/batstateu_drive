@@ -69,8 +69,8 @@ def get_disk_usage(folder_path):
         percent_used = round(((disk_usage.used / disk_usage.total) * 100), 2)
         
         all_storage.append({
-            'disk_used': disk_usage.used,
-            'disk_total': disk_usage.total,
+            'disk_used': round(bytes_to_gb(disk_usage.used), 2),
+            'disk_total': round(bytes_to_gb(disk_usage.total), 2),
             
             'disk_percentage': percent_used
         })
@@ -79,7 +79,9 @@ def get_disk_usage(folder_path):
 
 def disk_usage_view(request):  # Modify the view function to accept a request argument
     shared_folder = [
-        
+        r'\\PC-JIL\uploadedfiles',
+        r'\\PC-JIL\tryss',
+        r'\\PC-JIL\software\Installers'
     ]
     disk_usage_percentage = get_disk_usage(shared_folder)
     
@@ -90,6 +92,9 @@ def disk_usage_view(request):  # Modify the view function to accept a request ar
     return render(request, 'disk_storage.html', context)  # Pass the request argument to the render function
 
 
+
+def admindashboard(request):
+    return render(request, 'baseadmin.html')
 
 
 def dashboard(request):

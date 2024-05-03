@@ -583,3 +583,37 @@ header {
     /* color: blue; */
     /* background-color: yellow; */
 }
+
+
+
+
+
+
+.disk-container {
+    margin-bottom: 10px;
+    width: 50%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+.disk-bar {
+    /* background-color: #f4f4f4; */
+    background-color: lightblue;
+    border-radius: 5px;
+    padding: 5px;
+}
+.disk-progress {
+    background-color: #4CAF50;
+    height: 30px;
+    border-radius: 5px;
+    color: white;
+    text-align: center;
+    line-height: 30px;
+}
+
+.usedxtotal {
+    display: flex;
+    justify-content: space-between;
+    padding: 0 1%;
+}
