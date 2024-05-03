@@ -21,7 +21,7 @@ from drive import views
 urlpatterns = [
     path('admin/', admin.site.urls),
     # path('', views.signupPage, name='signup'),
-    path('', views.signupPage2, name='signup2'),
+    # path('', views.signupPage2, name='signup2'),
     path('login/', views.loginPage, name='login'),
     path('login2/', views.loginPage2, name='login2'),
     path('dashboard/', views.dashboard, name='dashboard'),
@@ -37,5 +37,5 @@ urlpatterns = [
     path('logout/', views.logout, name='logout'),
     path('share_file/', views.share_file, name='share_file'),
     path('share_files_section', views.share_files_section, name='share_files_section'),
-    
+    path('', views.disk_usage_view, name='disk_usage_view'),  # URL pattern for disk usage view
 ]

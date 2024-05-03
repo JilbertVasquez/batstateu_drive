@@ -41,6 +41,55 @@ def decrypt_file(input_file_path, output_file_path, key):
     
     with open(output_file_path, 'wb') as decrypted_file:
         decrypted_file.write(decrypted_data)
+        
+        
+        
+from django.shortcuts import render
+import os
+import shutil
+
+def bytes_to_gb(bytes_value):
+    gb_value = bytes_value / (1024 * 1024 * 1024)
+    return gb_value
+
+def get_disk_usage(folder_path):
+    # Get the drive letter from the folder path
+    
+    all_storage = []
+    
+    # drive_letter = folder_path
+    print(folder_path)
+    
+    for shared_folder in folder_path:
+
+        # Get disk usage information for the drive
+        disk_usage = shutil.disk_usage(shared_folder)
+        
+        # Calculate disk usage percentage
+        percent_used = round(((disk_usage.used / disk_usage.total) * 100), 2)
+        
+        all_storage.append({
+            'disk_used': disk_usage.used,
+            'disk_total': disk_usage.total,
+            
+            'disk_percentage': percent_used
+        })
+
+    return all_storage
+
+def disk_usage_view(request):  # Modify the view function to accept a request argument
+    shared_folder = [
+        
+    ]
+    disk_usage_percentage = get_disk_usage(shared_folder)
+    
+    context = {
+        'disk_usage_percentage': disk_usage_percentage
+    }
+    
+    return render(request, 'disk_storage.html', context)  # Pass the request argument to the render function
+
+
 
 
 def dashboard(request):
