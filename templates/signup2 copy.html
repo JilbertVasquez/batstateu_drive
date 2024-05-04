@@ -1,15 +1,29 @@
+{% load static %}
 
-{% extends 'baseadmin.html' %}
-
-{% block content %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+    <link rel="stylesheet" href="{% static 'signup2.css' %}">
+    <title>BatStateU | SignUp</title>
+</head>
 <body>
     <div class="wrapper">
         <div class='center-form'>
+            <nav class="nav">
+                <div class="nav-logo">
+                    <img src={% static 'logo.jpg' %} alt="logo">
+                    <p> BatStateU-Alangilan</p>
+                </div>
+            </nav>
 
             <div class="form-box">
                 <div class="register-container" id="register">
                     <div class="top">
-                        <header>Add Account</header>
+                        <header>Sign Up</header>
                     </div>
                     <form action="{% url 'signup2' %}" method="POST">
                         {% csrf_token %}
@@ -51,7 +65,10 @@
                             {% endif %}
                         </div>
                         <div class="input-box" id ="submitbutton">
-                            <input type="submit" class="submit" value="Add Account">
+                            <input type="submit" class="submit" value="Register">
+                        </div>
+                        <div class="top">
+                            <span>Have an account? <a href="{% url 'login2' %}" onclick="login()">Login</a></span>
                         </div>
                     </form>
                 </div>
@@ -108,4 +125,4 @@
     </script>
 
 </body>
-{% endblock %}
+</html>

@@ -27,7 +27,7 @@ SECRET_KEY = 'django-insecure-^3(&j$z6@(%$)f8g(gcnku%whhu%+wf=!51nlcu3zj6tuv!i(6
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['192.168.1.12', '127.0.0.1', '192.168.1.19', '192.168.110.74', '172.16.141.62']
+ALLOWED_HOSTS = ['192.168.1.12', '127.0.0.1', '192.168.1.19', '192.168.110.74', '172.16.141.62', '192.168.1.16']
 
 
 # Application definition
@@ -146,14 +146,14 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 # AUTH_USER_MODEL = 'drive.CustomUser'
 
 # MEDIA_ROOT = os.path.join(BASE_DIR, 'uploadedfiles')
-MEDIA_ROOT = r'\\PC-JIL\uploadedfiles'
-# MEDIA_ROOT = r'\\LAPTOP-JIL\uploadedfiles'
+# MEDIA_ROOT = r'\\PC-JIL\uploadedfiles'
+MEDIA_ROOT = r'\\LAPTOP-JIL\uploadedfiles'
 # MEDIA_ROOT = r'\\batstateuserver\tneuroot'
 
-MEDIA_TEMP = r'D:\batstateu_drive\temp_folder'
-# MEDIA_TEMP = r'D:\Thesis\batstateu_drive\temp_folder'
+# MEDIA_TEMP = r'D:\batstateu_drive\temp_folder'
+MEDIA_TEMP = r'D:\Thesis\batstateu_drive\temp_folder'
 # MEDIA_ROOT = "D:\\uploadedfiles"
 
-LOGIN_URL = '/login/'
+LOGIN_URL = ['/adminlogin/', '/login2/']
 
 # AUTH_USER_MODEL = 'drive.Users'

@@ -1,0 +1,116 @@
+{% extends 'baseadmin.html' %}
+
+{% block content %}
+
+<style>
+    
+</style>
+
+<body>
+<div class="usercontainer">
+    <div class="userdetailscontainer">
+        <h2>Users Table</h2>
+    </div>
+    <div class="userdetailscontainer">
+        <div class="userid">
+            <span>UserId</span>
+        </div>
+        <div class="userfirstname">
+            <span>Firstname</span>
+        </div>
+        <div class="userlastname">
+            <span>Lastname</span>
+        </div>
+        <div class="userusername">
+            <span>Username</span>
+        </div>
+        <div class="useremail">
+            <span>Email</span>
+        </div>
+        <div class="userpassword">
+            <span>Password</span>
+        </div>
+        <div class="useraction">
+            <span></span>
+        </div>
+        <div class="useraction" id="changepass">
+            <span></span>
+        </div>
+        <div class="useraction">
+            <span></span>
+        </div>
+    </div>
+    {% for user in users %}
+
+        <div class="userdetailscontainer">
+            <div class="userid">
+                <span>{{user.userid}}</span>
+            </div>
+            <div class="userfirstname">
+                <span>{{user.firstname}}</span>
+            </div>
+            <div class="userlastname">
+                <span>{{user.lastname}}</span>
+            </div>
+            <div class="userusername">
+                <span>{{user.username}}</span>
+            </div>
+            <div class="useremail">
+                <span>{{user.email}}</span>
+            </div>
+            <div class="userpassword">
+                <span>{{user.password}}</span>
+            </div>
+            <div class="useraction">
+                <form method="post" action="{% url 'edit_user' %}">
+                    {% csrf_token %}
+                    <input type="hidden" name="user_id" value="{{user.userid}}">
+                    <button type="submit" class="buttonClass"><i class='bx bxs-edit-alt' ></i></button>
+                </form>
+            </div>
+            <div class="useraction" id ="changepass">
+                <form method="post" action="{% url 'new_pass' %}">
+                    {% csrf_token %}
+                    <input type="hidden" name="user_id" value="{{user.userid}}">
+                    <button type="submit" class="buttonClass"><i class='bx bxs-lock-open' ></i></button>
+                </form>
+            </div>
+            <div class="useraction">
+                <form method="post" action="{% url 'delete_user' %}">
+                    {% csrf_token %}
+                    <input type="hidden" name="user_id" value="{{user.userid}}">
+                    <button type="submit" class="buttonClass"><i class='bx bxs-trash-alt' ></i></button>
+                </form>
+            </div>
+        </div>
+
+    {% endfor %}
+</div>
+
+{% if messages %}
+        {% for message in messages %}
+            <div class="error-section" style="display: block;">
+                <div class="message">
+                    <p>{{ message }}</p>
+                    <button class="buttonClass" onclick="closebutton()">Okay</button>
+                </div>
+            </div>
+        {% endfor %}
+    {% endif %}
+
+
+    <script>
+        function closebutton() {
+            const shareSectionFile = document.querySelector('.error-section');
+            if (shareSectionFile.style.display === 'none') {
+                shareSectionFile.style.display = 'block';
+            } else {
+                shareSectionFile.style.display = 'none';
+            }
+        };
+    </script>
+
+</body>
+{% endblock %}
+
+

@@ -20,13 +20,7 @@
             </div>
             <div class="options">
                 <div class="add">
-                    {% comment %} <button onclick="toggleUploadButtons()"><i class='bx bx-plus' ></i>Add New</button> {% endcomment %}
-                    <form method="POST" enctype="multipart/form-data" id="file-upload-form" action="{% url 'handle_file_upload' %}">
-                        {% csrf_token %}
-                        <input type="file" name="file" id="file" multiple style="display: none;">
-                        <input type="hidden" id="current_directory_input_file_upload" name="current_directory" value="{{ current_directory }}">
-                        <button type="button" onclick="uploadFile()"><i class='bx bx-plus' ></i>Upload Files</button>
-                    </form>
+                    <button onclick="toggleUploadButtons()"><i class='bx bx-plus' ></i>Add New</button>
                 </div>
                 <div class="upload-buttons">
                     <form method="POST" enctype="multipart/form-data" id="file-upload-form" action="{% url 'handle_file_upload' %}">

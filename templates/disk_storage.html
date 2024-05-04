@@ -8,7 +8,20 @@
 
 <body>
 <div class="disk-container">
-    <p>Drives Usage: </p>
+    <h2>Overall Usage: </h2>
+
+    {% if overall_used %}
+    <div class="disk-bar2">
+        <div class="disk-progress2 w3-xlarge" style="width: {{ overall_used }}%;">{{ overall_used }}%</div>
+    </div>
+    <div class="usedxtotal">
+        <h4>{{ total_used }}GB</h4>
+        <h4>{{ total }}GB</h4>
+    </div>
+    <br>
+    {% endif %}
+
+    <h2>Drives Usage: </h2>
     {% for disk in disk_usage_percentage %}
 
         <div class="disk-bar">

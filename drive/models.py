@@ -51,6 +51,17 @@ class CustomUser(AbstractBaseUser):
 
 from django.db import models
 
+
+class Admin(models.Model):
+    userid = models.AutoField(primary_key=True)
+    username = models.CharField(max_length=255)
+    email = models.EmailField(max_length=255)
+    password = models.CharField(max_length=255)
+
+    class Meta:
+        db_table = 'admin'
+
+
 class Users(models.Model):
     userid = models.AutoField(primary_key=True)
     firstname = models.CharField(max_length=255)

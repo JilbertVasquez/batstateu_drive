@@ -21,9 +21,9 @@ from drive import views
 urlpatterns = [
     path('admin/', admin.site.urls),
     # path('', views.signupPage, name='signup'),
-    # path('', views.signupPage2, name='signup2'),
+    path('signup2/', views.signupPage2, name='signup2'),
     path('login/', views.loginPage, name='login'),
-    path('login2/', views.loginPage2, name='login2'),
+    path('', views.loginPage2, name='login2'),
     path('dashboard/', views.dashboard, name='dashboard'),
     path('handle_file_upload/', views.handle_file_upload, name='handle_file_upload'),
     path('handle_folder_upload/', views.handle_folder_upload, name='handle_folder_upload'),
@@ -37,6 +37,13 @@ urlpatterns = [
     path('logout/', views.logout, name='logout'),
     path('share_file/', views.share_file, name='share_file'),
     path('share_files_section', views.share_files_section, name='share_files_section'),
+    path('adminlogin/', views.adminlogin, name='adminlogin'),
     path('admindashboard/', views.admindashboard, name='admindashboard'),  # URL pattern for disk usage view
     path('disk_usage_view/', views.disk_usage_view, name='disk_usage_view'),
+    path('users_admin/', views.users_admin, name='users_admin'),
+    path('delete_user/', views.delete_user, name='delete_user'),
+    path('edit_user/', views.edit_user, name='edit_user'),
+    path('save_edit_account/', views.save_edit_account, name='save_edit_account'),
+    path('new_pass/', views.new_pass, name='new_pass'),
+    path('save_new_pass_acc/', views.save_new_pass_acc, name='save_new_pass_acc'),
 ]

@@ -7,6 +7,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+    <link rel="stylesheet" href="{% static 'signup2.css' %}">
     <link rel="stylesheet" href="{% static 'bsudashboard.css' %}">
 
     <title></title>
@@ -26,15 +27,36 @@
                 <div class="add">
                 </div>
                 <div class="optionfolders">
-                    <a href=""><i class='bx bxs-lock-open'></i>Change User Password</a>
+                    <a href="{% url 'signup2' %}"><i class="bx bxs-user"></i>Add User</a>
+                    <a href="{% url 'admindashboard' %}"><i class='bx bxs-lock-open'></i>Manage Account</a>
                     <br>
                     <a href="{% url 'disk_usage_view' %}"><i class='bx bxs-hdd'></i>Available Storage</a>
+                </div>
+                <div class = "optionfolders">
+                    <form action="{% url 'logout' %}" method="post">
+                        {% csrf_token %}
+                        <button type="submit" class="buttonClass" id = "logoutbutton">Logout</button>
+                    </form>
                 </div>
             </div>
             
         </div>
         <div class="rightsection">
-            <div class="download-section">
+            {% comment %} <header>
+                <div class="searchsection">
+                    <form method="GET" action="{% url 'search' %}">
+                        <input class="searchinput" type="text" name="query" placeholder="Search in TNEU Drive..." value="{{ query }}">
+                        <button type="submit"><i class='bx bx-search'></i></button>
+                    </form>
+                    <div class="searchsection-profile">
+                        <form action="{% url 'logout' %}" method="post">
+                            {% csrf_token %}
+                            <button type="submit">Logout</button>
+                        </form>
+                    </div>
+                </div>
+            </header> {% endcomment %}
+            <div class="manageaccount">
                 {% block content  %}
                 {% endblock %}
             </div>

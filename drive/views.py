@@ -1,6 +1,7 @@
 from django.shortcuts import render, HttpResponse
 from .models import Users, FileDetails
 from .models import SharingFiles
+from .models import Admin
 from django.contrib.auth import authenticate, login
 from django.contrib.auth.hashers import check_password
 from django.contrib.auth.hashers import make_password
@@ -56,9 +57,13 @@ def get_disk_usage(folder_path):
     # Get the drive letter from the folder path
     
     all_storage = []
+    overall_used = 0
+    length = 0
+    total_used = 0
+    total = 0
     
     # drive_letter = folder_path
-    print(folder_path)
+    # print(folder_path)
     
     for shared_folder in folder_path:
 
@@ -68,6 +73,14 @@ def get_disk_usage(folder_path):
         # Calculate disk usage percentage
         percent_used = round(((disk_usage.used / disk_usage.total) * 100), 2)
         
+        overall_used += percent_used
+        length += 1
+        
+        overall = round(overall_used / length , 2)
+        
+        total_used += round(bytes_to_gb(disk_usage.used), 2)
+        total += round(bytes_to_gb(disk_usage.total), 2)
+        
         all_storage.append({
             'disk_used': round(bytes_to_gb(disk_usage.used), 2),
             'disk_total': round(bytes_to_gb(disk_usage.total), 2),
@@ -75,18 +88,43 @@ def get_disk_usage(folder_path):
             'disk_percentage': percent_used
         })
 
-    return all_storage
+    return all_storage, overall, total_used, total
 
 def disk_usage_view(request):  # Modify the view function to accept a request argument
-    shared_folder = [
-        r'\\PC-JIL\uploadedfiles',
-        r'\\PC-JIL\tryss',
-        r'\\PC-JIL\software\Installers'
-    ]
-    disk_usage_percentage = get_disk_usage(shared_folder)
+    
+    contents = os.listdir(settings.MEDIA_ROOT)
+
+    folders = [item for item in contents if os.path.isdir(os.path.join(settings.MEDIA_ROOT, item))]
+    
+    disk = [item for item in contents]
+    
+    drive = os.path.join(settings.MEDIA_ROOT, disk[0], 'drives.txt')
+    
+    # print(drive)
+    
+    shared_folder = []
+    
+    if os.path.exists(drive):
+        with open(drive, 'r') as file:
+            contents = file.read()
+            # Process the contents as needed
+            shared_folder = contents.strip().split('\n')
+    else:
+        print("File 'drives.txt' does not exist.")
+    
+    # shared_folder = [
+    #     r'\\LAPTOP-JIL\tryss',
+    #     r'\\LAPTOP-JIL\uploadedfiles2'
+    # ]
+    
+    print(shared_folder)
+    disk_usage_percentage, overall_used, total_used, total = get_disk_usage(shared_folder)
     
     context = {
-        'disk_usage_percentage': disk_usage_percentage
+        'disk_usage_percentage': disk_usage_percentage,
+        'overall_used': overall_used,
+        'total_used': total_used,
+        'total': total
     }
     
     return render(request, 'disk_storage.html', context)  # Pass the request argument to the render function
@@ -94,7 +132,147 @@ def disk_usage_view(request):  # Modify the view function to accept a request ar
 
 
 def admindashboard(request):
-    return render(request, 'baseadmin.html')
+    username = request.session.get('username', None)
+    if username:
+        # return render(request, 'baseadmin.html')
+        users = Users.objects.all()
+        return render(request, 'useraccountsadmin.html', {'users': users})
+    else:
+        return redirect('adminlogin')
+
+
+def adminlogin(request):
+    if request.method == 'POST':
+
+        username = request.POST.get("username")
+        pass1 = request.POST.get("password")
+        
+        try:
+            user = Admin.objects.get(username=username)
+            
+            if pass1 == user.password:
+                request.session['username'] = user.username
+                request.session['userid'] = user.userid
+                return redirect('admindashboard')
+            else:
+                errors = "Username or Password is incorrect"
+                return render(request, 'adminlogin.html', {'errors': errors})
+            
+        except Users.DoesNotExist:
+            errors = "User does not exist!!"
+            return render(request, 'adminlogin.html', {'errors': errors})
+        
+    else:
+        return render(request, 'adminlogin.html')
+
+
+def users_admin(request):
+    users = Users.objects.all()
+    return render(request, 'useraccountsadmin.html', {'users': users})
+
+
+def delete_user(request):
+    if request.method == 'POST':
+        user_id = request.POST.get('user_id')
+        try:
+            user = Users.objects.get(userid=user_id)
+            
+            # Delete user's folders in different directories
+            user_folders = [os.path.join(settings.MEDIA_ROOT, user_folder) for user_folder in os.listdir(settings.MEDIA_ROOT) if os.path.isdir(os.path.join(settings.MEDIA_ROOT, user_folder))]
+            for folder in user_folders:
+                dir = os.path.join(folder, user.username)
+                if os.path.exists(dir):
+                    shutil.rmtree(dir)   
+            
+            user.delete()
+            messages.success(request, "Account Deletion successfully!")
+            # Redirect back to the admin dashboard after deletion
+            return redirect('admindashboard')
+        except Users.DoesNotExist:
+            # Handle case where user does not exist
+            pass
+    # If request method is not POST or user does not exist, redirect to admin dashboard
+    return redirect('admindashboard')
+
+
+def edit_user(request):
+    if request.method == 'POST':
+        user_id = request.POST.get('user_id')
+        try:
+            user = Users.objects.get(userid=user_id)
+            # Redirect back to the admin dashboard after deletion
+            return render (request, 'editaccount.html', {'user': user})
+        except Users.DoesNotExist:
+            # Handle case where user does not exist
+            pass
+    # If request method is not POST or user does not exist, redirect to admin dashboard
+    return redirect('admindashboard')
+
+
+def save_edit_account(request):
+    if request.method == 'POST':
+        # Retrieve user ID and updated information from the request
+        user_id = request.POST.get('user_id')
+        firstname = request.POST.get('firstname')
+        lastname = request.POST.get('lastname')
+        username = request.POST.get('username')
+        email = request.POST.get('email')
+
+        try:
+            # Get the user object from the database
+            user = Users.objects.get(userid=user_id)
+            
+            # Update the user object with the new information
+            user.firstname = firstname
+            user.lastname = lastname
+            user.username = username
+            user.email = email
+            
+            # Save the changes to the user object
+            user.save()
+            messages.success(request, "Account Details Update successfully!")
+            # Redirect to the admin dashboard or any other desired page
+            return redirect('admindashboard')
+        
+        except Users.DoesNotExist:
+            # Handle the case where the user does not exist
+            errors = "User does not exist"
+            return render(request, 'edit_account.html', {'errors': errors})
+    
+    else:
+        # Handle the case where the request method is not POST
+        return redirect('admindashboard')
+
+
+def new_pass(request):
+    if request.method == 'POST':
+        user_id = request.POST.get('user_id')
+        try:
+            user = Users.objects.get(userid=user_id)
+            # Redirect back to the admin dashboard after deletion
+            return render (request, 'changepassword.html', {'user': user})
+        except Users.DoesNotExist:
+            # Handle case where user does not exist
+            pass
+    # If request method is not POST or user does not exist, redirect to admin dashboard
+    return redirect('admindashboard')
+
+
+def save_new_pass_acc(request):
+    if request.method == 'POST':
+        user_id = request.POST.get("user_id")
+        new_password = request.POST.get("password")
+        confirm_password = request.POST.get("password2")
+        
+        if new_password == confirm_password:
+            user = Users.objects.get(userid=user_id)
+            user.password = make_password(new_password)  # Hash the new password before saving
+            user.save()
+            messages.success(request, "Password updated successfully!")
+        else:
+            messages.error(request, "New password and confirm password do not match!")
+            
+    return redirect('admindashboard')
 
 
 def dashboard(request):
@@ -826,8 +1004,8 @@ def signupPage2(request):
             for folder in folders:
                 user_directory = os.path.join(settings.MEDIA_ROOT, folder, uname)
                 os.makedirs(user_directory, exist_ok=True)
-            
-            return redirect('login2')
+            message = "Account Successfully Added."
+            return render(request, 'signup2.html', {'errors': message})
         
     else:
         return render(request, 'signup2.html')
