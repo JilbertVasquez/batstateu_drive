@@ -1,3 +1,5 @@
+
+
 {% extends 'baseadmin.html' %}
 
 {% block content %}
@@ -7,36 +9,36 @@
 </style>
 
 <body>
-<div class="disk-container">
-    <h2>Overall Usage: </h2>
+    <div class="container">
+        <div class="container_storage">
+            <div class="disk-container">
+                <h2>Overall Usage: </h2>
 
-    {% if overall_used %}
-    <div class="disk-bar2">
-        <div class="disk-progress2 w3-xlarge" style="width: {{ overall_used }}%;">{{ overall_used }}%</div>
-    </div>
-    <div class="usedxtotal">
-        <h4>{{ total_used }}GB</h4>
-        <h4>{{ total }}GB</h4>
-    </div>
-    <br>
-    {% endif %}
+                {% if overall_used %}
+                <div class="disk-bar2">
+                    <div class="disk-progress2 w3-xlarge" style="width: {{ overall_used }}%;">{{ overall_used }}%</div>
+                </div>
+                <div class="usedxtotal">
+                    <h4>{{ total_used }}GB</h4>
+                    <h4>{{ total }}GB</h4>
+                </div>
+                <br>
+                {% endif %}
 
-    <h2>Drives Usage: </h2>
-    {% for disk in disk_usage_percentage %}
+                <h2>Drives Usage: </h2>
+                {% for disk in disk_usage_percentage %}
 
-        <div class="disk-bar">
-            <div class="disk-progress" style="width: {{ disk.disk_percentage }}%;">{{ disk.disk_percentage }}%</div>
+                    <div class="disk-bar">
+                        <div class="disk-progress" style="width: {{ disk.disk_percentage }}%;">{{ disk.disk_percentage }}%</div>
+                    </div>
+                    <div class="usedxtotal">
+                        <p>{{ disk.disk_used }}GB</p>
+                        <p>{{ disk.disk_total }}GB</p>
+                    </div>
+
+                {% endfor %}
+            </div>
         </div>
-        <div class="usedxtotal">
-            <p>{{ disk.disk_used }}GB</p>
-            <p>{{ disk.disk_total }}GB</p>
-        </div>
-
-    {% endfor %}
-</div>
-
-
+    </div>
 </body>
 {% endblock %}
-
-

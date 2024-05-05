@@ -68,25 +68,30 @@ def get_disk_usage(folder_path):
     for shared_folder in folder_path:
 
         # Get disk usage information for the drive
-        disk_usage = shutil.disk_usage(shared_folder)
+        if os.path.exists(shared_folder):
+            disk_usage = shutil.disk_usage(shared_folder)
         
-        # Calculate disk usage percentage
-        percent_used = round(((disk_usage.used / disk_usage.total) * 100), 2)
-        
-        overall_used += percent_used
-        length += 1
-        
-        overall = round(overall_used / length , 2)
-        
-        total_used += round(bytes_to_gb(disk_usage.used), 2)
-        total += round(bytes_to_gb(disk_usage.total), 2)
-        
-        all_storage.append({
-            'disk_used': round(bytes_to_gb(disk_usage.used), 2),
-            'disk_total': round(bytes_to_gb(disk_usage.total), 2),
+            # Calculate disk usage percentage
+            percent_used = round(((disk_usage.used / disk_usage.total) * 100), 2)
             
-            'disk_percentage': percent_used
-        })
+            overall_used += percent_used
+            length += 1
+            
+            overall = round(overall_used / length , 2)
+            
+            total_used += round(bytes_to_gb(disk_usage.used), 2)
+            total += round(bytes_to_gb(disk_usage.total), 2)
+            
+            all_storage.append({
+                'disk_used': round(bytes_to_gb(disk_usage.used), 2),
+                'disk_total': round(bytes_to_gb(disk_usage.total), 2),
+                
+                'disk_percentage': percent_used
+            })
+            
+            overall = round(overall, 2)
+            total_used = round(total_used, 2)
+            total = round(total, 2)
 
     return all_storage, overall, total_used, total
 
@@ -117,7 +122,7 @@ def disk_usage_view(request):  # Modify the view function to accept a request ar
     #     r'\\LAPTOP-JIL\uploadedfiles2'
     # ]
     
-    print(shared_folder)
+    # print(shared_folder)
     disk_usage_percentage, overall_used, total_used, total = get_disk_usage(shared_folder)
     
     context = {
@@ -360,7 +365,7 @@ def download_file(request):
                     decrypt_file(encrypted_filepath, temp_path, file_details.key)
                     
                     if os.path.exists(temp_path):
-                        print(encrypted_filepath)
+                        # print(encrypted_filepath)
                         response = FileResponse(open(temp_path, 'rb'), content_type='application/force-download')
                         response['Content-Disposition'] = f'attachment; filename="{file_details.filename}{file_details.extension}"'
                         
