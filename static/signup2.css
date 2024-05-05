@@ -84,6 +84,7 @@ body{
     border-bottom: #555 2px solid;
     border-top: #555 2px solid;
 }
+
 .register-container{
     position: absolute;
     width: 500px;
@@ -94,6 +95,10 @@ body{
     justify-content: center;
 
     
+}
+
+#filecon {
+    width: 100%;
 }
 .top {
     display: flex;
@@ -237,7 +242,26 @@ header{
     /* background-color: yellow; */
 }
 
+#managefile {
+    width: 100%;
+}
 
+#filecontainers {
+    display: flex;
+    width: 100%;
+    margin-bottom: 2%;
+}
+
+label {
+    width: 20%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.showfiles {
+    width: 80%;
+}
 
 @media only screen and (max-width: 540px) {
     .wrapper{

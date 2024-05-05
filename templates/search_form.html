@@ -57,9 +57,6 @@
                                     </form>
                                 </div>
 
-                                <div class="listfilefunctions">
-                                    <button class="rename-btn-file" data-item="{{ result.filename }}{{result.extension}}" data-is-dir="false">Rename</button>
-                                </div>
                                     <div class="listfilefunctions">
                                         <form method="post" action="{% url 'delete_item' %}">
                                             {% csrf_token %}

@@ -1,0 +1,102 @@
+
+{% extends 'baseadmin.html' %}
+
+{% block content %}
+<body>
+    {% if filedetails %}
+        <div class="wrapper">
+            <div class='center-form'>
+
+                <div class="form-box" id="managefile">
+                    <div class="register-container" id="filecon">
+                        <div class="top">
+                            <header>View File Details</header>
+                        </div>
+                            <div class="input-box" id="filecontainers">
+                                <label>File Id</label>
+                                <input type="text" class="input-field showfiles" value="{{filedetails.file_id}}">
+                            </div>
+                            <div class="input-box" id="filecontainers">
+                                <label>File Name</label>
+                                <input type="text" class="input-field showfiles" value="{{filedetails.filename}}">
+                            </div>
+                            <div class="input-box" id="filecontainers">
+                                <label>File Extension</label>
+                                <input type="text" class="input-field showfiles" value="{{filedetails.extension}}">
+                            </div>
+                            <div class="input-box" id="filecontainers">
+                                <label>File Size</label>
+                                <input type="text" class="input-field showfiles" value="{{filedetails.size}}">
+                            </div>
+                            <div class="input-box" id="filecontainers">
+                                <label>Upload Date</label>
+                                <input type="text" class="input-field showfiles" value="{{filedetails.upload_date}}">
+                            </div>
+                            <div class="input-box" id="filecontainers">
+                                <label>File Paths</label>
+                                <input type="text" class="input-field showfiles" value="{{filedetails.path}}">
+                            </div>
+                            <div class="input-box" id="filecontainers">
+                                <label>User Id</label>
+                                <input type="text" class="input-field showfiles" value="{{filedetails.user_id}}">
+                            </div>
+                            <div class="input-box" id="filecontainers">
+                                <label>Key</label>
+                                <input type="text" class="input-field showfiles" value="{{filedetails.key}}">
+                            </div>
+                    </div>
+                </div>
+                <div class="buttom">
+                </div>
+            </div>
+        </div> 
+    {% endif %} 
+
+    {% if errors %}
+        <div class="error-section" style="display: block;">
+            <div class="message">
+                <p>{{ errors }}</p>
+                <button class="buttonClass" onclick="closebutton()">Okay</button>
+            </div>
+        </div>
+    {% endif %}
+    
+    <script>
+        function togglePasswordVisibility() {
+            var passwordInput = document.getElementById("password");
+            var toggleButton = document.querySelector(".toggle-password");
+            
+            if (passwordInput.type === "password") {
+                passwordInput.type = "text";
+                toggleButton.textContent = "Hide";
+            } else {
+                passwordInput.type = "password";
+                toggleButton.textContent = "Show";
+            }
+        }
+
+        function togglePasswordVisibility2() {
+            var passwordInput = document.getElementById("password2");
+            var toggleButton = document.querySelector(".toggle-password2");
+            
+            if (passwordInput.type === "password") {
+                passwordInput.type = "text";
+                toggleButton.textContent = "Hide";
+            } else {
+                passwordInput.type = "password";
+                toggleButton.textContent = "Show";
+            }
+        }
+
+        function closebutton() {
+            const shareSectionFile = document.querySelector('.error-section');
+            if (shareSectionFile.style.display === 'none') {
+                shareSectionFile.style.display = 'block';
+            } else {
+                shareSectionFile.style.display = 'none';
+            }
+        };
+    </script>
+
+</body>
+{% endblock %}

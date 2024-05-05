@@ -19,6 +19,8 @@ from django.http import FileResponse
 from django.db.models import Q
 import random
 import time
+import shutil
+import re
 
 # Create your views here.
 
@@ -44,11 +46,6 @@ def decrypt_file(input_file_path, output_file_path, key):
     with open(output_file_path, 'wb') as decrypted_file:
         decrypted_file.write(decrypted_data)
         
-        
-        
-from django.shortcuts import render
-import os
-import shutil
 
 def bytes_to_gb(bytes_value):
     gb_value = bytes_value / (1024 * 1024 * 1024)
@@ -118,11 +115,6 @@ def disk_usage_view(request):  # Modify the view function to accept a request ar
     else:
         print("File 'drives.txt' does not exist.")
     
-    # shared_folder = [
-    #     r'\\LAPTOP-JIL\tryss',
-    #     r'\\LAPTOP-JIL\uploadedfiles2'
-    # ]
-    
     # print(shared_folder)
     disk_usage_percentage, overall_used, total_used, total = get_disk_usage(shared_folder)
     
@@ -140,7 +132,6 @@ def disk_usage_view(request):  # Modify the view function to accept a request ar
 def admindashboard(request):
     username = request.session.get('username', None)
     if username:
-        # return render(request, 'baseadmin.html')
         users = Users.objects.all()
         return render(request, 'useraccountsadmin.html', {'users': users})
     else:
@@ -278,6 +269,54 @@ def save_new_pass_acc(request):
         else:
             messages.error(request, "New password and confirm password do not match!")
             
+    return redirect('admindashboard')
+
+
+def trackfiledetails(request):
+    username = request.session.get('username', None)
+    if username:
+        filedetails = FileDetails.objects.all()
+        return render(request, 'trackfiledetails.html', {'filedetails': filedetails})
+    else:
+        return redirect('adminlogin')
+
+
+def view_file_details(request):
+    if request.method == 'POST':
+        file_id = request.POST.get('file_id')
+        print(file_id)
+        try:
+            filedetails = FileDetails.objects.get(file_id=file_id)
+            # Redirect back to the admin dashboard after deletion
+            return render (request, 'viewfiledetails.html', {'filedetails': filedetails})
+        except Users.DoesNotExist:
+            # Handle case where user does not exist
+            pass
+    # If request method is not POST or user does not exist, redirect to admin dashboard
+    return redirect('admindashboard')
+
+
+def tracksharefiles(request):
+    username = request.session.get('username', None)
+    if username:
+        sharedfiles = SharingFiles.objects.all()
+        return render(request, 'tracksharedfiles.html', {'sharedfiles': sharedfiles})
+    else:
+        return redirect('adminlogin')
+    
+
+def view_share_files(request):
+    if request.method == 'POST':
+        file_id = request.POST.get('file_id')
+        print(file_id)
+        try:
+            sharefiles = SharingFiles.objects.get(file_id=file_id)
+            # Redirect back to the admin dashboard after deletion
+            return render (request, 'viewsharedfiles.html', {'sharefiles': sharefiles})
+        except Users.DoesNotExist:
+            # Handle case where user does not exist
+            pass
+    # If request method is not POST or user does not exist, redirect to admin dashboard
     return redirect('admindashboard')
 
 
@@ -1041,7 +1080,7 @@ def signupPage(request):
     
     
 
-def signupPage2(request):
+def addaccount(request):
     if request.method == 'POST':
         fname = request.POST.get('firstname')
         lname = request.POST.get('lastname')
@@ -1052,6 +1091,11 @@ def signupPage2(request):
         
         if fname == "" or lname == "" or uname == "" or email == "" or pass1 == "" or pass2 == "":
             errors = "Don't leave it blank."
+            return render(request, 'signup2.html', {'errors': errors})
+        
+        # Check if the email matches the custom pattern
+        if not re.match(r'^[a-zA-Z0-9._%+-]+@g\.batstate-u\.edu\.ph$', email):
+            errors = "Please enter a valid email address in the format 'ict@g.batstate-u.edu.ph'."
             return render(request, 'signup2.html', {'errors': errors})
 
         if Users.objects.filter(username=uname).exists():

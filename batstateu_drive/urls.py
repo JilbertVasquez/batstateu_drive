@@ -21,7 +21,7 @@ from drive import views
 urlpatterns = [
     path('admin/', admin.site.urls),
     # path('', views.signupPage, name='signup'),
-    path('signup2/', views.signupPage2, name='signup2'),
+    path('addaccount/', views.addaccount, name='addaccount'),
     path('login/', views.loginPage, name='login'),
     path('', views.loginPage2, name='login2'),
     path('dashboard/', views.dashboard, name='dashboard'),
@@ -46,4 +46,9 @@ urlpatterns = [
     path('save_edit_account/', views.save_edit_account, name='save_edit_account'),
     path('new_pass/', views.new_pass, name='new_pass'),
     path('save_new_pass_acc/', views.save_new_pass_acc, name='save_new_pass_acc'),
+    path('trackfiledetails/', views.trackfiledetails, name='trackfiledetails'), 
+    path('view_file_details/', views.view_file_details, name='view_file_details'), 
+    path('tracksharefiles/', views.tracksharefiles, name='tracksharefiles'), 
+    path('view_share_files/', views.view_share_files, name='view_share_files'), 
+    
 ]

@@ -1,0 +1,102 @@
+{% extends 'baseadmin.html' %}
+
+{% block content %}
+
+<style>
+    
+</style>
+
+<body>
+<div class="usercontainer">
+    <div class="userdetailscontainer">
+        <h2>Shared Files Details</h2>
+    </div>
+    <div class="userdetailscontainer">
+        <div class="shareid">
+            <span>ShareId</span>
+        </div>
+        <div class="sharefilename">
+            <span>Filename</span>
+        </div>
+        <div class="sharefileextension">
+            <span>Extension</span>
+        </div>
+        <div class="sharedby">
+            <span>Shared By</span>
+        </div>
+        <div class="sharedto">
+            <span>Shared To</span>
+        </div>
+        <div class="sharefilepath">
+            <span>Paths</span>
+        </div>
+        <div class="sharefileid">
+            <span>File Id</span>
+        </div>
+        <div class="useraction">
+            <span></span>
+        </div>
+    </div>
+    {% for details in sharedfiles %}
+
+        <div class="userdetailscontainer">
+            <div class="shareid">
+                <span>{{details.share_id}}</span>
+            </div>
+            <div class="sharefilename">
+                <span>{{details.filename}}</span>
+            </div>
+            <div class="sharefileextension">
+                <span>{{details.extension}}</span>
+            </div>
+            <div class="sharedby">
+                <span>{{details.share_by}}</span>
+            </div>
+            <div class="sharedto">
+                <span>{{details.share_to}}</span>
+            </div>
+            <div class="sharefilepath">
+                <span>{{details.path}}</span>
+            </div>
+            <div class="fileuserid">
+                <span>{{details.file_id}}</span>
+            </div>
+            <div class="useraction">
+                <form method="post" action="{% url 'view_share_files' %}">
+                    {% csrf_token %}
+                    <input type="hidden" name="file_id" value="{{details.file_id}}">
+                    <button type="submit" class="buttonClass"><i class='bx bxs-file-find'></i></button>
+                </form>
+            </div>
+        </div>
+
+    {% endfor %}
+</div>
+
+{% if messages %}
+        {% for message in messages %}
+            <div class="error-section" style="display: block;">
+                <div class="message">
+                    <p>{{ message }}</p>
+                    <button class="buttonClass" onclick="closebutton()">Okay</button>
+                </div>
+            </div>
+        {% endfor %}
+    {% endif %}
+
+
+    <script>
+        function closebutton() {
+            const shareSectionFile = document.querySelector('.error-section');
+            if (shareSectionFile.style.display === 'none') {
+                shareSectionFile.style.display = 'block';
+            } else {
+                shareSectionFile.style.display = 'none';
+            }
+        };
+    </script>
+
+</body>
+{% endblock %}
+
+

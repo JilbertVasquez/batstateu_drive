@@ -1,0 +1,108 @@
+{% extends 'baseadmin.html' %}
+
+{% block content %}
+
+<style>
+    
+</style>
+
+<body>
+<div class="usercontainer">
+    <div class="userdetailscontainer">
+        <h2>File Details</h2>
+    </div>
+    <div class="userdetailscontainer">
+        <div class="fileid">
+            <span>File Id</span>
+        </div>
+        <div class="filename">
+            <span>Filename</span>
+        </div>
+        <div class="fileextension">
+            <span>Extension</span>
+        </div>
+        <div class="filesize">
+            <span>Size</span>
+        </div>
+        <div class="uploaddate">
+            <span>Upload Date</span>
+        </div>
+        <div class="filepath">
+            <span>Paths</span>
+        </div>
+        <div class="fileuserid">
+            <span>User Id</span>
+        </div>
+        <div class="key">
+            <span>Key</span>
+        </div>
+        <div class="useraction">
+            <span></span>
+        </div>
+    </div>
+    {% for details in filedetails %}
+
+        <div class="userdetailscontainer">
+            <div class="fileid">
+                <span>{{details.file_id}}</span>
+            </div>
+            <div class="filename">
+                <span>{{details.filename}}</span>
+            </div>
+            <div class="fileextension">
+                <span>{{details.extension}}</span>
+            </div>
+            <div class="filesize">
+                <span>{{details.size}}</span>
+            </div>
+            <div class="uploaddate">
+                <span>{{details.upload_date}}</span>
+            </div>
+            <div class="filepath">
+                <span>{{details.path}}</span>
+            </div>
+            <div class="fileuserid">
+                <span>{{details.user_id}}</span>
+            </div>
+            <div class="key">
+                <span>{{details.key}}</span>
+            </div>
+            <div class="useraction">
+                <form method="post" action="{% url 'view_file_details' %}">
+                    {% csrf_token %}
+                    <input type="hidden" name="file_id" value="{{details.file_id}}">
+                    <button type="submit" class="buttonClass"><i class='bx bxs-file-find'></i></button>
+                </form>
+            </div>
+        </div>
+
+    {% endfor %}
+</div>
+
+{% if messages %}
+        {% for message in messages %}
+            <div class="error-section" style="display: block;">
+                <div class="message">
+                    <p>{{ message }}</p>
+                    <button class="buttonClass" onclick="closebutton()">Okay</button>
+                </div>
+            </div>
+        {% endfor %}
+    {% endif %}
+
+
+    <script>
+        function closebutton() {
+            const shareSectionFile = document.querySelector('.error-section');
+            if (shareSectionFile.style.display === 'none') {
+                shareSectionFile.style.display = 'block';
+            } else {
+                shareSectionFile.style.display = 'none';
+            }
+        };
+    </script>
+
+</body>
+{% endblock %}
+
+

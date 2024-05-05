@@ -744,7 +744,9 @@ header {
     align-items: center;
 }
 
-.userid, .userfirstname, .userlastname, .userusername, .useremail, .userpassword, .useraction {
+.userid, .userfirstname, .userlastname, .userusername, .useremail, .userpassword, .useraction,
+.fileid, .filename, .fileextension, .filesize, .uploaddate, .filepath,.fileuserid, .key, .sharedby, .sharedto,
+.shareid, .sharefilename, .sharefileextension, .sharefilepath, .sharefileid {
     width: 12%;
     display: flex;
     justify-content: center;
@@ -760,8 +762,16 @@ header {
     width: 21.5%;
 }
 
-.userid, .useraction {
+.userid, .useraction, .fileid, .fileuserid, .useraction, .shareid, .sharefileid{
     width: 5%;
+}
+
+.filename, .fileextension, .filesize, .uploaddate, .filepath, .key {
+    width: 14.16%;
+}
+
+.sharedby, .sharedto, .sharefilename, .sharefileextension, .sharefilepath {
+    width: 17%;
 }
 
 /* #changepass {
