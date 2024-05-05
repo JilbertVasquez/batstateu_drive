@@ -18,6 +18,7 @@ from cryptography.fernet import Fernet
 from django.http import FileResponse
 from django.db.models import Q
 import random
+import time
 
 # Create your views here.
 
@@ -729,6 +730,8 @@ def handle_file_upload(request):
                         
                         list_of_dir_copy = []
                         
+                        start_time = time.time()  # Start measuring time
+                        
                         for i in range(distribute):
                             ran = random.choice(folders)
                             
@@ -748,6 +751,12 @@ def handle_file_upload(request):
                             
                         file_details = get_file_details(uploaded_file, list_of_dir_copy)
                         save_file_details(user, file_details, key)
+                        
+                        end_time = time.time()  # End measuring time
+                        upload_time = end_time - start_time  # Calculate total upload time
+                        
+                        print(f"Total upload time: {upload_time} seconds")
+                        
                         messages.success(request, f'Upload File Successful.')
                         return redirect('dashboard')
                     
@@ -760,6 +769,71 @@ def handle_file_upload(request):
     return redirect('dashboard')
 
 
+# import os
+# import random
+# import time
+# from concurrent.futures import ThreadPoolExecutor
+# from django.conf import settings
+# from django.core.files.storage import FileSystemStorage
+# from django.shortcuts import redirect, render
+# from django.contrib import messages
+# from .models import Users
+
+# def handle_file_upload(request):
+#     if request.method == 'POST':
+#         if 'file' in request.FILES:
+#             uploaded_files = request.FILES.getlist('file')
+            
+#             username = request.session.get('username')
+#             userid = request.session.get('userid', None)
+            
+#             if username:
+#                 user = Users.objects.get(userid=userid)
+                
+#                 def upload_to_storage(uploaded_file):
+#                     try:
+#                         contents = os.listdir(settings.MEDIA_ROOT)
+#                         newcontentlist = [folder for folder in contents if is_folder_accessible_upload(folder)]
+#                         folders = [item for item in newcontentlist if os.path.isdir(os.path.join(settings.MEDIA_ROOT, item))]
+#                         key = Fernet.generate_key()
+#                         size = len(folders)
+#                         if size <= 3:
+#                             distribute = size
+#                         elif size == 3:
+#                             distribute = 3
+#                         else:
+#                             distribute = int(size / 3) + 1
+#                         list_of_dir_copy = []
+#                         for _ in range(distribute):
+#                             ran = random.choice(folders)
+#                             user_directory = os.path.join(settings.MEDIA_ROOT, ran, username)
+#                             os.makedirs(user_directory, exist_ok=True)
+#                             list_of_dir_copy.append(user_directory)
+#                             fs = FileSystemStorage(location=user_directory)
+#                             fs.save(uploaded_file.name, uploaded_file)
+#                             input_file_path = os.path.join(user_directory, uploaded_file.name)
+#                             output_file_path = os.path.join(user_directory, uploaded_file.name)
+#                             encrypt_file(input_file_path, output_file_path, key)
+#                             folders.remove(ran)
+#                         file_details = get_file_details(uploaded_file, list_of_dir_copy)
+#                         save_file_details(user, file_details, key)
+#                         return f'Upload of {uploaded_file.name} completed.'
+#                     except Exception as e:
+#                         return f'Error uploading {uploaded_file.name}: {str(e)}'
+                
+#                 start_time = time.time()
+#                 with ThreadPoolExecutor() as executor:
+#                     results = list(executor.map(upload_to_storage, uploaded_files))
+                
+#                 end_time = time.time()  # End measuring time
+#                 upload_time = end_time - start_time  # Calculate total upload time
+#                 print(upload_time)
+
+                
+#                 return redirect('dashboard')
+#             else:
+#                 return redirect('dashboard')
+#     return redirect('dashboard')
 
 
 # def is_folder_accessible(folder_path):
