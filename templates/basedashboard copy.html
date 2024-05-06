@@ -11,14 +11,6 @@
     <title>BatStateU | Login</title>
 </head>
 <body>
-    <div class="foldercreationsection" id="folderCreationSection">
-        <form method="POST" enctype="multipart/form-data" id="upload-form" action="{% url 'handle_create_folder' %}">
-            {% csrf_token %}
-            <input type="text" id="folder-field" name="folder_name" placeholder="Enter folder name" required>
-            <input type="hidden" id="current_directory_input" name="current_directory" value="{{ current_directory }}">
-            <button class="buttonClass" type="submit">Create Folder</button>
-        </form>
-    </div>
     <div class="container">
         <div class="leftsection">
             <div class="leftsectionupper">
@@ -30,18 +22,6 @@
                     <button onclick="toggleUploadButtons()"><i class='bx bx-plus' ></i>Add New</button>
                 </div>
                 <div class="upload-buttons">
-                    <button class="buttonClass" type="button" onclick="toggleFolderCreation()">Create Folder</button>
-                    <form method="POST" enctype="multipart/form-data" id="file-upload-form" action="{% url 'handle_file_upload' %}">
-                        {% csrf_token %}
-                        <input type="file" name="file" id="file" multiple style="display: none;">
-                        <input type="hidden" id="current_directory_input_file_upload" name="current_directory" value="{{ current_directory }}">
-                        <button class="buttonClass" type="button" onclick="uploadFile()">Upload Files</button>
-                    </form>
-                    <form method="POST" enctype="multipart/form-data" id="upload-form" action="{% url 'handle_folder_upload' %}">
-                        {% csrf_token %}
-                        <input type="file" name="file" id="file" multiple style="display: none;">
-                        <button class="buttonClass" type="button" onclick="uploadFolder()">Upload Folder</button>
-                    </form>
                 </div>
                 <div class="optionfolders">
                     <a href=" {% url 'dashboard' %} "><i class='bx bxs-folder-open'></i>My Drive</a>

@@ -47,20 +47,6 @@
             
         </div>
         <div class="rightsection">
-            {% comment %} <header>
-                <div class="searchsection">
-                    <form method="GET" action="{% url 'search' %}">
-                        <input class="searchinput" type="text" name="query" placeholder="Search in TNEU Drive..." value="{{ query }}">
-                        <button type="submit"><i class='bx bx-search'></i></button>
-                    </form>
-                    <div class="searchsection-profile">
-                        <form action="{% url 'logout' %}" method="post">
-                            {% csrf_token %}
-                            <button type="submit">Logout</button>
-                        </form>
-                    </div>
-                </div>
-            </header> {% endcomment %}
             <div class="manageaccount">
                 {% block content  %}
                 {% endblock %}

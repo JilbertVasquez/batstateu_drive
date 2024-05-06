@@ -7,7 +7,7 @@
         <h2>My Drive</h2>
         {% if current_directory %}
         {% endif %}
-        <form method="get" action="{% if parent_directory %}{% url 'view_folder' folder_path=parent_directory %}{% else %}{% url 'dashboard' %}{% endif %}">
+        <form method="get" action="{% url 'dashboard' %}">
             <button type="submit"><i class='bx bx-left-arrow-alt'></i>Back</button>
         </form>
     </div>
@@ -60,9 +60,6 @@
                                 </form>
                             </div>
                             <div class="listfilefunctions">
-                                <button class="rename-btn-file" data-item="{{ file_info.name }}" data-is-dir="false"><i class='bx bxs-edit'></i>Rename</button>
-                            </div>
-                            <div class="listfilefunctions">
                                 <form method="post" action="{% url 'delete_item' %}">
                                     {% csrf_token %}
                                     <input type="hidden" id="item-delete-name" name="itemid" value="{{ file_info.fileid }}">
@@ -80,27 +77,6 @@
         {% endif %}
     </ul>
 
-    <div class="rename-section-file" style="display: none;">
-        <form id="rename-form-file" method="POST" action="{% url 'rename_file' %}">
-            {% csrf_token %}
-            <input type="hidden" id="item-file-name" name="lastname">
-            <input type="hidden" name="current_directory" value="{{ current_directory }}">
-            <input type="hidden" id="rename-item-name-file" name="item_path">
-            <input type="text" id="new-name-file" name="new_name" placeholder="Enter new file name">
-            <button class="buttonClassrename" type="submit">Rename File</button>
-        </form>
-    </div>
-
-    <div class="rename-section-folder" style="display: none;">
-        <form id="rename-form-folder" method="POST" action="{% url 'rename_folder' %}">
-            {% csrf_token %}
-            <input type="hidden" id="item-folder-name" name="itemname">
-            <input type="hidden" name="current_directory" value="{{ current_directory }}">
-            <input type="hidden" id="rename-item-name-folder" name="item_path">
-            <input type="text" id="new-name-folder" name="new_name" placeholder="Enter new folder name">
-            <button class="buttonClassrename" type="submit">Rename Folder</button>
-        </form>
-    </div>
 
     <div class="share-file-section" style="display: none;">
         <form id="share-file-form" method="POST" action="{% url 'share_file' %}">
@@ -124,49 +100,7 @@
     {% endif %}
 
     <script>
-        document.querySelectorAll('.rename-btn-file').forEach(btn => {
-            btn.addEventListener('click', function() {
-                const itemName = this.dataset.item;
-                const itemPathElement = this.closest('.filesfolders').querySelector('[name="item_path"]');
-                const itemPath = itemPathElement ? itemPathElement.value : null;
-    
-                const renameSectionFolder = document.querySelector('.rename-section-folder');
-                const renameSectionFile = document.querySelector('.rename-section-file');
-    
-                if (renameSectionFile.style.display === 'none' || renameSectionFile.querySelector('#rename-item-name-file').value !== itemPath) {
-                    renameSectionFile.style.display = 'block';
-                    renameSectionFile.querySelector('#rename-item-name-file').value = itemPath;
-                    renameSectionFile.querySelector('#item-file-name').value = itemName;
-                    renameSectionFile.querySelector('#new-name-file').value = itemName;
-                    renameSectionFolder.style.display = 'none';
-                } else {
-                    renameSectionFile.style.display = 'none';
-                }
-                document.querySelector('.share-file-section').style.display = 'none';
-            });
-        });
-    
-        document.querySelectorAll('.rename-btn-folder').forEach(btn => {
-            btn.addEventListener('click', function() {
-                const itemName = this.dataset.item;
-                const itemPathElement = this.closest('.filesfolders').querySelector('[name="item_path"]');
-                const itemPath = itemPathElement ? itemPathElement.value : null;
-    
-                const renameSectionFolder = document.querySelector('.rename-section-folder');
-                const renameSectionFile = document.querySelector('.rename-section-file');
-    
-                if (renameSectionFolder.style.display === 'none' || renameSectionFolder.querySelector('#rename-item-name-folder').value !== itemPath) {
-                    renameSectionFolder.style.display = 'block';
-                    renameSectionFolder.querySelector('#rename-item-name-folder').value = itemPath;
-                    renameSectionFolder.querySelector('#item-folder-name').value = itemName;
-                    renameSectionFolder.querySelector('#new-name-folder').value = itemName;
-                    renameSectionFile.style.display = 'none';
-                } else {
-                    renameSectionFolder.style.display = 'none';
-                }
-                document.querySelector('.share-file-section').style.display = 'none';
-            });
-        });
+
     
         document.querySelectorAll('.share-btn-file').forEach(btn => {
             btn.addEventListener('click', function() {
@@ -185,8 +119,6 @@
                 } else {
                     shareSectionFile.style.display = 'none';
                 }
-                document.querySelector('.rename-section-file').style.display = 'none';
-                document.querySelector('.rename-section-folder').style.display = 'none';
             });
         });
 

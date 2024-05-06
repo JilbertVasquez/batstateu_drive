@@ -20,7 +20,6 @@ body{
     align-items: center;
     max-height: 100vh;
     width: 50vw;
-    /* background: rgba(39, 39, 39, 0.4); */
 }
 .nav{
     
@@ -29,10 +28,6 @@ body{
     justify-content: space-around;
     width: 100%;
     height: 10%;
-    /* line-height: 100px; */
-    /* background: linear-gradient(rgba(39,39,39, 0.6), transparent); */
-    /* background-color: blue; */
-    /* z-index: 100; */
     border-bottom: #555 2px solid;
 }
 
@@ -58,7 +53,6 @@ body{
 }
 
 .center-form {
-    /* background-color: red; */
     height: 100vh;
     width: 100%;
     display: flex;
@@ -66,7 +60,6 @@ body{
     justify-content: center;
     align-items: center;
     background-color: rgba(255, 255, 255, 0.95);
-    /* box-shadow: 0px 0px 15px 15px rgba(0, 0, 0, 0.1); */
 }
 
 .form-box{
@@ -74,11 +67,9 @@ body{
     display: flex;
     align-items: center;
     justify-content: center;
-    /* width: 560px; */
     width: 70%;
     margin-top: 5%;
     height: 100%;
-    /* height: 600px; */
     overflow: hidden;
     z-index: 2;
     border-bottom: #555 2px solid;
@@ -221,8 +212,6 @@ header{
     justify-content: center;
     align-items: center;
     background-color: rgba(184, 0, 0, 0.85);
-    /* background-color: blue; */
-    
 }
 
 .message {
@@ -238,8 +227,6 @@ header{
     margin-top: 2%;
     padding: 1%;
     box-sizing: border-box;
-    /* color: blue; */
-    /* background-color: yellow; */
 }
 
 #managefile {
@@ -261,18 +248,4 @@ label {
 
 .showfiles {
     width: 80%;
-}
-
-@media only screen and (max-width: 540px) {
-    .wrapper{
-        min-height: 100vh;
-    }
-    .form-box{
-        width: 100%;
-        height: 500px;
-    }
-    .register-container .two-forms{
-        flex-direction: column;
-        gap: 0;
-    }
 }

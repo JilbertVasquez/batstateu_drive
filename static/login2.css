@@ -19,7 +19,6 @@ body{
     align-items: center;
     min-height: 100vh;
     width: 50vw;
-    /* background: rgba(39, 39, 39, 0.4); */
 }
 .nav{
     
@@ -28,10 +27,6 @@ body{
     justify-content: space-around;
     width: 100%;
     height: 10%;
-    /* line-height: 100px; */
-    /* background: linear-gradient(rgba(39,39,39, 0.6), transparent); */
-    /* background-color: blue; */
-    /* z-index: 100; */
     border-bottom: #555 2px solid;
 }
 
@@ -57,7 +52,6 @@ body{
 }
 
 .center-form {
-    /* background-color: red; */
     height: 100vh;
     width: 100%;
     display: flex;
@@ -73,14 +67,11 @@ body{
     display: flex;
     align-items: center;
     justify-content: center;
-    /* width: 560px; */
     width: 70%;
-    /* height: 500px; */
     margin-top: 5%;
     height: 55%;
     overflow: hidden;
     z-index: 2;
-    /* background-color: blue; */
     border-bottom: #555 2px solid;
     border-top: #555 2px solid;
 }
@@ -196,7 +187,6 @@ header{
 }
 
 
-
 .error-section {
     position: absolute;
     top: 50%;
@@ -214,9 +204,7 @@ header{
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    background-color: rgba(184, 0, 0, 0.85);
-    /* background-color: blue; */
-    
+    background-color: rgba(184, 0, 0, 0.85);    
 }
 
 .message {
@@ -232,27 +220,9 @@ header{
     margin-top: 2%;
     padding: 1%;
     box-sizing: border-box;
-    /* color: blue; */
-    /* background-color: yellow; */
 }
 
 
 #admin-header {
     color: red;
-}
-
-
-
-@media only screen and (max-width: 540px) {
-    .wrapper{
-        min-height: 100vh;
-    }
-    .form-box{
-        width: 100%;
-        height: 500px;
-    }
-    .login-container{
-        width: 100%;
-        padding: 0 20px;
-    }
 }

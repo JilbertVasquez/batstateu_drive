@@ -20,7 +20,6 @@
             </div>
             <div class="options">
                 <div class="add">
-                    {% comment %} <button onclick="toggleUploadButtons()"><i class='bx bx-plus' ></i>Add New</button> {% endcomment %}
                     <form method="POST" enctype="multipart/form-data" id="file-upload-form" action="{% url 'handle_file_upload' %}">
                         {% csrf_token %}
                         <input type="file" name="file" id="file" multiple style="display: none;">
@@ -68,29 +67,6 @@
 
 
     <script>
-        function updateCurrentDirectory(directory) {
-            document.getElementById('current_directory_input').value = directory;
-            document.getElementById('current_directory_input_file_upload').value = directory;
-        }
-
-        var viewFolderButtons = document.querySelectorAll('.view-folder-btn');
-        viewFolderButtons.forEach(function(button) {
-            button.addEventListener('click', function() {
-                var folderName = this.dataset.folderName;
-                var currentDirectory = document.getElementById('current_directory_input').value;
-                var updatedDirectory = currentDirectory ? currentDirectory + '/' + folderName : folderName;
-                updateCurrentDirectory(updatedDirectory);
-            });
-        });
-
-        function uploadFolder() {
-            document.getElementById('file').webkitdirectory = true;
-            document.getElementById('file').directory = true;
-            document.getElementById('file').multiple  = true;
-            document.getElementById('file').mozdirectory = true;
-            document.getElementById('file').click();
-        }
-
         function uploadFile() {
             document.getElementById('file').webkitdirectory = false;
             document.getElementById('file').directory = false;
@@ -116,15 +92,6 @@
             } else {
                 uploadButtons.style.display = "none";
                 
-            }
-        }
-
-        function toggleFolderCreation() {
-            var folderSection = document.getElementById("folderCreationSection");
-            if (folderSection.style.display === "none" || folderSection.style.display === "") {
-                folderSection.style.display = "flex";
-            } else {
-                folderSection.style.display = "none";
             }
         }
         

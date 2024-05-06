@@ -111,15 +111,6 @@
             <button type="submit">Back</button>
         </form>
     {% endif %}
-    <div class="rename-section-file" style="display: none;">
-        <form id="rename-form-file" method="POST" action="{% url 'rename_file' %}">
-            {% csrf_token %}
-            <input type="hidden" name="current_directory" value="{{ current_directory }}">
-            <input type="hidden" id="rename-item-name-file" name="item_path">
-            <input type="text" id="new-name-file" name="new_name" placeholder="Enter new file name">
-            <button type="submit">Rename File</button>
-        </form>
-    </div>
 
     <div class="share-file-section" style="display: none;">
         <form id="share-file-form" method="POST" action="{% url 'share_file' %}">
@@ -146,24 +137,6 @@
     </script>
     <script>
 
-    document.querySelectorAll('.rename-btn-file').forEach(btn => {
-        btn.addEventListener('click', function() {
-            const itemName = this.dataset.item;
-            const itemPath = this.parentElement.parentElement.querySelector('[name="item_path"]').value;
-            console.log(itemPath);
-            const renameSectionFile = document.querySelector('.rename-section-file');
-            if (renameSectionFile.style.display === 'none' || renameSectionFile.querySelector('#rename-item-name-file').value !== itemPath) {
-                document.querySelectorAll('.rename-section-file').forEach(section => {
-                    section.style.display = 'none';
-                });
-                renameSectionFile.style.display = 'block';
-                renameSectionFile.querySelector('#rename-item-name-file').value = itemPath;
-                renameSectionFile.querySelector('#new-name-file').value = itemName;
-            } else {
-                renameSectionFile.style.display = 'none';
-            }
-        });
-    });
 
     document.querySelectorAll('.share-btn-file').forEach(btn => {
         btn.addEventListener('click', function() {
@@ -182,9 +155,6 @@
             } else {
                 shareSectionFile.style.display = 'none';
             }
-
-            document.querySelector('.rename-section-file').style.display = 'none';
-            document.querySelector('.rename-section-folder').style.display = 'none';
         });
     });
     </script>

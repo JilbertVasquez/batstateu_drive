@@ -1,7 +1,6 @@
 from django.shortcuts import render, HttpResponse
 from .models import Users, FileDetails
 from .models import SharingFiles
-# from .models import Admin
 from django.contrib.auth import authenticate, login
 from django.contrib.auth.hashers import check_password
 from django.contrib.auth.hashers import make_password
@@ -21,6 +20,7 @@ import random
 import time
 import shutil
 import re
+from django.contrib.auth import authenticate, login
 
 # Create your views here.
 
@@ -51,25 +51,18 @@ def bytes_to_gb(bytes_value):
     gb_value = bytes_value / (1024 * 1024 * 1024)
     return gb_value
 
+
 def get_disk_usage(folder_path):
-    # Get the drive letter from the folder path
-    
     all_storage = []
     overall_used = 0
     length = 0
     total_used = 0
     total = 0
     
-    # drive_letter = folder_path
-    # print(folder_path)
-    
     for shared_folder in folder_path:
-
-        # Get disk usage information for the drive
         if os.path.exists(shared_folder):
             disk_usage = shutil.disk_usage(shared_folder)
         
-            # Calculate disk usage percentage
             percent_used = round(((disk_usage.used / disk_usage.total) * 100), 2)
             
             overall_used += percent_used
@@ -93,7 +86,8 @@ def get_disk_usage(folder_path):
 
     return all_storage, overall, total_used, total
 
-def disk_usage_view(request):  # Modify the view function to accept a request argument
+
+def disk_usage_view(request):
     
     contents = os.listdir(settings.MEDIA_ROOT)
 
@@ -102,8 +96,6 @@ def disk_usage_view(request):  # Modify the view function to accept a request ar
     disk = [item for item in contents]
     
     drive = os.path.join(settings.MEDIA_ROOT, disk[0], 'drives.txt')
-    
-    # print(drive, "-----------------")
     
     shared_folder = []
     
@@ -115,7 +107,6 @@ def disk_usage_view(request):  # Modify the view function to accept a request ar
     else:
         print("File 'drives.txt' does not exist.")
     
-    # print(shared_folder)
     disk_usage_percentage, overall_used, total_used, total = get_disk_usage(shared_folder)
     
     context = {
@@ -125,8 +116,7 @@ def disk_usage_view(request):  # Modify the view function to accept a request ar
         'total': total
     }
     
-    return render(request, 'disk_storage.html', context)  # Pass the request argument to the render function
-
+    return render(request, 'disk_storage.html', context)
 
 
 def admindashboard(request):
@@ -138,54 +128,23 @@ def admindashboard(request):
         return redirect('adminlogin')
 
 
-# def adminlogin(request):
-#     if request.method == 'POST':
-
-#         username = request.POST.get("username")
-#         pass1 = request.POST.get("password")
-        
-#         try:
-#             user = Admin.objects.get(username=username)
-            
-#             if pass1 == user.password:
-#                 request.session['username'] = user.username
-#                 request.session['userid'] = user.userid
-#                 return redirect('admindashboard')
-#             else:
-#                 errors = "Username or Password is incorrect"
-#                 return render(request, 'adminlogin.html', {'errors': errors})
-            
-#         except Users.DoesNotExist:
-#             errors = "User does not exist!!"
-#             return render(request, 'adminlogin.html', {'errors': errors})
-        
-#     else:
-#         return render(request, 'adminlogin.html')
-
-
-from django.contrib.auth import authenticate, login
-
 def adminlogin(request):
     if request.method == 'POST':
         username = request.POST.get("username")
         password = request.POST.get("password")
         
-        # Authenticate user
         user = authenticate(request, username=username, password=password)
         
         if user is not None:
-            # User authentication successful, log in the user
             request.session['username'] = user.username
             request.session['userid'] = user.id
             login(request, user)
             return redirect('admindashboard')
         else:
-            # Authentication failed
             errors = "Username or Password is incorrect"
             return render(request, 'adminlogin.html', {'errors': errors})
     else:
         return render(request, 'adminlogin.html')
-
 
 
 def users_admin(request):
@@ -199,7 +158,6 @@ def delete_user(request):
         try:
             user = Users.objects.get(userid=user_id)
             
-            # Delete user's folders in different directories
             user_folders = [os.path.join(settings.MEDIA_ROOT, user_folder) for user_folder in os.listdir(settings.MEDIA_ROOT) if os.path.isdir(os.path.join(settings.MEDIA_ROOT, user_folder))]
             for folder in user_folders:
                 dir = os.path.join(folder, user.username)
@@ -208,12 +166,9 @@ def delete_user(request):
             
             user.delete()
             messages.success(request, "Account Deletion successfully!")
-            # Redirect back to the admin dashboard after deletion
             return redirect('admindashboard')
         except Users.DoesNotExist:
-            # Handle case where user does not exist
             pass
-    # If request method is not POST or user does not exist, redirect to admin dashboard
     return redirect('admindashboard')
 
 
@@ -222,18 +177,14 @@ def edit_user(request):
         user_id = request.POST.get('user_id')
         try:
             user = Users.objects.get(userid=user_id)
-            # Redirect back to the admin dashboard after deletion
             return render (request, 'editaccount.html', {'user': user})
         except Users.DoesNotExist:
-            # Handle case where user does not exist
             pass
-    # If request method is not POST or user does not exist, redirect to admin dashboard
     return redirect('admindashboard')
 
 
 def save_edit_account(request):
     if request.method == 'POST':
-        # Retrieve user ID and updated information from the request
         user_id = request.POST.get('user_id')
         firstname = request.POST.get('firstname')
         lastname = request.POST.get('lastname')
@@ -241,28 +192,21 @@ def save_edit_account(request):
         email = request.POST.get('email')
 
         try:
-            # Get the user object from the database
-            user = Users.objects.get(userid=user_id)
-            
-            # Update the user object with the new information
+            user = Users.objects.get(userid=user_id) 
             user.firstname = firstname
             user.lastname = lastname
             user.username = username
             user.email = email
             
-            # Save the changes to the user object
             user.save()
             messages.success(request, "Account Details Update successfully!")
-            # Redirect to the admin dashboard or any other desired page
             return redirect('admindashboard')
         
         except Users.DoesNotExist:
-            # Handle the case where the user does not exist
             errors = "User does not exist"
             return render(request, 'edit_account.html', {'errors': errors})
     
     else:
-        # Handle the case where the request method is not POST
         return redirect('admindashboard')
 
 
@@ -271,12 +215,9 @@ def new_pass(request):
         user_id = request.POST.get('user_id')
         try:
             user = Users.objects.get(userid=user_id)
-            # Redirect back to the admin dashboard after deletion
             return render (request, 'changepassword.html', {'user': user})
         except Users.DoesNotExist:
-            # Handle case where user does not exist
             pass
-    # If request method is not POST or user does not exist, redirect to admin dashboard
     return redirect('admindashboard')
 
 
@@ -288,7 +229,7 @@ def save_new_pass_acc(request):
         
         if new_password == confirm_password:
             user = Users.objects.get(userid=user_id)
-            user.password = make_password(new_password)  # Hash the new password before saving
+            user.password = make_password(new_password)
             user.save()
             messages.success(request, "Password updated successfully!")
         else:
@@ -312,12 +253,9 @@ def view_file_details(request):
         print(file_id)
         try:
             filedetails = FileDetails.objects.get(file_id=file_id)
-            # Redirect back to the admin dashboard after deletion
             return render (request, 'viewfiledetails.html', {'filedetails': filedetails})
         except Users.DoesNotExist:
-            # Handle case where user does not exist
             pass
-    # If request method is not POST or user does not exist, redirect to admin dashboard
     return redirect('admindashboard')
 
 
@@ -336,12 +274,10 @@ def view_share_files(request):
         print(file_id)
         try:
             sharefiles = SharingFiles.objects.get(file_id=file_id)
-            # Redirect back to the admin dashboard after deletion
             return render (request, 'viewsharedfiles.html', {'sharefiles': sharefiles})
         except Users.DoesNotExist:
-            # Handle case where user does not exist
             pass
-    # If request method is not POST or user does not exist, redirect to admin dashboard
+
     return redirect('admindashboard')
 
 
@@ -363,8 +299,6 @@ def dashboard(request):
 
     folders = [item for item in contents if os.path.isdir(os.path.join(settings.MEDIA_ROOT, item))]
     
-    # folder1 = [item for item in os.listdir(os.path.join(settings.MEDIA_ROOT, folders[0], username)) if os.path.isdir(os.path.join(settings.MEDIA_ROOT, folders[0], username, item))]
-
     uploaded_files = []
 
     if username:
@@ -387,8 +321,7 @@ def dashboard(request):
             print(e)
         
         request.session['current-section'] = 'MyDrive'
-        
-        # return render(request, 'dashboardextend.html', {'username': username, 'uploaded_files': uploaded_files, 'folders': folder1})
+
         return render(request, 'dashboardextend.html', {'username': username, 'uploaded_files': uploaded_files})
     else:
         return redirect('login')
@@ -405,47 +338,6 @@ def convert_size(size_bytes):
 
     return f"{size_bytes:.2f} {suffixes[-1]}"
 
-
-# def download_file(request):
-#     if request.method == 'POST':
-#         file_id = request.POST.get('itemid')
-        
-#         file_details = FileDetails.objects.get(file_id=file_id)
-
-#         path_index = 0
-        
-#         while True:
-            
-#             if len(file_details.get_paths()) == path_index:
-#                 return redirect('dashboard') 
-            
-#             file_path = file_details.get_paths()[path_index]
-            
-#             if os.path.exists(file_path):
-#                 temp_path = os.path.join(settings.MEDIA_TEMP, file_details.filename + file_details.extension)
-                
-#                 encrypted_filepath = os.path.join(file_path, file_details.filename + file_details.extension)
-#                 if os.path.exists(encrypted_filepath):
-                    
-#                     decrypt_file(encrypted_filepath, temp_path, file_details.key)
-                    
-#                     if os.path.exists(temp_path):
-#                         # print(encrypted_filepath)
-#                         response = FileResponse(open(temp_path, 'rb'), content_type='application/force-download')
-#                         response['Content-Disposition'] = f'attachment; filename="{file_details.filename}{file_details.extension}"'
-                        
-#                         return response
-#                     else:
-#                         path_index += 1
-#                 else:
-#                     path_index += 1
-#             else:
-#                 path_index += 1
-#     else:
-#         messages.error(request, f'Method not allowed.')
-#         return redirect('dashboard')
-
-import random
 
 def download_file(request):
     if request.method == 'POST':
@@ -480,7 +372,6 @@ def download_file(request):
         return redirect('dashboard')
 
 
-
 def delete_item(request):
     if request.method == 'POST':
         username = request.session.get('username', None)
@@ -500,7 +391,6 @@ def delete_item(request):
                     if os.path.exists(path):
                         file_path = os.path.join(path, str(file_details.filename + file_details.extension))
                         if os.path.exists(file_path):
-                        # print(file_path)
                             os.remove(file_path)
                         else:
                             pass
@@ -519,26 +409,6 @@ def delete_item(request):
     else:
         return HttpResponse("Method not allowed", status=405)
 
-def delete_item_search(request):
-    if request.method == 'POST':
-        username = request.session.get('username', None)
-        userid = request.session.get('userid', None)
-        item_path = request.POST.get('item_path')
-        item_name = request.POST.get('item_name')
-        if username and item_path:
-            if os.path.exists(item_path):
-                try:
-                    os.remove(os.path.join(item_path))
-                    return redirect('view_folder', folder_path=os.path.dirname(item_path))
-                except Exception as e:
-                    return JsonResponse({'success': False, 'message': f'Error deleting item: {str(e)}'})
-            else:
-                return HttpResponse("Item not found", status=404)
-        else:
-            return HttpResponse("Invalid request", status=400)
-    else:
-        return HttpResponse("Method not allowed", status=405)
-
 
 def get_folder_contents(folder_path):
     contents = []
@@ -551,27 +421,6 @@ def get_folder_contents(folder_path):
         item_info['full_path'] = item_path
         contents.append(item_info)
     return contents
-
-
-def view_folder(request, folder_path):
-    username = request.session.get('username', None)
-    userid = request.session.get('userid', None)
-    folder_path = os.path.join(settings.MEDIA_ROOT, username, folder_path)
-    uploaded_items = []
-
-    if os.path.exists(folder_path) and os.path.isdir(folder_path):
-        uploaded_items = get_folder_contents(folder_path)
-    else:
-        return HttpResponse("Folder not found", status=404)
-
-    for item in uploaded_items:
-        item['full_path'] = os.path.join(folder_path, item['name'])
-        
-    parent_directory = os.path.dirname(folder_path)
-    if parent_directory == settings.MEDIA_ROOT:
-        return redirect('dashboard')
-    else:
-        return render(request, 'dashboardextend.html', {'uploaded_files': uploaded_items, 'current_directory': folder_path, 'parent_directory': parent_directory, 'username': username})
 
 
 def share_file(request):
@@ -688,106 +537,14 @@ def search(request):
     })
 
 
-def rename_file(request):
-    if request.method == 'POST':
-        username = request.session.get('username')  
-        item_path = request.POST.get('item_path')
-
-        last_name = request.POST.get('lastname')
-        last_name1 = last_name.split(".")
-        last_name2 = last_name1[0]
-        last_name3 = "." + last_name1[-1]
-        new_name = request.POST.get('new_name')
-        new_name1 = new_name.split(".")
-        new_name2 = new_name1[0]
-        new_name3 = "." + new_name1[-1]
-        current_dir = request.POST.get("current_directory")
-        if current_dir == "":
-            current_dir = os.path.join(settings.MEDIA_ROOT, username) + "\\"
-        try:
-            os.rename(item_path, os.path.join(os.path.dirname(item_path), new_name))
-            
-            user = Users.objects.get(username=username)
-            userid = user.userid
-            useremail = user.email
-            
-            file_detail = FileDetails.objects.get(filename=last_name2, extension=last_name3 ,path=current_dir, user_id=userid)
-            file_detail.filename = new_name2
-            file_detail.extension = new_name3
-            file_detail.save()
-            
-            shared_files = SharingFiles.objects.filter(share_by=useremail, filename=last_name2, extension=last_name3, path=current_dir)
-            for shared_file in shared_files:
-                shared_file.filename = new_name2
-                shared_file.extension = new_name3
-                shared_file.save()
-
-            if current_dir == "":
-                return redirect("dashboard")
-            else:
-                return redirect('view_folder', folder_path=current_dir)
-        except Exception as e:
-            return JsonResponse({'success': False, 'error': str(e)})
-    else:
-        return JsonResponse({'success': False, 'error': 'Method not allowed'})
-
-def rename_folder(request):
-    if request.method == 'POST':
-        username = request.session.get('username')
-        item_path = request.POST.get('item_path')
-        last_name = request.POST.get('itemname')
-        new_name = request.POST.get('new_name')
-        current_dir = request.POST.get("current_directory")
-        current_dir2 = ""
-        
-        newpath = ""
-        if current_dir == "":
-            current_dir2 = os.path.join(settings.MEDIA_ROOT, username, last_name)
-            newpath = os.path.join(settings.MEDIA_ROOT, username, new_name)
-        else:
-            current_dir2 = current_dir
-
-        try:
-            user = Users.objects.get(username=username)
-            userid = user.userid
-            
-            file_details = FileDetails.objects.filter(path__contains=current_dir2, user_id=userid)
-            shared_files = SharingFiles.objects.filter(path__contains=current_dir2)
-            
-            for file_detail in file_details:
-                new_db_path = file_detail.path.replace(current_dir2, newpath)
-                file_detail.path = new_db_path
-                file_detail.save()
-                
-            for shared_file in shared_files:
-                new_db_path = shared_file.path.replace(current_dir2, newpath)
-                shared_file.path = new_db_path
-                shared_file.save()
-            
-            os.rename(item_path, os.path.join(os.path.dirname(item_path), new_name))
-            if current_dir == "":
-                return redirect("dashboard")
-            else:
-                return redirect('view_folder', folder_path=current_dir)
-        except Exception as e:
-            return JsonResponse({'success': False, 'error': str(e)})
-    else:
-        return JsonResponse({'success': False, 'error': 'Method not allowed'})
-
-
-
-
-
 def is_folder_accessible_upload(folder_path):
     # Check if the folder exists
     path = os.path.join(settings.MEDIA_ROOT, folder_path)
     if not os.path.exists(path):
-        # print("NOOOOOO", path)
         return False
     
     try:
         _ = os.listdir(path)
-        # print("YESSSSS", path)
         return True
     except Exception as e:
         print(f"Error accessing folder: {e}")
@@ -868,131 +625,6 @@ def handle_file_upload(request):
     return redirect('dashboard')
 
 
-# import os
-# import random
-# import time
-# from concurrent.futures import ThreadPoolExecutor
-# from django.conf import settings
-# from django.core.files.storage import FileSystemStorage
-# from django.shortcuts import redirect, render
-# from django.contrib import messages
-# from .models import Users
-
-# def handle_file_upload(request):
-#     if request.method == 'POST':
-#         if 'file' in request.FILES:
-#             uploaded_files = request.FILES.getlist('file')
-            
-#             username = request.session.get('username')
-#             userid = request.session.get('userid', None)
-            
-#             if username:
-#                 user = Users.objects.get(userid=userid)
-                
-#                 def upload_to_storage(uploaded_file):
-#                     try:
-#                         contents = os.listdir(settings.MEDIA_ROOT)
-#                         newcontentlist = [folder for folder in contents if is_folder_accessible_upload(folder)]
-#                         folders = [item for item in newcontentlist if os.path.isdir(os.path.join(settings.MEDIA_ROOT, item))]
-#                         key = Fernet.generate_key()
-#                         size = len(folders)
-#                         if size <= 3:
-#                             distribute = size
-#                         elif size == 3:
-#                             distribute = 3
-#                         else:
-#                             distribute = int(size / 3) + 1
-#                         list_of_dir_copy = []
-#                         for _ in range(distribute):
-#                             ran = random.choice(folders)
-#                             user_directory = os.path.join(settings.MEDIA_ROOT, ran, username)
-#                             os.makedirs(user_directory, exist_ok=True)
-#                             list_of_dir_copy.append(user_directory)
-#                             fs = FileSystemStorage(location=user_directory)
-#                             fs.save(uploaded_file.name, uploaded_file)
-#                             input_file_path = os.path.join(user_directory, uploaded_file.name)
-#                             output_file_path = os.path.join(user_directory, uploaded_file.name)
-#                             encrypt_file(input_file_path, output_file_path, key)
-#                             folders.remove(ran)
-#                         file_details = get_file_details(uploaded_file, list_of_dir_copy)
-#                         save_file_details(user, file_details, key)
-#                         return f'Upload of {uploaded_file.name} completed.'
-#                     except Exception as e:
-#                         return f'Error uploading {uploaded_file.name}: {str(e)}'
-                
-#                 start_time = time.time()
-#                 with ThreadPoolExecutor() as executor:
-#                     results = list(executor.map(upload_to_storage, uploaded_files))
-                
-#                 end_time = time.time()  # End measuring time
-#                 upload_time = end_time - start_time  # Calculate total upload time
-#                 print(upload_time)
-
-                
-#                 return redirect('dashboard')
-#             else:
-#                 return redirect('dashboard')
-#     return redirect('dashboard')
-
-
-# def is_folder_accessible(folder_path):
-#     # Check if the folder exists
-#     if not os.path.exists(folder_path):
-#         return False
-    
-#     # Check network accessibility by attempting to access a file within the folder
-#     try:
-#         return True
-#     except Exception as e:
-#         print(f"Error accessing folder: {e}")
-#         return False
-
-
-# def handle_file_upload(request):
-#     if request.method == 'POST':
-#         if 'file' in request.FILES:
-#             uploaded_files = request.FILES.getlist('file')
-            
-#             username = request.session.get('username')
-#             userid = request.session.get('userid', None)
-#             current_directory = request.POST.get('current_directory', '')
-            
-#             if username:
-#                 user = Users.objects.get(userid=userid)
-
-#                 for uploaded_file in uploaded_files:
-#                     try:
-#                         contents = os.listdir(settings.MEDIA_ROOT)
-#                         folders = [item for item in contents if os.path.isdir(os.path.join(settings.MEDIA_ROOT, item))]
-                        
-                        
-                        
-#                         list_of_dir_copy = []
-#                         key = Fernet.generate_key()
-#                         for folder in folders:
-#                             user_directory = os.path.join(settings.MEDIA_ROOT, folder, username)
-#                             list_of_dir_copy.append(user_directory)
-#                             fs = FileSystemStorage(location=user_directory)
-#                             fs.save(uploaded_file.name, uploaded_file)
-                            
-#                             input_file_path = os.path.join(user_directory, uploaded_file.name)
-#                             output_file_path = os.path.join(user_directory, uploaded_file.name)
-#                             encrypt_file(input_file_path, output_file_path, key)
-                            
-#                         file_details = get_file_details(uploaded_file, list_of_dir_copy)
-#                         save_file_details(user, file_details, key)
-                        
-#                         return redirect('dashboard')
-                    
-#                     except Exception as e:
-#                         return render(request, 'basedashboard.html', {'error': str(e)})
-                    
-#                 return redirect('dashboard')
-#             else:
-#                 return redirect('dashboard')
-#     return redirect('dashboard')
-
-
 def get_file_details(uploaded_file, file_path):
 
     file_name = uploaded_file.name
@@ -1042,104 +674,8 @@ def save_file_details(user, file_details, key):
     file_details_object.set_paths(file_details['path'])
     file_details_object.save()
     return file_details_object
-
-
-def handle_folder_upload(request):
-    if request.method == 'POST':
-        if 'file' in request.FILES:
-            uploaded_folder = request.FILES['file']
-            username = request.session.get('username', None)
-            userid = request.session.get('userid', None)
-            if username:
-                user_upload_dir = os.path.join(settings.MEDIA_ROOT, username)
-                if not os.path.exists(user_upload_dir):
-                    os.makedirs(user_upload_dir)
-
-                folder_name = uploaded_folder.name
-
-                directory_path = os.path.join(user_upload_dir, folder_name)
-                os.makedirs(directory_path, exist_ok=True)
-
-                for uploaded_file in uploaded_folder:
-                    fs = FileSystemStorage(location=directory_path)
-                    fs.save(uploaded_file.name, uploaded_file)
-                
-                return redirect('dashboard') 
-            else:
-                return redirect('login')
-    return render(request, 'basedashboard.html')
-
-
-def handle_create_folder(request):
-    if request.method == 'POST':
-        username = request.session.get('username', None)
-        userid = request.session.get('userid', None)
-
-        folder_name = request.POST.get('folder_name')
-        current_directory = request.POST.get('current_directory')
-        
-        if username and folder_name:
-            try:
-                contents = os.listdir(settings.MEDIA_ROOT)
-
-                folders = [item for item in contents if os.path.isdir(os.path.join(settings.MEDIA_ROOT, item))]
-
-                for folder in folders:
-                    user_directory = os.path.join(settings.MEDIA_ROOT, folder, username, folder_name )
-                    os.makedirs(user_directory, exist_ok=True)
-
-                if current_directory:
-                    return redirect(reverse('view_folder', kwargs={'folder_path': current_directory}))
-                else:
-                    return redirect('dashboard')
-            except Exception as e:
-                return JsonResponse({'success': False, 'message': f'Error creating folder: {str(e)}'})
-        else:
-            return JsonResponse({'success': False, 'message': 'Invalid request or missing data'})
-    else:
-        return HttpResponse('Method not allowed', status=405)
-
-
-def signupPage(request):
-    if request.method == 'POST':
-        fname = request.POST.get('firstname')
-        lname = request.POST.get('lastname')
-        uname = request.POST.get('username')
-        email = request.POST.get('email')
-        pass1 = request.POST.get('password')
-        pass2 = request.POST.get('password2')
-
-        if Users.objects.filter(username=uname).exists():
-            messages.error(request, "Username already exists.")
-            return render(request, 'signup.html', {'messages': messages})
-
-        if Users.objects.filter(email=email).exists():
-            messages.error(request, "Email already exists.")
-            return render(request, 'signup.html', {'messages': messages})
-        
-        if pass1 != pass2:
-            messages.error(request, "Your password is not the same !!")
-            return render(request, 'signup.html', {'messages': messages})
-        else:
-            hashed_password = make_password(pass1)
-            my_user = Users(firstname=fname, lastname=lname, username=uname, email=email, password=hashed_password)
-            my_user.save()
-            
-            contents = os.listdir(settings.MEDIA_ROOT)
-
-            folders = [item for item in contents if os.path.isdir(os.path.join(settings.MEDIA_ROOT, item))]
-
-            for folder in folders:
-                user_directory = os.path.join(settings.MEDIA_ROOT, folder, uname)
-                os.makedirs(user_directory, exist_ok=True)
-            
-            return redirect('login')
-        
-    else:
-        return render(request, 'signup.html')
     
     
-
 def addaccount(request):
     if request.method == 'POST':
         fname = request.POST.get('firstname')
@@ -1159,19 +695,14 @@ def addaccount(request):
             return render(request, 'signup2.html', {'errors': errors})
 
         if Users.objects.filter(username=uname).exists():
-            # messages.error(request, "Username already exists.")
             errors = "Username already exists."
             return render(request, 'signup2.html', {'errors': errors})
 
         if Users.objects.filter(email=email).exists():
-            # messages.error(request, "Email already exists.")
-            # return render(request, 'signup2.html', {'messages': messages})
             errors = "Account already exists."
             return render(request, 'signup2.html', {'errors': errors})
         
         if pass1 != pass2:
-            # messages.error(request, "Your password is not the same !!")
-            # return render(request, 'signup2.html', {'messages': messages})
             errors = "Your password is not the same !!"
             return render(request, 'signup2.html', {'errors': errors})
         
@@ -1192,29 +723,6 @@ def addaccount(request):
         
     else:
         return render(request, 'signup2.html')
-
-
-def loginPage(request):
-    if request.method == 'POST':
-
-        email = request.POST.get("email")
-        pass1 = request.POST.get("password")
-        
-        try:
-            user = Users.objects.get(email=email)
-            
-            if check_password(pass1, user.password):
-                request.session['username'] = user.username
-                request.session['userid'] = user.userid
-                return redirect('dashboard')
-            else:
-                return HttpResponse("Username or Password is incorrect")
-            
-        except Users.DoesNotExist:
-            return HttpResponse("User does not exist!!")
-        
-    else:
-        return render(request, 'login.html')
     
 
 def loginPage2(request):
