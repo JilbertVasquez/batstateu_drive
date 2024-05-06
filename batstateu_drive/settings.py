@@ -148,11 +148,11 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 # MEDIA_ROOT = os.path.join(BASE_DIR, 'uploadedfiles')
 # MEDIA_ROOT = r'\\PC-JIL\uploadedfiles'
 # MEDIA_ROOT = r'\\LAPTOP-JIL\uploadedfiles'
-MEDIA_ROOT = r'\\batstateuserver\tneuroot'
-# MEDIA_ROOT = r'\\172.16.127.100\tneuroot'
+# MEDIA_ROOT = r'\\batstateuserver\tneuroot'
+MEDIA_ROOT = r'\\DC02\tneuroot'
 
-# MEDIA_TEMP = r'D:\batstateu_drive\temp_folder'
-MEDIA_TEMP = r'D:\Thesis\batstateu_drive\temp_folder'
+MEDIA_TEMP = r'D:\batstateu_drive\temp_folder'
+# MEDIA_TEMP = r'D:\Thesis\batstateu_drive\temp_folder'
 # MEDIA_ROOT = "D:\\uploadedfiles"
 
 LOGIN_URL = ['/adminlogin/', '/login2/']

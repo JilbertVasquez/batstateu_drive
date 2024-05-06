@@ -103,7 +103,7 @@ def disk_usage_view(request):  # Modify the view function to accept a request ar
     
     drive = os.path.join(settings.MEDIA_ROOT, disk[0], 'drives.txt')
     
-    # print(drive)
+    # print(drive, "-----------------")
     
     shared_folder = []
     
