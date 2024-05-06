@@ -21,6 +21,7 @@ import time
 import shutil
 import re
 from django.contrib.auth import authenticate, login
+from concurrent.futures import ThreadPoolExecutor
 
 # Create your views here.
 
@@ -399,6 +400,7 @@ def delete_item(request):
             if share_details:
                 share_details.delete()
             
+            messages.success(request, 'File Deleted Successfully.')
             return redirect('dashboard')
             
         except FileDetails.DoesNotExist:
@@ -551,31 +553,180 @@ def is_folder_accessible_upload(folder_path):
         return False
 
 
+# def handle_file_upload(request):
+#     if request.method == 'POST':
+#         if 'file' in request.FILES:
+#             uploaded_files = request.FILES.getlist('file')
+            
+#             username = request.session.get('username')
+#             userid = request.session.get('userid', None)
+            
+#             if username:
+#                 user = Users.objects.get(userid=userid)
+
+#                 for uploaded_file in uploaded_files:
+#                     try:
+#                         contents = os.listdir(settings.MEDIA_ROOT)
+                        
+#                         newcontentlist = []
+                        
+#                         for folder in contents:
+#                             if is_folder_accessible_upload(folder):
+#                                 newcontentlist.append(folder)
+                                
+#                         folders = [item for item in newcontentlist if os.path.isdir(os.path.join(settings.MEDIA_ROOT, item))]
+                        
+#                         key = Fernet.generate_key()
+                        
+#                         size = len(folders)
+#                         if size <= 3:
+#                             distribute = size
+#                         elif size == 3:
+#                             distribute = 3
+#                         else:
+#                             distribute = int(size / 3) + 1
+                        
+#                         list_of_dir_copy = []
+                        
+#                         start_time = time.time()  # Start measuring time
+                        
+#                         for i in range(distribute):
+#                             ran = random.choice(folders)
+                            
+#                             user_directory = os.path.join(settings.MEDIA_ROOT, ran, username)
+                            
+#                             if not os.path.exists(user_directory):
+#                                 os.makedirs(user_directory, exist_ok=True)
+                            
+#                             list_of_dir_copy.append(user_directory)
+#                             fs = FileSystemStorage(location=user_directory)
+#                             fs.save(uploaded_file.name, uploaded_file)
+                            
+#                             input_file_path = os.path.join(user_directory, uploaded_file.name)
+#                             output_file_path = os.path.join(user_directory, uploaded_file.name)
+#                             encrypt_file(input_file_path, output_file_path, key)
+#                             folders.remove(ran)
+                            
+#                         file_details = get_file_details(uploaded_file, list_of_dir_copy)
+#                         save_file_details(user, file_details, key)
+                        
+#                         end_time = time.time()  # End measuring time
+#                         upload_time = end_time - start_time  # Calculate total upload time
+                        
+#                         print(f"Total upload time: {upload_time} seconds")
+                        
+#                         messages.success(request, f'Upload File Successful.')
+#                         return redirect('dashboard')
+                    
+#                     except Exception as e:
+#                         return render(request, 'basedashboard.html', {'error': str(e)})
+                    
+#                 return redirect('dashboard')
+#             else:
+#                 return redirect('dashboard')
+#     return redirect('dashboard')
+
+
+#NEW FILE UPLOAD IN TEMP FOLDER 2 ------------------------
+
+# def handle_file_upload(request):
+#     if request.method == 'POST':
+#         if 'file' in request.FILES:
+#             uploaded_files = request.FILES.getlist('file')
+            
+#             username = request.session.get('username')
+#             userid = request.session.get('userid', None)
+            
+#             if username:
+#                 user = Users.objects.get(userid=userid)
+
+#                 for uploaded_file in uploaded_files:
+#                     try:
+#                         contents = os.listdir(settings.MEDIA_ROOT)
+                        
+#                         newcontentlist = []
+                        
+#                         for folder in contents:
+#                             if is_folder_accessible_upload(folder):
+#                                 newcontentlist.append(folder)
+                                
+#                         folders = [item for item in newcontentlist if os.path.isdir(os.path.join(settings.MEDIA_ROOT, item))]
+                        
+#                         key = Fernet.generate_key()
+                        
+#                         size = len(folders)
+#                         if size <= 3:
+#                             distribute = size
+#                         elif size == 3:
+#                             distribute = 3
+#                         else:
+#                             distribute = int(size / 3) + 1
+                        
+#                         list_of_dir_copy = []
+                        
+#                         start_time = time.time()  # Start measuring time
+                        
+#                         fs = FileSystemStorage(location=settings.MEDIA_TEMP2)
+#                         fs.save(uploaded_file.name, uploaded_file)
+                        
+#                         input_file_path = os.path.join(settings.MEDIA_TEMP2, uploaded_file.name)
+#                         output_file_path = os.path.join(settings.MEDIA_TEMP2, uploaded_file.name)
+#                         print(output_file_path)
+#                         encrypt_file(input_file_path, output_file_path, key)
+                        
+#                         for i in range(distribute):
+#                             ran = random.choice(folders)
+                            
+#                             user_directory = os.path.join(settings.MEDIA_ROOT, ran, username)
+                            
+#                             if not os.path.exists(user_directory):
+#                                 os.makedirs(user_directory, exist_ok=True)
+                            
+#                             list_of_dir_copy.append(user_directory)
+#                             fs = FileSystemStorage(location=user_directory)
+#                             fs.save(uploaded_file.name, open(output_file_path, 'rb'))
+                            
+#                             folders.remove(ran)
+                            
+#                         file_details = get_file_details(uploaded_file, list_of_dir_copy)
+#                         save_file_details(user, file_details, key)
+                        
+#                         os.remove(input_file_path)
+                        
+#                         end_time = time.time()  # End measuring time
+#                         upload_time = end_time - start_time  # Calculate total upload time
+                        
+#                         print(f"Total upload time: {upload_time} seconds")
+                        
+#                         messages.success(request, f'Upload File Successful.')
+#                         return redirect('dashboard')
+                    
+#                     except Exception as e:
+#                         return render(request, 'basedashboard.html', {'error': str(e)})
+                    
+#                 return redirect('dashboard')
+#             else:
+#                 return redirect('dashboard')
+#     return redirect('dashboard')
+
+
+# NEW FILE UPLOAD WITH PARALLEL UPLOAD
+
 def handle_file_upload(request):
     if request.method == 'POST':
         if 'file' in request.FILES:
             uploaded_files = request.FILES.getlist('file')
-            
             username = request.session.get('username')
             userid = request.session.get('userid', None)
             
             if username:
                 user = Users.objects.get(userid=userid)
-
-                for uploaded_file in uploaded_files:
+                contents = os.listdir(settings.MEDIA_ROOT)
+                folders = [folder for folder in contents if is_folder_accessible_upload(folder)]
+                
+                def upload_file(uploaded_file):
                     try:
-                        contents = os.listdir(settings.MEDIA_ROOT)
-                        
-                        newcontentlist = []
-                        
-                        for folder in contents:
-                            if is_folder_accessible_upload(folder):
-                                newcontentlist.append(folder)
-                                
-                        folders = [item for item in newcontentlist if os.path.isdir(os.path.join(settings.MEDIA_ROOT, item))]
-                        
                         key = Fernet.generate_key()
-                        
                         size = len(folders)
                         if size <= 3:
                             distribute = size
@@ -584,45 +735,54 @@ def handle_file_upload(request):
                         else:
                             distribute = int(size / 3) + 1
                         
+                        # Temporary file storage
+                        fs_temp = FileSystemStorage(location=settings.MEDIA_TEMP)
+                        fs_temp.save(uploaded_file.name, uploaded_file)
+                        input_file_path = os.path.join(settings.MEDIA_TEMP, uploaded_file.name)
+                        output_file_path = os.path.join(settings.MEDIA_TEMP, uploaded_file.name)
+                        encrypt_file(input_file_path, output_file_path, key)
+                        
+                        # Parallel upload to selected folders
                         list_of_dir_copy = []
-                        
-                        start_time = time.time()  # Start measuring time
-                        
-                        for i in range(distribute):
-                            ran = random.choice(folders)
-                            
-                            user_directory = os.path.join(settings.MEDIA_ROOT, ran, username)
-                            
-                            if not os.path.exists(user_directory):
+                        with ThreadPoolExecutor() as executor:
+                            for i in range(distribute):
+                                ran = random.choice(folders)
+                                user_directory = os.path.join(settings.MEDIA_ROOT, ran, username)
                                 os.makedirs(user_directory, exist_ok=True)
-                            
-                            list_of_dir_copy.append(user_directory)
-                            fs = FileSystemStorage(location=user_directory)
-                            fs.save(uploaded_file.name, uploaded_file)
-                            
-                            input_file_path = os.path.join(user_directory, uploaded_file.name)
-                            output_file_path = os.path.join(user_directory, uploaded_file.name)
-                            encrypt_file(input_file_path, output_file_path, key)
-                            folders.remove(ran)
-                            
+                                list_of_dir_copy.append(user_directory)
+                                executor.submit(upload_to_folder, user_directory, uploaded_file.name, output_file_path)
+                                folders.remove(ran)
+                        
+                        # Record file details and save to the database
                         file_details = get_file_details(uploaded_file, list_of_dir_copy)
                         save_file_details(user, file_details, key)
                         
-                        end_time = time.time()  # End measuring time
-                        upload_time = end_time - start_time  # Calculate total upload time
+                        # Remove temporary file
+                        os.remove(input_file_path)
                         
-                        print(f"Total upload time: {upload_time} seconds")
-                        
-                        messages.success(request, f'Upload File Successful.')
-                        return redirect('dashboard')
-                    
                     except Exception as e:
-                        return render(request, 'basedashboard.html', {'error': str(e)})
-                    
+                        return str(e)
+
+                start_time = time.time()  # Start measuring time
+                with ThreadPoolExecutor() as executor:
+                    for result in executor.map(upload_file, uploaded_files):
+                        if result is not None:
+                            return render(request, 'basedashboard.html', {'error': result})
+                
+                end_time = time.time()  # End measuring time
+                upload_time = end_time - start_time  # Calculate total upload time
+                print(f"Total upload time: {upload_time} seconds")
+                messages.success(request, f'Upload File Successful.')
                 return redirect('dashboard')
+            
             else:
                 return redirect('dashboard')
+    
     return redirect('dashboard')
+
+def upload_to_folder(user_directory, filename, file_path):
+    fs = FileSystemStorage(location=user_directory)
+    fs.save(filename, open(file_path, 'rb'))
 
 
 def get_file_details(uploaded_file, file_path):
