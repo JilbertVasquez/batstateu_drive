@@ -406,22 +406,59 @@ def convert_size(size_bytes):
     return f"{size_bytes:.2f} {suffixes[-1]}"
 
 
+# def download_file(request):
+#     if request.method == 'POST':
+#         file_id = request.POST.get('itemid')
+        
+#         file_details = FileDetails.objects.get(file_id=file_id)
+
+#         path_index = 0
+        
+#         while True:
+            
+#             if len(file_details.get_paths()) == path_index:
+#                 return redirect('dashboard') 
+            
+#             file_path = file_details.get_paths()[path_index]
+            
+#             if os.path.exists(file_path):
+#                 temp_path = os.path.join(settings.MEDIA_TEMP, file_details.filename + file_details.extension)
+                
+#                 encrypted_filepath = os.path.join(file_path, file_details.filename + file_details.extension)
+#                 if os.path.exists(encrypted_filepath):
+                    
+#                     decrypt_file(encrypted_filepath, temp_path, file_details.key)
+                    
+#                     if os.path.exists(temp_path):
+#                         # print(encrypted_filepath)
+#                         response = FileResponse(open(temp_path, 'rb'), content_type='application/force-download')
+#                         response['Content-Disposition'] = f'attachment; filename="{file_details.filename}{file_details.extension}"'
+                        
+#                         return response
+#                     else:
+#                         path_index += 1
+#                 else:
+#                     path_index += 1
+#             else:
+#                 path_index += 1
+#     else:
+#         messages.error(request, f'Method not allowed.')
+#         return redirect('dashboard')
+
+import random
+
 def download_file(request):
     if request.method == 'POST':
         file_id = request.POST.get('itemid')
         
         file_details = FileDetails.objects.get(file_id=file_id)
-
-        path_index = 0
         
-        while True:
-            
-            if len(file_details.get_paths()) == path_index:
-                return redirect('dashboard') 
-            
-            file_path = file_details.get_paths()[path_index]
-            
+        paths = file_details.get_paths()
+        random.shuffle(paths)  # Shuffle the list of paths
+        
+        for file_path in paths:
             if os.path.exists(file_path):
+                print(file_path)
                 temp_path = os.path.join(settings.MEDIA_TEMP, file_details.filename + file_details.extension)
                 
                 encrypted_filepath = os.path.join(file_path, file_details.filename + file_details.extension)
@@ -430,20 +467,18 @@ def download_file(request):
                     decrypt_file(encrypted_filepath, temp_path, file_details.key)
                     
                     if os.path.exists(temp_path):
-                        # print(encrypted_filepath)
                         response = FileResponse(open(temp_path, 'rb'), content_type='application/force-download')
                         response['Content-Disposition'] = f'attachment; filename="{file_details.filename}{file_details.extension}"'
-                        
                         return response
-                    else:
-                        path_index += 1
                 else:
-                    path_index += 1
-            else:
-                path_index += 1
+                    continue  # Try the next path if decryption fails or file doesn't exist
+        else:
+            # If none of the paths were successful
+            return redirect('dashboard')
     else:
         messages.error(request, f'Method not allowed.')
         return redirect('dashboard')
+
 
 
 def delete_item(request):
