@@ -1,7 +1,7 @@
 from django.shortcuts import render, HttpResponse
 from .models import Users, FileDetails
 from .models import SharingFiles
-from .models import Admin
+# from .models import Admin
 from django.contrib.auth import authenticate, login
 from django.contrib.auth.hashers import check_password
 from django.contrib.auth.hashers import make_password
@@ -138,29 +138,54 @@ def admindashboard(request):
         return redirect('adminlogin')
 
 
+# def adminlogin(request):
+#     if request.method == 'POST':
+
+#         username = request.POST.get("username")
+#         pass1 = request.POST.get("password")
+        
+#         try:
+#             user = Admin.objects.get(username=username)
+            
+#             if pass1 == user.password:
+#                 request.session['username'] = user.username
+#                 request.session['userid'] = user.userid
+#                 return redirect('admindashboard')
+#             else:
+#                 errors = "Username or Password is incorrect"
+#                 return render(request, 'adminlogin.html', {'errors': errors})
+            
+#         except Users.DoesNotExist:
+#             errors = "User does not exist!!"
+#             return render(request, 'adminlogin.html', {'errors': errors})
+        
+#     else:
+#         return render(request, 'adminlogin.html')
+
+
+from django.contrib.auth import authenticate, login
+
 def adminlogin(request):
     if request.method == 'POST':
-
         username = request.POST.get("username")
-        pass1 = request.POST.get("password")
+        password = request.POST.get("password")
         
-        try:
-            user = Admin.objects.get(username=username)
-            
-            if pass1 == user.password:
-                request.session['username'] = user.username
-                request.session['userid'] = user.userid
-                return redirect('admindashboard')
-            else:
-                errors = "Username or Password is incorrect"
-                return render(request, 'adminlogin.html', {'errors': errors})
-            
-        except Users.DoesNotExist:
-            errors = "User does not exist!!"
+        # Authenticate user
+        user = authenticate(request, username=username, password=password)
+        
+        if user is not None:
+            # User authentication successful, log in the user
+            request.session['username'] = user.username
+            request.session['userid'] = user.id
+            login(request, user)
+            return redirect('admindashboard')
+        else:
+            # Authentication failed
+            errors = "Username or Password is incorrect"
             return render(request, 'adminlogin.html', {'errors': errors})
-        
     else:
         return render(request, 'adminlogin.html')
+
 
 
 def users_admin(request):
