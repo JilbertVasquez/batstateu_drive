@@ -627,89 +627,6 @@ def is_folder_accessible_upload(folder_path):
 #     return redirect('dashboard')
 
 
-#NEW FILE UPLOAD IN TEMP FOLDER 2 ------------------------
-
-# def handle_file_upload(request):
-#     if request.method == 'POST':
-#         if 'file' in request.FILES:
-#             uploaded_files = request.FILES.getlist('file')
-            
-#             username = request.session.get('username')
-#             userid = request.session.get('userid', None)
-            
-#             if username:
-#                 user = Users.objects.get(userid=userid)
-
-#                 for uploaded_file in uploaded_files:
-#                     try:
-#                         contents = os.listdir(settings.MEDIA_ROOT)
-                        
-#                         newcontentlist = []
-                        
-#                         for folder in contents:
-#                             if is_folder_accessible_upload(folder):
-#                                 newcontentlist.append(folder)
-                                
-#                         folders = [item for item in newcontentlist if os.path.isdir(os.path.join(settings.MEDIA_ROOT, item))]
-                        
-#                         key = Fernet.generate_key()
-                        
-#                         size = len(folders)
-#                         if size <= 3:
-#                             distribute = size
-#                         elif size == 3:
-#                             distribute = 3
-#                         else:
-#                             distribute = int(size / 3) + 1
-                        
-#                         list_of_dir_copy = []
-                        
-#                         start_time = time.time()  # Start measuring time
-                        
-#                         fs = FileSystemStorage(location=settings.MEDIA_TEMP2)
-#                         fs.save(uploaded_file.name, uploaded_file)
-                        
-#                         input_file_path = os.path.join(settings.MEDIA_TEMP2, uploaded_file.name)
-#                         output_file_path = os.path.join(settings.MEDIA_TEMP2, uploaded_file.name)
-#                         print(output_file_path)
-#                         encrypt_file(input_file_path, output_file_path, key)
-                        
-#                         for i in range(distribute):
-#                             ran = random.choice(folders)
-                            
-#                             user_directory = os.path.join(settings.MEDIA_ROOT, ran, username)
-                            
-#                             if not os.path.exists(user_directory):
-#                                 os.makedirs(user_directory, exist_ok=True)
-                            
-#                             list_of_dir_copy.append(user_directory)
-#                             fs = FileSystemStorage(location=user_directory)
-#                             fs.save(uploaded_file.name, open(output_file_path, 'rb'))
-                            
-#                             folders.remove(ran)
-                            
-#                         file_details = get_file_details(uploaded_file, list_of_dir_copy)
-#                         save_file_details(user, file_details, key)
-                        
-#                         os.remove(input_file_path)
-                        
-#                         end_time = time.time()  # End measuring time
-#                         upload_time = end_time - start_time  # Calculate total upload time
-                        
-#                         print(f"Total upload time: {upload_time} seconds")
-                        
-#                         messages.success(request, f'Upload File Successful.')
-#                         return redirect('dashboard')
-                    
-#                     except Exception as e:
-#                         return render(request, 'basedashboard.html', {'error': str(e)})
-                    
-#                 return redirect('dashboard')
-#             else:
-#                 return redirect('dashboard')
-#     return redirect('dashboard')
-
-
 # NEW FILE UPLOAD WITH PARALLEL UPLOAD
 
 def handle_file_upload(request):
@@ -847,24 +764,24 @@ def addaccount(request):
         
         if fname == "" or lname == "" or uname == "" or email == "" or pass1 == "" or pass2 == "":
             errors = "Don't leave it blank."
-            return render(request, 'signup2.html', {'errors': errors})
+            return render(request, 'addaccount.html', {'errors': errors})
         
         # Check if the email matches the custom pattern
         if not re.match(r'^[a-zA-Z0-9._%+-]+@g\.batstate-u\.edu\.ph$', email):
             errors = "Please enter a valid email address in the format 'ict@g.batstate-u.edu.ph'."
-            return render(request, 'signup2.html', {'errors': errors})
+            return render(request, 'addaccount.html', {'errors': errors})
 
         if Users.objects.filter(username=uname).exists():
             errors = "Username already exists."
-            return render(request, 'signup2.html', {'errors': errors})
+            return render(request, 'addaccount.html', {'errors': errors})
 
         if Users.objects.filter(email=email).exists():
             errors = "Account already exists."
-            return render(request, 'signup2.html', {'errors': errors})
+            return render(request, 'addaccount.html', {'errors': errors})
         
         if pass1 != pass2:
             errors = "Your password is not the same !!"
-            return render(request, 'signup2.html', {'errors': errors})
+            return render(request, 'addaccount.html', {'errors': errors})
         
         else:
             hashed_password = make_password(pass1)
@@ -879,13 +796,13 @@ def addaccount(request):
                 user_directory = os.path.join(settings.MEDIA_ROOT, folder, uname)
                 os.makedirs(user_directory, exist_ok=True)
             message = "Account Successfully Added."
-            return render(request, 'signup2.html', {'errors': message})
+            return render(request, 'addaccount.html', {'errors': message})
         
     else:
-        return render(request, 'signup2.html')
+        return render(request, 'addaccount.html')
     
 
-def loginPage2(request):
+def loginPage(request):
     if request.method == 'POST':
 
         email = request.POST.get("email")
@@ -900,15 +817,15 @@ def loginPage2(request):
                 return redirect('dashboard')
             else:
                 errors = "Username or Password is incorrect"
-                return render(request, 'login2.html', {'errors': errors})
+                return render(request, 'login.html', {'errors': errors})
             
         except Users.DoesNotExist:
             errors = "User does not exist!!"
-            return render(request, 'login2.html', {'errors': errors})
+            return render(request, 'login.html', {'errors': errors})
         
     else:
-        return render(request, 'login2.html')
+        return render(request, 'login.html')
 
 def logout(request):
     request.session.flush()
-    return redirect('login2')
+    return redirect('login')

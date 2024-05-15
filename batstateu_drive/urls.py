@@ -21,7 +21,7 @@ from drive import views
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('addaccount/', views.addaccount, name='addaccount'),
-    path('', views.loginPage2, name='login2'),
+    path('', views.loginPage, name='login'),
     path('dashboard/', views.dashboard, name='dashboard'),
     path('handle_file_upload/', views.handle_file_upload, name='handle_file_upload'),
     path('download/', views.download_file, name='download_file'),
